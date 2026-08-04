@@ -10,13 +10,24 @@ interface PaginationProps {
   pageSize?: number;
   buildHref: (page: number) => string;
   className?: string;
+  onPrevHover?: () => void;
+  onNextHover?: () => void;
 }
 
 /**
  * Navigasi halaman reusable — server-safe (pakai <Link>).
  * Menampilkan "Menampilkan x–y dari z" + tombol Sebelumnya/Berikutnya.
  */
-export function Pagination({ page, totalPages, total, pageSize = 10, buildHref, className }: PaginationProps) {
+export function Pagination({
+  page,
+  totalPages,
+  total,
+  pageSize = 10,
+  buildHref,
+  className,
+  onPrevHover,
+  onNextHover,
+}: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const start = (page - 1) * pageSize + 1;
@@ -41,7 +52,7 @@ export function Pagination({ page, totalPages, total, pageSize = 10, buildHref, 
       </p>
       <div className="flex items-center gap-2">
         {page > 1 ? (
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" onMouseEnter={onPrevHover}>
             <Link href={buildHref(page - 1)} prefetch={true}>
               <ChevronLeft className="h-4 w-4" /> Sebelumnya
             </Link>
@@ -52,7 +63,7 @@ export function Pagination({ page, totalPages, total, pageSize = 10, buildHref, 
           </Button>
         )}
         {page < totalPages ? (
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" onMouseEnter={onNextHover}>
             <Link href={buildHref(page + 1)} prefetch={true}>
               Berikutnya <ChevronRight className="h-4 w-4" />
             </Link>

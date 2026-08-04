@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { PwaRegister } from "@/components/pwa/pwa-register";
 
@@ -118,9 +119,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body className="min-h-full" suppressHydrationWarning>
-        {children}
-        <PwaRegister />
-        <Toaster />
+        <QueryProvider>
+          {children}
+          <PwaRegister />
+          <Toaster />
+        </QueryProvider>
       </body>
     </html>
   );
