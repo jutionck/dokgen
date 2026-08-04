@@ -4,8 +4,7 @@ import * as React from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export interface DateInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface DateInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   value?: string;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }

@@ -54,8 +54,7 @@ export function TerminDialog({
   const [dueDate, setDueDate] = useState(addDaysISO(todayISO(), 30));
   const [notes, setNotes] = useState("");
 
-  const setPercent = (pct: number) =>
-    setNominal(String(Math.round((docTotal * pct) / 100)));
+  const setPercent = (pct: number) => setNominal(String(Math.round((docTotal * pct) / 100)));
 
   const handleSubmit = async () => {
     const value = Number(nominal);
@@ -130,11 +129,7 @@ export function TerminDialog({
             </div>
             <div className="space-y-2">
               <Label>Catatan (opsional)</Label>
-              <Input
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Contoh: Tahap 1 — DP"
-              />
+              <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Contoh: Tahap 1 — DP" />
             </div>
           </div>
         </div>

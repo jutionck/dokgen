@@ -90,9 +90,7 @@ export default async function DashboardPage() {
       {/* ===== Header: versi mobile (native) — hanya HP ===== */}
       <div className="flex items-center justify-between gap-3 sm:hidden">
         <div className="min-w-0">
-          <p className="text-xs font-medium text-muted-foreground">
-            {formatDate(new Date().toISOString(), true)}
-          </p>
+          <p className="text-xs font-medium text-muted-foreground">{formatDate(new Date().toISOString(), true)}</p>
           <h1 className="truncate text-xl font-bold tracking-tight">Halo, {company.name}</h1>
         </div>
         <Button asChild size="sm" className="shrink-0">
@@ -162,7 +160,12 @@ export default async function DashboardPage() {
                       className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50 sm:px-6"
                     >
                       {/* Ikon jenis — hanya HP */}
-                      <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:hidden", style.row)}>
+                      <span
+                        className={cn(
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:hidden",
+                          style.row
+                        )}
+                      >
                         <Icon className="h-5 w-5" />
                       </span>
                       <div className="min-w-0 flex-1">

@@ -24,7 +24,13 @@ export const pdfStyles = StyleSheet.create({
   companyLine: { fontSize: 8.5, color: "#475569", marginBottom: 1 },
   docTitle: { fontSize: 16, fontFamily: "Helvetica-Bold", textTransform: "uppercase" },
   docMeta: { fontSize: 9, color: "#475569", marginTop: 2 },
-  sectionTitle: { fontSize: 9.5, fontFamily: "Helvetica-Bold", marginBottom: 4, marginTop: 8, textTransform: "uppercase" },
+  sectionTitle: {
+    fontSize: 9.5,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 4,
+    marginTop: 8,
+    textTransform: "uppercase",
+  },
   text: { fontSize: 9.5, lineHeight: 1.55, marginBottom: 6 },
   bold: { fontFamily: "Helvetica-Bold" },
   gray: { color: "#64748b" },
@@ -39,7 +45,13 @@ export const pdfStyles = StyleSheet.create({
   },
   td: { fontSize: 8.5, padding: "3.5 6", borderBottomWidth: 1, borderBottomColor: "#cbd5e1" },
   tdRight: { fontSize: 8.5, padding: "3.5 6", textAlign: "right", borderBottomWidth: 1, borderBottomColor: "#cbd5e1" },
-  tdCenter: { fontSize: 8.5, padding: "3.5 6", textAlign: "center", borderBottomWidth: 1, borderBottomColor: "#cbd5e1" },
+  tdCenter: {
+    fontSize: 8.5,
+    padding: "3.5 6",
+    textAlign: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#cbd5e1",
+  },
   totalsRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 1.5 },
   totalsBox: { width: "55%", alignSelf: "flex-end", marginTop: 6 },
   totalLine: {
@@ -96,9 +108,7 @@ export function PdfClient({ data }: { data: TemplateData }) {
   if (!client) return null;
   return (
     <View style={pdfStyles.text}>
-      <Text style={[pdfStyles.gray, pdfStyles.bold, { fontSize: 8, textTransform: "uppercase" }]}>
-        Kepada Yth.
-      </Text>
+      <Text style={[pdfStyles.gray, pdfStyles.bold, { fontSize: 8, textTransform: "uppercase" }]}>Kepada Yth.</Text>
       <Text style={pdfStyles.bold}>{client.company || client.name}</Text>
       {client.name && client.company ? <Text>U.p. {client.name}</Text> : null}
       {client.address ? <Text>{client.address}</Text> : null}
@@ -175,9 +185,7 @@ export function PdfTotals({ data }: { data: TemplateData }) {
         <Text>Total Tagihan</Text>
         <Text>{fmt(totals.total, doc.currency)}</Text>
       </View>
-      <Text style={[pdfStyles.italic, { color: "#64748b", marginTop: 3 }]}>
-        Terbilang: {terbilang(totals.total)}
-      </Text>
+      <Text style={[pdfStyles.italic, { color: "#64748b", marginTop: 3 }]}>Terbilang: {terbilang(totals.total)}</Text>
     </View>
   );
 }
@@ -391,19 +399,9 @@ export function PdfNotesBlock({ notes, title = "Catatan" }: { notes?: string | n
   );
 }
 
-export function PdfDocumentShell({
-  data,
-  children,
-}: {
-  data: TemplateData;
-  children?: React.ReactNode;
-}) {
+export function PdfDocumentShell({ data, children }: { data: TemplateData; children?: React.ReactNode }) {
   return (
-    <Document
-      title={`${data.doc.title} - ${data.doc.number}`}
-      author={data.company.name}
-      creator="Dokgen"
-    >
+    <Document title={`${data.doc.title} - ${data.doc.number}`} author={data.company.name} creator="Dokgen">
       <Page size="A4" style={pdfStyles.page}>
         <PdfHeader data={data} />
         {children}

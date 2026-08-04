@@ -19,10 +19,16 @@ export async function POST(request: Request, props: RouteContext<"/api/documents
   }
 
   if (!process.env.RESEND_API_KEY) {
-    return Response.json({ error: "RESEND_API_KEY belum dikonfigurasi di Settings → Environment Variables" }, { status: 500 });
+    return Response.json(
+      { error: "RESEND_API_KEY belum dikonfigurasi di Settings → Environment Variables" },
+      { status: 500 }
+    );
   }
   if (!process.env.RESEND_FROM) {
-    return Response.json({ error: "RESEND_FROM (email pengirim) belum dikonfigurasi. Contoh: Dokgen <noreply@domain.com>" }, { status: 500 });
+    return Response.json(
+      { error: "RESEND_FROM (email pengirim) belum dikonfigurasi. Contoh: Dokgen <noreply@domain.com>" },
+      { status: 500 }
+    );
   }
 
   const body = await request.json().catch(() => ({}));
@@ -33,9 +39,7 @@ export async function POST(request: Request, props: RouteContext<"/api/documents
 
   const session = await auth.api.getSession({ headers: await headers() });
 
-  const subject =
-    String(body.subject || "").trim() ||
-    `${data.doc.title} ${data.doc.number} - ${data.company.name}`;
+  const subject = String(body.subject || "").trim() || `${data.doc.title} ${data.doc.number} - ${data.company.name}`;
   const message =
     String(body.message || "").trim() ||
     `Kepada Yth. Bapak/Ibu,\n\nTerlampir kami kirimkan ${data.doc.title.toLowerCase()} dengan nomor ${data.doc.number}.\n\nTerima kasih atas perhatian dan kerjasamanya.\n\nHormat kami,\n${data.company.name}`;
@@ -94,6 +98,9 @@ export async function POST(request: Request, props: RouteContext<"/api/documents
       status: "failed",
       error: e instanceof Error ? e.message : "unknown",
     });
-    return Response.json({ error: `Gagal mengirim email: ${e instanceof Error ? e.message : "unknown"}` }, { status: 500 });
+    return Response.json(
+      { error: `Gagal mengirim email: ${e instanceof Error ? e.message : "unknown"}` },
+      { status: 500 }
+    );
   }
 }

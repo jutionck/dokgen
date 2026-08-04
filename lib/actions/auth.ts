@@ -8,10 +8,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { companies, companyMembers, user } from "@/db/schema";
 
-export async function registerAction(
-  _prevState: { error: string } | null,
-  formData: FormData
-) {
+export async function registerAction(_prevState: { error: string } | null, formData: FormData) {
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
   const name = String(formData.get("name") || "").trim();
@@ -42,11 +39,7 @@ export async function registerAction(
   if (signUpRes?.user) {
     user_id = signUpRes.user.id;
   } else {
-    const existing = await db
-      .select({ id: user.id })
-      .from(user)
-      .where(eq(user.email, email.toLowerCase()))
-      .limit(1);
+    const existing = await db.select({ id: user.id }).from(user).where(eq(user.email, email.toLowerCase())).limit(1);
     if (existing.length === 0) {
       return { error: "Registrasi gagal. Silakan coba lagi." };
     }

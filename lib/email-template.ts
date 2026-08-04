@@ -24,8 +24,7 @@ const INTRO: Record<DocType, (i: EmailTemplateInput) => string> = {
     `Terlampir kami sampaikan draf Surat Perjanjian Kerja (SPK) nomor ${docNumber} untuk ditinjau bersama. Mohon konfirmasi apabila sudah sesuai untuk ditandatangani.`,
 };
 
-const CLOSING =
-  "Terima kasih atas kepercayaan dan kerjasamanya.\n\nHormat kami,\n";
+const CLOSING = "Terima kasih atas kepercayaan dan kerjasamanya.\n\nHormat kami,\n";
 
 export function buildEmailTemplate(i: EmailTemplateInput): { subject: string; body: string } {
   const label = DOC_TYPES[i.docType].label;

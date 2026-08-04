@@ -33,9 +33,7 @@ export default async function DocumentDetailPage(props: PageProps<"/documents/[i
   const [items, emailLogs, clientRows] = await Promise.all([
     listDocumentItems(id),
     listEmailLogs(id),
-    doc.client_id
-      ? db.select().from(clients).where(eq(clients.id, doc.client_id)).limit(1)
-      : Promise.resolve([]),
+    doc.client_id ? db.select().from(clients).where(eq(clients.id, doc.client_id)).limit(1) : Promise.resolve([]),
   ]);
 
   const client = clientRows[0] ?? null;
@@ -51,16 +49,18 @@ export default async function DocumentDetailPage(props: PageProps<"/documents/[i
 
   const terminIndex =
     doc.type === "invoice" && doc.client_id
-      ? (await db
-          .select({ id: documents.id })
-          .from(documents)
-          .where(
-            and(
-              eq(documents.company_id, company.id),
-              eq(documents.type, "invoice"),
-              eq(documents.client_id, doc.client_id)
+      ? (
+          await db
+            .select({ id: documents.id })
+            .from(documents)
+            .where(
+              and(
+                eq(documents.company_id, company.id),
+                eq(documents.type, "invoice"),
+                eq(documents.client_id, doc.client_id)
+              )
             )
-          )).length + 1
+        ).length + 1
       : 1;
 
   return (
@@ -68,7 +68,11 @@ export default async function DocumentDetailPage(props: PageProps<"/documents/[i
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <Link href="/documents">
-            <Button variant="outline" size="sm" className="h-9 w-9 p-0 sm:w-auto sm:px-3 sm:py-1.5 sm:gap-1.5 text-xs font-semibold">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 w-9 p-0 sm:w-auto sm:px-3 sm:py-1.5 sm:gap-1.5 text-xs font-semibold"
+            >
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Kembali</span>
             </Button>
@@ -127,7 +131,9 @@ export default async function DocumentDetailPage(props: PageProps<"/documents/[i
                     <Badge variant={log.status === "sent" ? "success" : "destructive"}>
                       {log.status === "sent" ? "Terkirim" : "Gagal"}
                     </Badge>
-                    {log.status === "failed" && <p className="mt-1 max-w-xs truncate text-xs text-red-500">{log.error}</p>}
+                    {log.status === "failed" && (
+                      <p className="mt-1 max-w-xs truncate text-xs text-red-500">{log.error}</p>
+                    )}
                   </TableCell>
                   <TableCell>{log.sent_at ? formatDateTime(log.sent_at) : "-"}</TableCell>
                 </TableRow>

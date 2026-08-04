@@ -50,7 +50,12 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
         payment_terms: "DP 50% dibayarkan di awal pekerjaan.\nPelunasan 50% setelah pekerjaan selesai.",
       },
       items: [
-        { description: "DP 50% — Pekerjaan Pembuatan Website Company Profile", qty: 1, unit: "ls", unit_price: 15000000 },
+        {
+          description: "DP 50% — Pekerjaan Pembuatan Website Company Profile",
+          qty: 1,
+          unit: "ls",
+          unit_price: 15000000,
+        },
       ],
     },
     {
@@ -64,7 +69,12 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
         payment_terms: "Pelunasan dibayarkan setelah pekerjaan selesai dan diterima (BAST).",
       },
       items: [
-        { description: "Pelunasan 50% — Pekerjaan Pembuatan Website Company Profile", qty: 1, unit: "ls", unit_price: 15000000 },
+        {
+          description: "Pelunasan 50% — Pekerjaan Pembuatan Website Company Profile",
+          qty: 1,
+          unit: "ls",
+          unit_price: 15000000,
+        },
       ],
     },
   ],
@@ -86,7 +96,12 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
         payment_terms: "DP 50% di awal pekerjaan, pelunasan 50% setelah pekerjaan selesai (BAST).",
       },
       items: [
-        { description: "Pembuatan Website Company Profile (5 halaman + CMS)", qty: 1, unit: "paket", unit_price: 30000000 },
+        {
+          description: "Pembuatan Website Company Profile (5 halaman + CMS)",
+          qty: 1,
+          unit: "paket",
+          unit_price: 30000000,
+        },
         { description: "Hosting & Domain (1 tahun)", qty: 1, unit: "paket", unit_price: 3000000 },
       ],
     },
@@ -134,8 +149,7 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
       name: "Quotation Barang",
       description: "Rincian harga penjualan barang",
       title: "Quotation",
-      terms:
-        "Quotation ini berlaku 14 hari sejak tanggal terbit.\nHarga belum termasuk PPN dan biaya pengiriman.",
+      terms: "Quotation ini berlaku 14 hari sejak tanggal terbit.\nHarga belum termasuk PPN dan biaya pengiriman.",
       extra: {
         validity_days: 14,
         payment_terms: "Pembayaran 50% di muka, sisanya sebelum barang dikirim.",
@@ -153,8 +167,7 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
       description: "Pernyataan pekerjaan selesai & diterima",
       title: "Berita Acara Serah Terima",
       extra: {
-        work_description:
-          "Pekerjaan pembuatan website company profile beserta seluruh fitur yang telah disepakati.",
+        work_description: "Pekerjaan pembuatan website company profile beserta seluruh fitur yang telah disepakati.",
         location: "Jakarta",
         result_text:
           "Bahwa seluruh pekerjaan tersebut telah diselesaikan dengan baik dan telah diterima oleh PIHAK KEDUA. Dengan diserahkannya pekerjaan tersebut, maka dianggap selesainya seluruh kewajiban PIHAK PERTAMA kepada PIHAK KEDUA.",
@@ -167,8 +180,7 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
       description: "Serah terima pekerjaan beserta nilai pekerjaan",
       title: "Berita Acara Serah Terima",
       extra: {
-        work_description:
-          "Pekerjaan pengadaan perangkat komputer beserta instalasi dan pengujian di lokasi klien.",
+        work_description: "Pekerjaan pengadaan perangkat komputer beserta instalasi dan pengujian di lokasi klien.",
         location: "Bandung",
         contract_ref: "001/SPK/08/2026",
         result_text:
@@ -192,13 +204,12 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
         scope_of_work:
           "1. Analisis kebutuhan dan desain sistem\n2. Pengembangan aplikasi web\n3. Pengujian dan quality assurance\n4. Pelatihan pengguna\n5. Dokumentasi teknis",
         duration_text: "90 hari kalender",
-        payment_terms: "DP 40% saat kontrak ditandatangani.\nTermin 2 30% setelah progres 50%.\nPelunasan 30% setelah BAST.",
+        payment_terms:
+          "DP 40% saat kontrak ditandatangani.\nTermin 2 30% setelah progres 50%.\nPelunasan 30% setelah BAST.",
         clauses:
           "1. Apabila terjadi keterlambatan penyelesaian pekerjaan di luar kesepakatan, PIHAK PERTAMA dikenakan denda sebesar 0,1% per hari keterlambatan dari nilai kontrak.\n2. Seluruh hasil pekerjaan menjadi hak milik PIHAK KEDUA setelah pelunasan.\n3. Kerahasiaan data perusahaan PIHAK KEDUA dijaga oleh PIHAK PERTAMA.",
       },
-      items: [
-        { description: "Pembuatan Sistem Informasi Perusahaan", qty: 1, unit: "paket", unit_price: 120000000 },
-      ],
+      items: [{ description: "Pembuatan Sistem Informasi Perusahaan", qty: 1, unit: "paket", unit_price: 120000000 }],
     },
     {
       id: "spk-sederhana",
@@ -213,9 +224,7 @@ export const DOC_TEMPLATES: Record<DocType, DocSeed[]> = {
         payment_terms: "Pembayaran 100% setelah pekerjaan selesai dan diterima.",
         clauses: "",
       },
-      items: [
-        { description: "Jasa Instalasi Jaringan & Server", qty: 1, unit: "paket", unit_price: 35000000 },
-      ],
+      items: [{ description: "Jasa Instalasi Jaringan & Server", qty: 1, unit: "paket", unit_price: 35000000 }],
     },
   ],
 };

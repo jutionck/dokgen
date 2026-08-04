@@ -10,9 +10,7 @@ export function BastTemplate({ data }: { data: TemplateData }) {
     <div className="space-y-5">
       <DocHeader data={data} />
 
-      <p className="text-center text-sm font-semibold italic">
-        Nomor: {doc.number}
-      </p>
+      <p className="text-center text-sm font-semibold italic">Nomor: {doc.number}</p>
 
       <p className="text-sm leading-relaxed">
         Pada hari ini, {fmtDateLong(doc.issue_date)}, bertempat di {extra.location || company.city || "-"}, yang
@@ -36,9 +34,7 @@ export function BastTemplate({ data }: { data: TemplateData }) {
         </div>
       </div>
 
-      <p className="text-sm leading-relaxed">
-        Dengan ini menyatakan bahwa pekerjaan dengan rincian sebagai berikut:
-      </p>
+      <p className="text-sm leading-relaxed">Dengan ini menyatakan bahwa pekerjaan dengan rincian sebagai berikut:</p>
 
       {extra.work_description && (
         <div className="text-sm">
@@ -79,8 +75,8 @@ export function BastTemplate({ data }: { data: TemplateData }) {
       </p>
 
       <p className="text-sm">
-        Demikian berita acara ini dibuat dalam rangkap dua (2) dengan kekuatan hukum yang sama
-        untuk dipergunakan sebagaimana mestinya.
+        Demikian berita acara ini dibuat dalam rangkap dua (2) dengan kekuatan hukum yang sama untuk dipergunakan
+        sebagaimana mestinya.
       </p>
 
       <div className="grid grid-cols-2 gap-8 text-sm">

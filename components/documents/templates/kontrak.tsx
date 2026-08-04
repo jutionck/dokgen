@@ -5,7 +5,9 @@ import { DocHeader, ItemsTable } from "./blocks";
 function Pasal({ no, title, children }: { no: string; title: string; children: React.ReactNode }) {
   return (
     <div className="text-sm">
-      <h3 className="font-bold uppercase">{no}. {title}</h3>
+      <h3 className="font-bold uppercase">
+        {no}. {title}
+      </h3>
       <div className="mt-1 leading-relaxed">{children}</div>
     </div>
   );
@@ -20,12 +22,9 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
     <div className="space-y-5">
       <DocHeader data={data} />
 
-      <p className="text-center text-sm font-semibold italic">
-        Nomor: {doc.number}
-      </p>
+      <p className="text-center text-sm font-semibold italic">Nomor: {doc.number}</p>
       <p className="text-center text-sm">
-        Pada hari ini, {fmtDate(doc.issue_date)}, bertempat di {city}, yang bertanda tangan di
-        bawah ini:
+        Pada hari ini, {fmtDate(doc.issue_date)}, bertempat di {city}, yang bertanda tangan di bawah ini:
       </p>
 
       <div className="space-y-2 text-sm">
@@ -73,8 +72,8 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
 
       <p className="text-sm leading-relaxed">
         PIHAK PERTAMA dan PIHAK KEDUA secara bersama-sama disebut <span className="font-bold">PARA PIHAK</span>,
-        terlebih dahulu menerangkan bahwa kedua belah pihak sepakat untuk mengikatkan diri dalam
-        Perjanjian Kerja dengan ketentuan sebagai berikut:
+        terlebih dahulu menerangkan bahwa kedua belah pihak sepakat untuk mengikatkan diri dalam Perjanjian Kerja dengan
+        ketentuan sebagai berikut:
       </p>
 
       <div className="space-y-4">
@@ -88,21 +87,16 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
               </>
             )}
           </p>
-          {extra.scope_of_work && (
-            <p className="mt-1 whitespace-pre-line">{extra.scope_of_work}</p>
-          )}
-          {extra.work_description && (
-            <p className="mt-1 whitespace-pre-line">{extra.work_description}</p>
-          )}
+          {extra.scope_of_work && <p className="mt-1 whitespace-pre-line">{extra.scope_of_work}</p>}
+          {extra.work_description && <p className="mt-1 whitespace-pre-line">{extra.work_description}</p>}
         </Pasal>
 
         <Pasal no="Pasal 2" title="Jangka Waktu Pelaksanaan">
           <p>
-            Pekerjaan dilaksanakan mulai{" "}
-            <span className="font-semibold">{fmtDate(extra.start_date)}</span> sampai dengan{" "}
-            <span className="font-semibold">{fmtDate(extra.end_date)}</span>
-            {extra.duration_text ? ` (${extra.duration_text})` : ""}, atau sesuai kesepakatan
-            bersama yang dituangkan dalam addendum.
+            Pekerjaan dilaksanakan mulai <span className="font-semibold">{fmtDate(extra.start_date)}</span> sampai
+            dengan <span className="font-semibold">{fmtDate(extra.end_date)}</span>
+            {extra.duration_text ? ` (${extra.duration_text})` : ""}, atau sesuai kesepakatan bersama yang dituangkan
+            dalam addendum.
           </p>
         </Pasal>
 
@@ -133,9 +127,7 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
               <span>{fmt(totals.total, doc.currency)}</span>
             </div>
           </div>
-          <p className="mt-1 text-[11px] italic text-slate-500">
-            Terbilang: {terbilang(totals.total)}
-          </p>
+          <p className="mt-1 text-[11px] italic text-slate-500">Terbilang: {terbilang(totals.total)}</p>
         </Pasal>
 
         <Pasal no="Pasal 4" title="Cara Pembayaran">
@@ -145,8 +137,7 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
           </p>
           {company.bank_name && (
             <p className="mt-1">
-              Rekening: {company.bank_name} a.n. {company.bank_account_holder} (No.{" "}
-              {company.bank_account_number})
+              Rekening: {company.bank_name} a.n. {company.bank_account_holder} (No. {company.bank_account_number})
             </p>
           )}
         </Pasal>
@@ -159,9 +150,8 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
 
         <Pasal no="Pasal 6" title="Penutup">
           <p className="whitespace-pre-line">
-            Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian atas kesepakatan
-            PARA PIHAK. Perjanjian ini dibuat dan ditandatangani dalam rangkap dua (2) dengan
-            kekuatan hukum yang sama.
+            Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian atas kesepakatan PARA PIHAK. Perjanjian
+            ini dibuat dan ditandatangani dalam rangkap dua (2) dengan kekuatan hukum yang sama.
           </p>
         </Pasal>
       </div>

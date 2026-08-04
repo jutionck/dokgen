@@ -16,8 +16,7 @@ export async function GET(_request: Request, props: RouteContext<"/api/documents
     const buffer = await buildDocx(data);
     return new Response(new Uint8Array(buffer), {
       headers: {
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "Content-Disposition": `attachment; filename="${docxFilename(data.doc)}"`,
       },
     });

@@ -12,13 +12,6 @@ import {
   Briefcase,
   Calculator,
   FileCheck,
-  Building2,
-  Calendar,
-  DollarSign,
-  Tag,
-  Clock,
-  FileSpreadsheet,
-  Info,
   ListOrdered,
   List,
   TableProperties,
@@ -79,8 +72,7 @@ const defaultTerms: Record<DocType, string> = {
     "1. Quotation berlaku selama 14 hari sejak tanggal penerbitan.\n2. Pengerjaan dimulai setelah persetujuan quotation ini dikonfirmasi.\n3. Pembayaran dilakukan sesuai dengan syarat dan ketentuan yang disepakati.",
   invoice:
     "1. Pembayaran dapat dilakukan via transfer ke rekening bank resmi yang tertera pada dokumen ini.\n2. Mohon konfirmasi atau kirimkan bukti transfer setelah pembayaran selesai dilakukan.",
-  bast:
-    "1. Pekerjaan telah diperiksa dan diserahkan dalam keadaan baik dan lengkap.\n2. Hak dan kewajiban para pihak atas hasil pekerjaan ini tunduk pada syarat dan ketentuan yang berlaku.",
+  bast: "1. Pekerjaan telah diperiksa dan diserahkan dalam keadaan baik dan lengkap.\n2. Hak dan kewajiban para pihak atas hasil pekerjaan ini tunduk pada syarat dan ketentuan yang berlaku.",
   kontrak:
     "1. Surat Perjanjian ini mengikat kedua belah pihak sejak tanggal ditandatangani.\n2. Segala perubahan atau penambahan lingkup pekerjaan akan disepakati bersama secara tertulis.",
 };
@@ -96,7 +88,9 @@ function ListHelperButtons({
 }) {
   const formatNumbered = () => {
     if (!value.trim()) {
-      onChange("1. Estimasi waktu pengerjaan 1-2 minggu terhitung setelah DP 1 diterima (50%)\n2. Garansi bug-fixing selama 90 hari setelah go-live tanpa biaya tambahan.\n3. Penawaran ini berlaku selama 14 hari sejak tanggal penerbitan.");
+      onChange(
+        "1. Estimasi waktu pengerjaan 1-2 minggu terhitung setelah DP 1 diterima (50%)\n2. Garansi bug-fixing selama 90 hari setelah go-live tanpa biaya tambahan.\n3. Penawaran ini berlaku selama 14 hari sejak tanggal penerbitan."
+      );
       return;
     }
     const lines = value.split("\n");
@@ -196,9 +190,7 @@ export function DocumentForm({
 
   const [type, setType] = useState<DocType>(isEdit ? doc!.type : initialType);
   const [clientId, setClientId] = useState(doc?.client_id || "");
-  const [title, setTitle] = useState(
-    isEdit ? doc!.title : seed?.title || DOC_TYPES[initialType].defaultTitle
-  );
+  const [title, setTitle] = useState(isEdit ? doc!.title : seed?.title || DOC_TYPES[initialType].defaultTitle);
   const [status, setStatus] = useState<DocStatus>(isEdit ? doc!.status : "draft");
   const [issueDate, setIssueDate] = useState(doc?.issue_date || todayISO());
   const [dueDate, setDueDate] = useState(doc?.due_date || "");
@@ -206,9 +198,7 @@ export function DocumentForm({
   const [taxRate, setTaxRate] = useState(String(doc?.tax_rate ?? 0));
   const [discount, setDiscount] = useState(String(doc?.discount ?? 0));
   const [notes, setNotes] = useState(doc?.notes || seed?.notes || "");
-  const [terms, setTerms] = useState(
-    doc?.terms ?? (isEdit ? "" : seed?.terms ?? defaultTerms[initialType])
-  );
+  const [terms, setTerms] = useState(doc?.terms ?? (isEdit ? "" : (seed?.terms ?? defaultTerms[initialType])));
   const [extra, setExtra] = useState<DocExtra>({
     ...emptyExtra(),
     ...(seed?.extra || {}),
@@ -504,7 +494,9 @@ export function DocumentForm({
               </div>
               <div>
                 <CardTitle className="text-base font-semibold text-slate-800">Detail Pekerjaan & Kontrak</CardTitle>
-                <CardDescription className="text-xs">Informasi spesifik mengenai lingkup & durasi pekerjaan</CardDescription>
+                <CardDescription className="text-xs">
+                  Informasi spesifik mengenai lingkup & durasi pekerjaan
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -587,7 +579,9 @@ export function DocumentForm({
                   />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold text-slate-700">Pernyataan Hasil Serah Terima (Opsional)</Label>
+                  <Label className="text-xs font-semibold text-slate-700">
+                    Pernyataan Hasil Serah Terima (Opsional)
+                  </Label>
                   <Textarea
                     value={extra.result_text || ""}
                     onChange={setExtraField("result_text")}
@@ -622,9 +616,7 @@ export function DocumentForm({
                 <Briefcase className="h-4 w-4" />
               </div>
               <div>
-                <CardTitle className="text-base font-semibold text-slate-800">
-                  Rincian Lingkup Pekerjaan
-                </CardTitle>
+                <CardTitle className="text-base font-semibold text-slate-800">Rincian Lingkup Pekerjaan</CardTitle>
                 <CardDescription className="text-xs">
                   Daftar rincian pekerjaan dan keterangan spesifikasi yang tampil pada tabel penawaran
                 </CardDescription>
@@ -730,7 +722,9 @@ export function DocumentForm({
             </div>
             <div>
               <CardTitle className="text-base font-semibold text-slate-800">Rincian Item & Biaya</CardTitle>
-              <CardDescription className="text-xs">Daftar item barang/jasa, kuantitas, dan harga satuan</CardDescription>
+              <CardDescription className="text-xs">
+                Daftar item barang/jasa, kuantitas, dan harga satuan
+              </CardDescription>
             </div>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={addRow} className="gap-1.5 text-xs font-semibold">
@@ -915,7 +909,9 @@ export function DocumentForm({
                   <Landmark className="h-4 w-4 text-blue-600" />
                   <div>
                     <Label className="text-xs font-bold text-slate-800">Pilihan Rekening Bank Transfer</Label>
-                    <p className="text-[11px] text-slate-500">Pilih rekening mana saja yang ingin ditampilkan di dokumen ini</p>
+                    <p className="text-[11px] text-slate-500">
+                      Pilih rekening mana saja yang ingin ditampilkan di dokumen ini
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -947,7 +943,7 @@ export function DocumentForm({
                             : companyBankAccounts.map((a) => `${a.bank_name}|${a.bank_account_number}`);
 
                         const exists = current.includes(key);
-                        let updated = exists
+                        const updated = exists
                           ? current.filter((k) => k !== key && k !== acc.bank_name && k !== acc.bank_account_number)
                           : [...current, key];
                         return { ...ex, selected_banks: updated };
@@ -973,7 +969,9 @@ export function DocumentForm({
                         <div className="min-w-0 flex-1 text-xs">
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-slate-900">{acc.bank_name}</span>
-                            <span className="font-mono text-[11px] font-semibold text-slate-700">{acc.bank_account_number}</span>
+                            <span className="font-mono text-[11px] font-semibold text-slate-700">
+                              {acc.bank_account_number}
+                            </span>
                           </div>
                           <p className="text-[11px] text-slate-500 truncate">a.n. {acc.bank_account_holder}</p>
                         </div>
@@ -986,7 +984,8 @@ export function DocumentForm({
                   Belum ada rekening bank yang tersimpan. Silakan atur rekening Anda di{" "}
                   <Link href="/settings" className="underline font-bold text-amber-900" target="_blank">
                     Pengaturan Perusahaan &gt; Bank
-                  </Link>.
+                  </Link>
+                  .
                 </p>
               )}
             </div>

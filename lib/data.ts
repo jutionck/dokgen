@@ -37,12 +37,12 @@ export interface PageResult<T> {
 
 export const PAGE_SIZE = 10;
 
-export async function listClientsPage(companyId: string, page: number): Promise<PageResult<typeof clients.$inferSelect>> {
+export async function listClientsPage(
+  companyId: string,
+  page: number
+): Promise<PageResult<typeof clients.$inferSelect>> {
   const safePage = Math.max(1, page);
-  const [totalRow] = await db
-    .select({ c: count() })
-    .from(clients)
-    .where(eq(clients.company_id, companyId));
+  const [totalRow] = await db.select({ c: count() }).from(clients).where(eq(clients.company_id, companyId));
   const total = totalRow?.c ?? 0;
   const rows = await db
     .select()

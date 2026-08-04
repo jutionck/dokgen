@@ -50,8 +50,8 @@ export function PenawaranPdf({ data }: { data: TemplateData }) {
       {extra.payment_terms ? <PdfTermsBlock terms={extra.payment_terms} /> : null}
       {doc.notes ? <PdfNotesBlock notes={doc.notes} /> : null}
       <Text style={pdfStyles.text}>
-        Demikian penawaran ini kami sampaikan. Apabila Bapak/Ibu berkenan, kami siap membahas lebih lanjut dan
-        menunggu balasan positif dari pihak {client?.company || client?.name || "Bapak/Ibu"}.
+        Demikian penawaran ini kami sampaikan. Apabila Bapak/Ibu berkenan, kami siap membahas lebih lanjut dan menunggu
+        balasan positif dari pihak {client?.company || client?.name || "Bapak/Ibu"}.
       </Text>
       <Text style={pdfStyles.text}>
         <Text style={pdfStyles.bold}>Terima kasih atas kepercayaan dan kerjasamanya.</Text>
@@ -160,8 +160,14 @@ export function BastPdf({ data }: { data: TemplateData }) {
         Pada hari ini, {fmtDateLong(doc.issue_date)}, bertempat di {extra.location || company.city || "-"}, yang
         bertanda tangan di bawah ini:
       </Text>
-      <PartyBox party="PIHAK PERTAMA (PENYEDIA JASA)" title={`${company.signer_name || company.name}\n${company.signer_position || "Direktur"}\n${company.name}\n${company.address}`} />
-      <PartyBox party="PIHAK KEDUA (PENERIMA)" title={`${client?.name || "-"}\n${client?.pic || "-"}\n${client?.company || "-"}\n${client?.address || "-"}`} />
+      <PartyBox
+        party="PIHAK PERTAMA (PENYEDIA JASA)"
+        title={`${company.signer_name || company.name}\n${company.signer_position || "Direktur"}\n${company.name}\n${company.address}`}
+      />
+      <PartyBox
+        party="PIHAK KEDUA (PENERIMA)"
+        title={`${client?.name || "-"}\n${client?.pic || "-"}\n${client?.company || "-"}\n${client?.address || "-"}`}
+      />
       <Text style={pdfStyles.text}>Dengan ini menyatakan bahwa pekerjaan dengan rincian sebagai berikut:</Text>
       {extra.work_description ? (
         <View>
@@ -263,9 +269,9 @@ export function KontrakPdf({ data }: { data: TemplateData }) {
         </Text>
       </View>
       <Text style={[pdfStyles.text, { marginTop: 8 }]}>
-        PIHAK PERTAMA dan PIHAK KEDUA secara bersama-sama disebut{" "}
-        <Text style={pdfStyles.bold}>PARA PIHAK</Text>, terlebih dahulu menerangkan bahwa kedua belah pihak sepakat
-        untuk mengikatkan diri dalam Perjanjian Kerja dengan ketentuan sebagai berikut:
+        PIHAK PERTAMA dan PIHAK KEDUA secara bersama-sama disebut <Text style={pdfStyles.bold}>PARA PIHAK</Text>,
+        terlebih dahulu menerangkan bahwa kedua belah pihak sepakat untuk mengikatkan diri dalam Perjanjian Kerja dengan
+        ketentuan sebagai berikut:
       </Text>
 
       <PasalPdf no="Pasal 1" title="Ruang Lingkup Pekerjaan">

@@ -56,7 +56,15 @@ function h3(text: string): Paragraph {
   return p([run(text.toUpperCase(), { bold: true, size: 19 })], { spacing: { before: 200, after: 100 } });
 }
 
-function cell(text: string, opts: { bold?: boolean; align?: (typeof AlignmentType)[keyof typeof AlignmentType]; fill?: string; color?: string } = {}): TableCell {
+function cell(
+  text: string,
+  opts: {
+    bold?: boolean;
+    align?: (typeof AlignmentType)[keyof typeof AlignmentType];
+    fill?: string;
+    color?: string;
+  } = {}
+): TableCell {
   return new TableCell({
     width: { size: 100 / 6, type: WidthType.PERCENTAGE },
     shading: opts.fill ? { type: ShadingType.CLEAR, fill: opts.fill } : undefined,
@@ -89,7 +97,10 @@ function itemsTable(data: TemplateData, showQty = true): Table {
     cell(String(i + 1), { align: AlignmentType.CENTER }),
     cell(item.description),
     ...(showQty
-      ? [cell(fmtNum(Number(item.qty)), { align: AlignmentType.CENTER }), cell(item.unit, { align: AlignmentType.CENTER })]
+      ? [
+          cell(fmtNum(Number(item.qty)), { align: AlignmentType.CENTER }),
+          cell(item.unit, { align: AlignmentType.CENTER }),
+        ]
       : []),
     cell(fmt(Number(item.unit_price), doc.currency), { align: AlignmentType.RIGHT }),
     cell(fmt(Number(item.qty) * Number(item.unit_price), doc.currency), { align: AlignmentType.RIGHT }),
@@ -110,7 +121,10 @@ function itemsTable(data: TemplateData, showQty = true): Table {
   return new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     borders,
-    rows: [new TableRow({ tableHeader: true, children: head }), ...body.map((cells) => new TableRow({ children: cells }))],
+    rows: [
+      new TableRow({ tableHeader: true, children: head }),
+      ...body.map((cells) => new TableRow({ children: cells })),
+    ],
   });
 }
 
@@ -120,10 +134,7 @@ function totalsBlock(data: TemplateData): Paragraph[] {
   const row = (label: string, value: string, opts: { bold?: boolean; fill?: string; color?: string } = {}) =>
     new Paragraph({
       alignment: AlignmentType.RIGHT,
-      children: [
-        run(`${label.padEnd(28, " ")}`, opts),
-        run(value, opts),
-      ],
+      children: [run(`${label.padEnd(28, " ")}`, opts), run(value, opts)],
       spacing: { after: 40 },
     });
   lines.push(row("Subtotal", fmt(totals.subtotal, doc.currency)));
@@ -147,16 +158,15 @@ function signatureBlock(data: TemplateData, left: string[], right?: string[]): P
 
   const col = (lines: string[], align: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.RIGHT) => [
     p([run(lines[0], { bold: true })], { alignment: align, spacing: { after: 20 } }),
-    ...(dateLine ? [p([run(dateLine, { size: 17, color: "64748b" })], { alignment: align, spacing: { after: 240 } })] : []),
+    ...(dateLine
+      ? [p([run(dateLine, { size: 17, color: "64748b" })], { alignment: align, spacing: { after: 240 } })]
+      : []),
     p([run(lines[1] || "", { bold: true, underline: {} })], { alignment: align, spacing: { after: 20 } }),
     p([run(lines[2] || "", { size: 17, color: "475569" })], { alignment: align, spacing: { after: 0 } }),
   ];
 
   if (!right) {
-    return [
-      new Paragraph({ spacing: { before: 240 }, children: [] }),
-      ...col(left, AlignmentType.RIGHT),
-    ];
+    return [new Paragraph({ spacing: { before: 240 }, children: [] }), ...col(left, AlignmentType.RIGHT)];
   }
 
   return [
@@ -169,11 +179,12 @@ function signatureBlock(data: TemplateData, left: string[], right?: string[]): P
 
 function formattedListDocx(title: string, text?: string | null): Paragraph[] {
   if (!text) return [];
-  const res: Paragraph[] = [
-    h3(title),
-  ];
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-  lines.forEach(line => {
+  const res: Paragraph[] = [h3(title)];
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  lines.forEach((line) => {
     res.push(p([run(line)], { spacing: { after: 40 } }));
   });
   return res;
@@ -190,11 +201,30 @@ function header(data: TemplateData): Paragraph[] {
     ...(company.tagline ? [p([run(company.tagline, { italics: true, size: 17, color: "475569" })])] : []),
     ...(company.address ? [p([run(company.address, { size: 17, color: "475569" })], { spacing: { after: 20 } })] : []),
     ...([company.phone, company.email, company.website].filter(Boolean).length
-      ? [p([run([company.phone, company.email, company.website].filter(Boolean).join("  ·  "), { size: 17, color: "475569" })], { spacing: { after: 20 } })]
+      ? [
+          p(
+            [
+              run([company.phone, company.email, company.website].filter(Boolean).join("  ·  "), {
+                size: 17,
+                color: "475569",
+              }),
+            ],
+            { spacing: { after: 20 } }
+          ),
+        ]
       : []),
-    ...(company.npwp ? [p([run(`NPWP: ${company.npwp}`, { size: 17, color: "64748b" })], { spacing: { after: 20 } })] : []),
+    ...(company.npwp
+      ? [p([run(`NPWP: ${company.npwp}`, { size: 17, color: "64748b" })], { spacing: { after: 20 } })]
+      : []),
     title(doc.title),
-    ...(doc.number ? [p([run(`No. ${doc.number}`, { bold: true, size: 20 })], { alignment: AlignmentType.RIGHT, spacing: { after: 120 } })] : []),
+    ...(doc.number
+      ? [
+          p([run(`No. ${doc.number}`, { bold: true, size: 20 })], {
+            alignment: AlignmentType.RIGHT,
+            spacing: { after: 120 },
+          }),
+        ]
+      : []),
     new Paragraph({
       border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: "1f2937" } },
       spacing: { before: 120, after: 240 },
@@ -270,7 +300,10 @@ function buildScopeTableDocx(scopeOfWork?: string | null): (Paragraph | Table)[]
     new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
       borders,
-      rows: [new TableRow({ tableHeader: true, children: head }), ...body.map((cells) => new TableRow({ children: cells }))],
+      rows: [
+        new TableRow({ tableHeader: true, children: head }),
+        ...body.map((cells) => new TableRow({ children: cells })),
+      ],
     }),
   ];
 }
@@ -281,12 +314,15 @@ function buildBankBlockDocx(company: TemplateData["company"], selectedBanks?: st
   const lines: Paragraph[] = [h3("Pembayaran Dapat Ditransfer Ke")];
   accounts.forEach((acc) => {
     lines.push(
-      p([
-        run(`${acc.bank_name}`, { bold: true }),
-        run(` - No. Rekening: `),
-        run(acc.bank_account_number, { bold: true, color: "0f172a" }),
-        run(` (a.n. ${acc.bank_account_holder})`),
-      ], { spacing: { after: 40 } })
+      p(
+        [
+          run(`${acc.bank_name}`, { bold: true }),
+          run(` - No. Rekening: `),
+          run(acc.bank_account_number, { bold: true, color: "0f172a" }),
+          run(` (a.n. ${acc.bank_account_holder})`),
+        ],
+        { spacing: { after: 40 } }
+      )
     );
   });
   return lines;
@@ -310,18 +346,37 @@ export function buildPenawaran(data: TemplateData) {
           p([run(`Hal : ${extra.project_title || doc.title}`, { bold: true })], { spacing: { after: 200 } }),
           ...clientBlock(data),
           p([run("Dengan hormat,")]),
-          p([run(`Bersama ini kami sampaikan penawaran jasa `), ...ml(extra.project_title || "sesuai kebutuhan Anda"), run(` kepada ${client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:`)]),
+          p([
+            run(`Bersama ini kami sampaikan penawaran jasa `),
+            ...ml(extra.project_title || "sesuai kebutuhan Anda"),
+            run(
+              ` kepada ${client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:`
+            ),
+          ]),
           ...(extra.intro ? [p([...ml(extra.intro)])] : []),
           ...(extra.scope_of_work ? buildScopeTableDocx(extra.scope_of_work) : []),
           h3("Rincian Biaya Penawaran"),
           itemsTable(data),
           ...totalsBlock(data),
-          p([run(`Masa berlaku penawaran: ${validityDays} hari (s.d. ${fmtDate(doc.issue_date)} + ${validityDays} hari)`, { color: "64748b" })]),
+          p([
+            run(
+              `Masa berlaku penawaran: ${validityDays} hari (s.d. ${fmtDate(doc.issue_date)} + ${validityDays} hari)`,
+              { color: "64748b" }
+            ),
+          ]),
           ...(extra.payment_terms ? formattedListDocx("Ketentuan Pembayaran", extra.payment_terms) : []),
           ...(doc.notes ? formattedListDocx("Catatan", doc.notes) : []),
-          p([run("Demikian penawaran ini kami sampaikan. Apabila Bapak/Ibu berkenan, kami siap membahas lebih lanjut dan menunggu balasan positif dari pihak Anda.")]),
+          p([
+            run(
+              "Demikian penawaran ini kami sampaikan. Apabila Bapak/Ibu berkenan, kami siap membahas lebih lanjut dan menunggu balasan positif dari pihak Anda."
+            ),
+          ]),
           p([run("Terima kasih atas kepercayaan dan kerjasamanya.", { bold: true })]),
-          ...signatureBlock(data, [`Hormat kami,\n${company.name}`.split("\n")[0], company.signer_name || company.name, company.signer_position || ""]),
+          ...signatureBlock(data, [
+            `Hormat kami,\n${company.name}`.split("\n")[0],
+            company.signer_name || company.name,
+            company.signer_position || "",
+          ]),
         ],
       },
     ],
@@ -346,11 +401,20 @@ export function buildQuotation(data: TemplateData) {
           ...(extra.scope_of_work ? buildScopeTableDocx(extra.scope_of_work) : []),
           itemsTable(data),
           ...totalsBlock(data),
-          p([run(`Masa berlaku penawaran: ${validityDays} hari, berakhir ${fmtDate(doc.issue_date)} + ${validityDays} hari.`, { color: "64748b" })]),
+          p([
+            run(
+              `Masa berlaku penawaran: ${validityDays} hari, berakhir ${fmtDate(doc.issue_date)} + ${validityDays} hari.`,
+              { color: "64748b" }
+            ),
+          ]),
           ...(extra.payment_terms ? formattedListDocx("Ketentuan Pembayaran", extra.payment_terms) : []),
           ...(doc.notes ? formattedListDocx("Catatan", doc.notes) : []),
           ...buildBankBlockDocx(company, extra.selected_banks),
-          ...signatureBlock(data, [`Hormat kami,\n${company.name}`.split("\n")[0], company.signer_name || company.name, company.signer_position || ""]),
+          ...signatureBlock(data, [
+            `Hormat kami,\n${company.name}`.split("\n")[0],
+            company.signer_name || company.name,
+            company.signer_position || "",
+          ]),
         ],
       },
     ],
@@ -370,13 +434,22 @@ export function buildInvoice(data: TemplateData) {
           ...header(data),
           ...clientBlock(data),
           ...(extra.po_number ? [p([run(`No. PO / Referensi: ${extra.po_number}`)])] : []),
-          p([run(doc.status === "paid" ? "LUNAS" : doc.status === "cancelled" ? "DIBATALKAN" : "BELUM DIBAYAR", { bold: true, color: doc.status === "paid" ? "047857" : "b45309" })]),
+          p([
+            run(doc.status === "paid" ? "LUNAS" : doc.status === "cancelled" ? "DIBATALKAN" : "BELUM DIBAYAR", {
+              bold: true,
+              color: doc.status === "paid" ? "047857" : "b45309",
+            }),
+          ]),
           itemsTable(data),
           ...totalsBlock(data),
           ...buildBankBlockDocx(company, extra.selected_banks),
           ...(extra.payment_terms ? formattedListDocx("Ketentuan Pembayaran", extra.payment_terms) : []),
           ...(doc.notes ? formattedListDocx("Catatan", doc.notes) : []),
-          ...signatureBlock(data, [`Hormat kami,\n${company.name}`.split("\n")[0], company.signer_name || company.name, company.signer_position || ""]),
+          ...signatureBlock(data, [
+            `Hormat kami,\n${company.name}`.split("\n")[0],
+            company.signer_name || company.name,
+            company.signer_position || "",
+          ]),
         ],
       },
     ],
@@ -394,8 +467,15 @@ export function buildBast(data: TemplateData) {
       {
         children: [
           ...header(data),
-          p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], { alignment: AlignmentType.CENTER, spacing: { after: 200 } }),
-          p([run(`Pada hari ini, ${fmtDateLong(doc.issue_date)}, bertempat di ${extra.location || company.city || "-"}, yang bertanda tangan di bawah ini:`)]),
+          p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], {
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 200 },
+          }),
+          p([
+            run(
+              `Pada hari ini, ${fmtDateLong(doc.issue_date)}, bertempat di ${extra.location || company.city || "-"}, yang bertanda tangan di bawah ini:`
+            ),
+          ]),
           ...partyBox("PIHAK PERTAMA (PENYEDIA JASA)", [
             `Nama : ${company.signer_name || company.name}`,
             `Jabatan : ${company.signer_position || "Direktur"}`,
@@ -416,9 +496,23 @@ export function buildBast(data: TemplateData) {
             ? [p([run(`Tanggal Mulai : ${fmtDate(extra.start_date)}    Tanggal Selesai : ${fmtDate(extra.end_date)}`)])]
             : []),
           ...(extra.contract_ref ? [p([run(`Referensi Kontrak / SPK : ${extra.contract_ref}`)])] : []),
-          p([...ml(extra.result_text || "Bahwa seluruh pekerjaan tersebut telah diselesaikan dengan baik dan telah diterima oleh PIHAK KEDUA. Dengan diserahkannya pekerjaan tersebut, maka dianggap selesainya seluruh kewajiban PIHAK PERTAMA kepada PIHAK KEDUA.")]),
-          p([run("Demikian berita acara ini dibuat dalam rangkap dua (2) dengan kekuatan hukum yang sama untuk dipergunakan sebagaimana mestinya.", { bold: true })]),
-          ...signatureBlock(data, ["PIHAK PERTAMA,", company.signer_name || company.name, company.signer_position || ""], ["PIHAK KEDUA,", client?.name || "..........................", client?.pic || ".........................."]),
+          p([
+            ...ml(
+              extra.result_text ||
+                "Bahwa seluruh pekerjaan tersebut telah diselesaikan dengan baik dan telah diterima oleh PIHAK KEDUA. Dengan diserahkannya pekerjaan tersebut, maka dianggap selesainya seluruh kewajiban PIHAK PERTAMA kepada PIHAK KEDUA."
+            ),
+          ]),
+          p([
+            run(
+              "Demikian berita acara ini dibuat dalam rangkap dua (2) dengan kekuatan hukum yang sama untuk dipergunakan sebagaimana mestinya.",
+              { bold: true }
+            ),
+          ]),
+          ...signatureBlock(
+            data,
+            ["PIHAK PERTAMA,", company.signer_name || company.name, company.signer_position || ""],
+            ["PIHAK KEDUA,", client?.name || "..........................", client?.pic || ".........................."]
+          ),
         ],
       },
     ],
@@ -437,8 +531,13 @@ export function buildKontrak(data: TemplateData) {
       {
         children: [
           ...header(data),
-          p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], { alignment: AlignmentType.CENTER, spacing: { after: 120 } }),
-          p([run(`Pada hari ini, ${fmtDate(doc.issue_date)}, bertempat di ${city}, yang bertanda tangan di bawah ini:`)]),
+          p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], {
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 120 },
+          }),
+          p([
+            run(`Pada hari ini, ${fmtDate(doc.issue_date)}, bertempat di ${city}, yang bertanda tangan di bawah ini:`),
+          ]),
           ...partyBox("PIHAK PERTAMA", [
             `Nama : ${company.signer_name || company.name}`,
             `Jabatan : ${company.signer_position || "Direktur"}`,
@@ -455,7 +554,11 @@ export function buildKontrak(data: TemplateData) {
             `Telepon/Email : ${client?.phone || "-"} / ${client?.email || "-"}`,
             "Selanjutnya disebut PIHAK KEDUA.",
           ]),
-          p([run("PIHAK PERTAMA dan PIHAK KEDUA secara bersama-sama disebut PARA PIHAK, terlebih dahulu menerangkan bahwa kedua belah pihak sepakat untuk mengikatkan diri dalam Perjanjian Kerja dengan ketentuan sebagai berikut:")]),
+          p([
+            run(
+              "PIHAK PERTAMA dan PIHAK KEDUA secara bersama-sama disebut PARA PIHAK, terlebih dahulu menerangkan bahwa kedua belah pihak sepakat untuk mengikatkan diri dalam Perjanjian Kerja dengan ketentuan sebagai berikut:"
+            ),
+          ]),
           ...pasal("Pasal 1", "Ruang Lingkup Pekerjaan", [
             ...(extra.project_title
               ? [
@@ -470,7 +573,11 @@ export function buildKontrak(data: TemplateData) {
             ...(extra.work_description ? [p([...ml(extra.work_description)])] : []),
           ]),
           ...pasal("Pasal 2", "Jangka Waktu Pelaksanaan", [
-            p([run(`Pekerjaan dilaksanakan mulai ${fmtDate(extra.start_date)} sampai dengan ${fmtDate(extra.end_date)}${extra.duration_text ? ` (${extra.duration_text})` : ""}, atau sesuai kesepakatan bersama yang dituangkan dalam addendum.`)]),
+            p([
+              run(
+                `Pekerjaan dilaksanakan mulai ${fmtDate(extra.start_date)} sampai dengan ${fmtDate(extra.end_date)}${extra.duration_text ? ` (${extra.duration_text})` : ""}, atau sesuai kesepakatan bersama yang dituangkan dalam addendum.`
+              ),
+            ]),
           ]),
           ...pasal("Pasal 3", "Nilai Pekerjaan", [
             p([run("Rincian nilai pekerjaan adalah sebagai berikut:")]),
@@ -487,16 +594,35 @@ export function buildKontrak(data: TemplateData) {
             }),
           ]),
           ...pasal("Pasal 4", "Cara Pembayaran", [
-            p([...ml(extra.payment_terms || "Pembayaran dilakukan secara bertahap sesuai kesepakatan PARA PIHAK, melalui transfer bank ke rekening PIHAK PERTAMA.")]),
-            ...(company.bank_name ? [p([run(`Rekening: ${company.bank_name} a.n. ${company.bank_account_holder} (No. ${company.bank_account_number})`)])] : []),
+            p([
+              ...ml(
+                extra.payment_terms ||
+                  "Pembayaran dilakukan secara bertahap sesuai kesepakatan PARA PIHAK, melalui transfer bank ke rekening PIHAK PERTAMA."
+              ),
+            ]),
+            ...(company.bank_name
+              ? [
+                  p([
+                    run(
+                      `Rekening: ${company.bank_name} a.n. ${company.bank_account_holder} (No. ${company.bank_account_number})`
+                    ),
+                  ]),
+                ]
+              : []),
           ]),
-          ...(extra.clauses
-            ? pasal("Pasal 5", "Ketentuan Lain", [p([...ml(extra.clauses)])])
-            : []),
+          ...(extra.clauses ? pasal("Pasal 5", "Ketentuan Lain", [p([...ml(extra.clauses)])]) : []),
           ...pasal(extra.clauses ? "Pasal 6" : "Pasal 5", "Penutup", [
-            p([run("Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian atas kesepakatan PARA PIHAK. Perjanjian ini dibuat dan ditandatangani dalam rangkap dua (2) dengan kekuatan hukum yang sama.")]),
+            p([
+              run(
+                "Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian atas kesepakatan PARA PIHAK. Perjanjian ini dibuat dan ditandatangani dalam rangkap dua (2) dengan kekuatan hukum yang sama."
+              ),
+            ]),
           ]),
-          ...signatureBlock(data, ["PIHAK PERTAMA,", company.signer_name || company.name, company.signer_position || ""], ["PIHAK KEDUA,", client?.name || "..........................", client?.pic || ".........................."]),
+          ...signatureBlock(
+            data,
+            ["PIHAK PERTAMA,", company.signer_name || company.name, company.signer_position || ""],
+            ["PIHAK KEDUA,", client?.name || "..........................", client?.pic || ".........................."]
+          ),
         ],
       },
     ],

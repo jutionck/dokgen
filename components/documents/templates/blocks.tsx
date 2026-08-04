@@ -5,11 +5,7 @@ function logo(company: TemplateData["company"]) {
   if (!company.logo_url) return null;
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={company.logo_url}
-      alt="logo"
-      className="mb-2 h-16 w-auto max-w-[200px] object-contain"
-    />
+    <img src={company.logo_url} alt="logo" className="mb-2 h-16 w-auto max-w-[200px] object-contain" />
   );
 }
 
@@ -26,21 +22,13 @@ export function DocHeader({ data }: { data: TemplateData }) {
         {company.tagline && <p className="text-xs italic text-slate-500">{company.tagline}</p>}
         <div className="mt-1.5 space-y-0.5 text-xs text-slate-600">
           {company.address && <p>{company.address}</p>}
-          <p>
-            {[company.phone, company.email, company.website].filter(Boolean).join("  ·  ")}
-          </p>
+          <p>{[company.phone, company.email, company.website].filter(Boolean).join("  ·  ")}</p>
           {company.npwp && <p className="text-slate-500">NPWP: {company.npwp}</p>}
         </div>
       </div>
       <div className="shrink-0 text-left md:text-right">
-        <p className="font-serif text-2xl font-bold uppercase tracking-tight text-slate-800">
-          {doc.title}
-        </p>
-        {doc.number && (
-          <p className="mt-1 font-mono text-sm font-semibold text-slate-700">
-            No. {doc.number}
-          </p>
-        )}
+        <p className="font-serif text-2xl font-bold uppercase tracking-tight text-slate-800">{doc.title}</p>
+        {doc.number && <p className="mt-1 font-mono text-sm font-semibold text-slate-700">No. {doc.number}</p>}
       </div>
     </header>
   );
@@ -78,8 +66,12 @@ export function ItemsTable({ data, showQty = true }: { data: TemplateData; showQ
                 <th className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-center font-medium w-14">Satuan</th>
               </>
             )}
-            <th className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-right font-medium whitespace-nowrap">Harga Satuan</th>
-            <th className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-right font-medium whitespace-nowrap">Jumlah</th>
+            <th className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-right font-medium whitespace-nowrap">
+              Harga Satuan
+            </th>
+            <th className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-right font-medium whitespace-nowrap">
+              Jumlah
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -96,11 +88,15 @@ export function ItemsTable({ data, showQty = true }: { data: TemplateData; showQ
               <td className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 break-words">{item.description}</td>
               {showQty && (
                 <>
-                  <td className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-center">{fmtNum(Number(item.qty))}</td>
+                  <td className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-center">
+                    {fmtNum(Number(item.qty))}
+                  </td>
                   <td className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-center">{item.unit}</td>
                 </>
               )}
-              <td className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-right whitespace-nowrap">{fmt(Number(item.unit_price), doc.currency)}</td>
+              <td className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-right whitespace-nowrap">
+                {fmt(Number(item.unit_price), doc.currency)}
+              </td>
               <td className="border border-slate-300 px-1.5 sm:px-2.5 py-1.5 text-right whitespace-nowrap font-medium">
                 {fmt(Number(item.qty) * Number(item.unit_price), doc.currency)}
               </td>
@@ -137,9 +133,7 @@ export function TotalsBlock({ data }: { data: TemplateData }) {
         <span>Total</span>
         <span>{fmt(totals.total, doc.currency)}</span>
       </div>
-      <p className="text-[11px] italic text-slate-500">
-        Terbilang: {terbilang(totals.total)}
-      </p>
+      <p className="text-[11px] italic text-slate-500">Terbilang: {terbilang(totals.total)}</p>
     </div>
   );
 }
@@ -225,9 +219,7 @@ export function ScopeTable({ scopeOfWork }: { scopeOfWork?: string | null }) {
 
   return (
     <div className="my-4 space-y-2">
-      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-        Lingkup Pekerjaan
-      </h3>
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">Lingkup Pekerjaan</h3>
       <div className="w-full overflow-x-auto">
         <table className="w-full min-w-[480px] sm:min-w-0 border-collapse text-xs sm:text-sm">
           <thead>
@@ -240,8 +232,12 @@ export function ScopeTable({ scopeOfWork }: { scopeOfWork?: string | null }) {
           <tbody>
             {items.map((item) => (
               <tr key={item.no} className="hover:bg-slate-50/50">
-                <td className="border border-slate-300 px-2 py-1.5 text-center font-medium text-slate-600">{item.no}</td>
-                <td className="border border-slate-300 px-2 py-1.5 text-slate-800 font-medium break-words">{item.description}</td>
+                <td className="border border-slate-300 px-2 py-1.5 text-center font-medium text-slate-600">
+                  {item.no}
+                </td>
+                <td className="border border-slate-300 px-2 py-1.5 text-slate-800 font-medium break-words">
+                  {item.description}
+                </td>
                 <td className="border border-slate-300 px-2 py-1.5 text-slate-600 italic">
                   <FormattedListText text={item.note} />
                 </td>
@@ -310,9 +306,7 @@ export function BankBlock({
 
   return (
     <div className="rounded-md border border-slate-200 bg-slate-50/80 p-3.5 text-xs text-slate-700">
-      <h3 className="mb-2 font-bold uppercase tracking-wider text-slate-600">
-        Pembayaran dapat ditransfer ke
-      </h3>
+      <h3 className="mb-2 font-bold uppercase tracking-wider text-slate-600">Pembayaran dapat ditransfer ke</h3>
       <div className={`grid gap-3 ${accounts.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
         {accounts.map((acc, idx) => (
           <div key={idx} className="rounded border border-slate-200/80 bg-white p-2.5 space-y-1 shadow-2xs">
@@ -364,7 +358,7 @@ export function SignatureBlock({
   signerPosition,
   city,
   date,
-  leftLabel = companyName => `Hormat kami,\n${companyName}`,
+  leftLabel = (companyName) => `Hormat kami,\n${companyName}`,
   rightLabel,
   rightSignerName,
   rightSignerPosition,
@@ -390,7 +384,9 @@ export function SignatureBlock({
           <p className="whitespace-pre-line font-semibold text-slate-800">{leftLabel(company.name)}</p>
           {dateLine && <p className="mt-1 text-xs text-slate-500">{dateLine}</p>}
           <div className="mt-16 flex flex-col items-center">
-            <p className="font-semibold underline text-slate-900">{signerName || company.signer_name || company.name}</p>
+            <p className="font-semibold underline text-slate-900">
+              {signerName || company.signer_name || company.name}
+            </p>
             <p className="text-xs text-slate-600">{signerPosition || company.signer_position}</p>
             {company.signer_nip && <p className="text-xs text-slate-500">NIP. {company.signer_nip}</p>}
           </div>

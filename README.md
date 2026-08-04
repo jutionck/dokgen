@@ -11,16 +11,16 @@ Aplikasi web untuk membuat dokumen bisnis **dalam satu pintu**: **Surat Penawara
 
 ## Tech Stack (semua gratis)
 
-| Komponen | Pilihan | Alasan |
-| --- | --- | --- |
-| Framework | Next.js 16 (App Router) | Serverless di Vercel |
-| Database | [Neon Postgres](https://neon.tech) (free tier) | Postgres serverless, 500MB gratis |
-| ORM | Drizzle ORM | Type-safe, migrasi otomatis |
-| Auth | [Better Auth](https://better-auth.com) (open source) | Email/password, tanpa biaya |
-| Email | [Resend](https://resend.com) (free tier) | 3.000 email/bulan gratis |
-| Storage (logo) | [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | Gratis 1GB |
-| PDF | @react-pdf/renderer | Render server-side |
-| DOCX | docx | Export Word asli |
+| Komponen       | Pilihan                                                    | Alasan                            |
+| -------------- | ---------------------------------------------------------- | --------------------------------- |
+| Framework      | Next.js 16 (App Router)                                    | Serverless di Vercel              |
+| Database       | [Neon Postgres](https://neon.tech) (free tier)             | Postgres serverless, 500MB gratis |
+| ORM            | Drizzle ORM                                                | Type-safe, migrasi otomatis       |
+| Auth           | [Better Auth](https://better-auth.com) (open source)       | Email/password, tanpa biaya       |
+| Email          | [Resend](https://resend.com) (free tier)                   | 3.000 email/bulan gratis          |
+| Storage (logo) | [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | Gratis 1GB                        |
+| PDF            | @react-pdf/renderer                                        | Render server-side                |
+| DOCX           | docx                                                       | Export Word asli                  |
 
 ## Setup Lokal
 
@@ -60,7 +60,7 @@ npm run dev           # http://localhost:3000
 ## Deploy ke Vercel
 
 1. Push repo ke GitHub → import di [vercel.com](https://vercel.com)
-2. Di dashboard Vercel → **Storage** → **Blob** → *Create* (token otomatis masuk ke env)
+2. Di dashboard Vercel → **Storage** → **Blob** → _Create_ (token otomatis masuk ke env)
 3. Isi environment variables: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
    (URL production, contoh `https://dokgen.vercel.app`), `BETTER_AUTH_TRUSTED_ORIGINS`,
    `RESEND_API_KEY`, `RESEND_FROM`

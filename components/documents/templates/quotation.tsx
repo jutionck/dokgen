@@ -1,6 +1,16 @@
 import type { TemplateData } from "./shared";
 import { fmtDate } from "./shared";
-import { DocHeader, ClientBlock, ItemsTable, TotalsBlock, SignatureBlock, TermsBlock, NotesBlock, ScopeTable, BankBlock } from "./blocks";
+import {
+  DocHeader,
+  ClientBlock,
+  ItemsTable,
+  TotalsBlock,
+  SignatureBlock,
+  TermsBlock,
+  NotesBlock,
+  ScopeTable,
+  BankBlock,
+} from "./blocks";
 
 export function QuotationTemplate({ data }: { data: TemplateData }) {
   const { company, doc, client } = data;
@@ -15,8 +25,7 @@ export function QuotationTemplate({ data }: { data: TemplateData }) {
         <ClientBlock data={data} />
         <div className="shrink-0 text-sm">
           <p>
-            <span className="text-slate-500">Kepada:</span>{" "}
-            <span className="font-semibold">{client?.name || "-"}</span>
+            <span className="text-slate-500">Kepada:</span> <span className="font-semibold">{client?.name || "-"}</span>
           </p>
           <p>
             <span className="text-slate-500">Tanggal:</span> {fmtDate(doc.issue_date)}
@@ -39,8 +48,8 @@ export function QuotationTemplate({ data }: { data: TemplateData }) {
 
       <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50/80 p-3.5 text-xs text-slate-700">
         <p>
-          <span className="font-semibold text-slate-600">Masa berlaku penawaran:</span> {validityDays} hari,
-          berakhir {fmtDate(doc.issue_date)} + {validityDays} hari.
+          <span className="font-semibold text-slate-600">Masa berlaku penawaran:</span> {validityDays} hari, berakhir{" "}
+          {fmtDate(doc.issue_date)} + {validityDays} hari.
         </p>
       </div>
 

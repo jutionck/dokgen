@@ -74,10 +74,7 @@ export function ClientForm({ mode, client, trigger, onSaved }: ClientFormProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const res =
-      mode === "create"
-        ? await createClientAction(form)
-        : await updateClientAction(client!.id, form);
+    const res = mode === "create" ? await createClientAction(form) : await updateClientAction(client!.id, form);
     setSaving(false);
     if (res.error) {
       toast.error(res.error);
@@ -106,7 +103,13 @@ export function ClientForm({ mode, client, trigger, onSaved }: ClientFormProps) 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{trigger || <Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button>}</DialogTrigger>
+        <DialogTrigger asChild>
+          {trigger || (
+            <Button variant="ghost" size="icon">
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+        </DialogTrigger>
         <DialogContent className="max-w-xl">
           <DialogHeader>
             <DialogTitle>{mode === "create" ? "Tambah Klien" : `Edit ${client?.name}`}</DialogTitle>
@@ -139,7 +142,12 @@ export function ClientForm({ mode, client, trigger, onSaved }: ClientFormProps) 
             </div>
             <div className="col-span-2 space-y-2">
               <Label htmlFor="notes">Catatan</Label>
-              <Textarea id="notes" value={form.notes} onChange={set("notes")} placeholder="Catatan internal (opsional)" />
+              <Textarea
+                id="notes"
+                value={form.notes}
+                onChange={set("notes")}
+                placeholder="Catatan internal (opsional)"
+              />
             </div>
             <DialogFooter className="col-span-2">
               {mode === "edit" && (

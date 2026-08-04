@@ -2,15 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  FileText,
-  LayoutDashboard,
-  LogOut,
-  PlusCircle,
-  Settings,
-  Users,
-  ChevronDown,
-} from "lucide-react";
+import { FileText, LayoutDashboard, LogOut, PlusCircle, Settings, Users, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { logoutAction } from "@/lib/actions/auth";
@@ -69,17 +61,14 @@ function NavContent({ companyName, isOwner }: { companyName: string; isOwner: bo
           </Link>
         </Button>
         {navItems.map((item) => {
-          const active =
-            pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
                 "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                active
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                active ? "bg-blue-600 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -97,9 +86,7 @@ function NavContent({ companyName, isOwner }: { companyName: string; isOwner: bo
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate text-xs font-medium">
-              {isOwner ? "Pemilik Perusahaan" : "Anggota Tim"}
-            </p>
+            <p className="truncate text-xs font-medium">{isOwner ? "Pemilik Perusahaan" : "Anggota Tim"}</p>
             <p className="truncate text-[11px] text-muted-foreground">{companyName}</p>
           </div>
         </div>

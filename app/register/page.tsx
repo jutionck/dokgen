@@ -76,7 +76,9 @@ export default function RegisterPage() {
 
                 <TabsContent value="create" className="mt-0 space-y-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="company_name">Nama Perusahaan <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="company_name">
+                      Nama Perusahaan <span className="text-red-500">*</span>
+                    </Label>
                     <Input id="company_name" name="company_name" placeholder="PT Contoh Karya" className="h-11" />
                   </div>
                   <div className="space-y-1.5">
@@ -87,7 +89,9 @@ export default function RegisterPage() {
 
                 <TabsContent value="join" className="mt-0 space-y-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="join_code">Kode Perusahaan <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="join_code">
+                      Kode Perusahaan <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="join_code"
                       name="join_code"
@@ -107,15 +111,21 @@ export default function RegisterPage() {
 
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="name">Nama Anda <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="name">
+                      Nama Anda <span className="text-red-500">*</span>
+                    </Label>
                     <Input id="name" name="name" placeholder="Nama lengkap" className="h-11" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="email">
+                      Email <span className="text-red-500">*</span>
+                    </Label>
                     <Input id="email" name="email" type="email" placeholder="nama@email.com" className="h-11" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="password">Password <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="password">
+                      Password <span className="text-red-500">*</span>
+                    </Label>
                     <PasswordInput
                       id="password"
                       name="password"

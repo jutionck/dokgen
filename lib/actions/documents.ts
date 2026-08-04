@@ -9,8 +9,7 @@ import type { DocStatus, DocType, DocumentItem, DocExtra } from "@/lib/types";
 import { requireCompanyId } from "@/lib/documents/auth";
 
 export type DocActionResult =
-  | { success: true; id: string; number?: string; error?: never }
-  | { success?: never; error: string; id?: never };
+  { success: true; id: string; number?: string; error?: never } | { success?: never; error: string; id?: never };
 
 export interface DocumentInput {
   type: DocType;
@@ -244,10 +243,7 @@ export interface TerminInput {
  * - jatuh tempo default +30 hari dari tanggal terbit
  * - item, pajak, diskon di-set 0 — bisa diedit setelahnya
  */
-export async function createNextTerminAction(
-  sourceId: string,
-  input: TerminInput
-): Promise<DocActionResult> {
+export async function createNextTerminAction(sourceId: string, input: TerminInput): Promise<DocActionResult> {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
   if (!Number.isFinite(input.nominal) || input.nominal <= 0) {
@@ -265,8 +261,7 @@ export async function createNextTerminAction(
 
   const issue_date = new Date().toISOString().slice(0, 10);
   const due_date =
-    input.due_date ||
-    new Date(new Date(issue_date).getTime() + 30 * 86400000).toISOString().slice(0, 10);
+    input.due_date || new Date(new Date(issue_date).getTime() + 30 * 86400000).toISOString().slice(0, 10);
   const number = await nextDocNumber(company_id, "invoice", issue_date);
 
   const title = input.title?.trim() || "Invoice Termin";

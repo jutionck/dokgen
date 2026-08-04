@@ -36,7 +36,7 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
 
   const type: DocType | null = typeParam && DOC_TYPES[typeParam] ? typeParam : null;
   const templates = type ? DOC_TEMPLATES[type] : [];
-  const seed = type && seedParam ? templates.find((t) => t.id === seedParam) ?? null : null;
+  const seed = type && seedParam ? (templates.find((t) => t.id === seedParam) ?? null) : null;
 
   const go = (params: Record<string, string | undefined>) => {
     const p = new URLSearchParams();
@@ -122,7 +122,9 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
             type="button"
             onClick={() => go({ type, seed: undefined, blank: "1" })}
             className="group rounded-xl border border-dashed bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
-          >            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition-colors group-hover:bg-slate-200">
+          >
+            {" "}
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition-colors group-hover:bg-slate-200">
               <FilePlus2 className="h-5 w-5" />
             </div>
             <p className="font-semibold">Mulai dari Kosong</p>
@@ -145,11 +147,7 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
               Jenis
             </button>
             <ChevronRight className="h-3.5 w-3.5" />
-            <button
-              type="button"
-              onClick={() => go({ type, seed: undefined })}
-              className="hover:text-foreground"
-            >
+            <button type="button" onClick={() => go({ type, seed: undefined })} className="hover:text-foreground">
               Template
             </button>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -175,15 +173,29 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
             </span>
           </h1>
           <p className="text-sm text-muted-foreground">
-            {seed ? "Data template sudah terisi — silakan sesuaikan, lalu simpan." : "Form kosong — isi data dokumen Anda, lalu simpan."}
+            {seed
+              ? "Data template sudah terisi — silakan sesuaikan, lalu simpan."
+              : "Form kosong — isi data dokumen Anda, lalu simpan."}
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => go({ type, seed: undefined, blank: undefined })}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => go({ type, seed: undefined, blank: undefined })}
+        >
           <ArrowLeft className="h-4 w-4" /> Ganti Template
         </Button>
       </div>
 
-      <DocumentForm key={`${type}-${seed?.id ?? "blank"}`} mode="create" clients={clients} initialType={type} seed={seed} company={company} />
+      <DocumentForm
+        key={`${type}-${seed?.id ?? "blank"}`}
+        mode="create"
+        clients={clients}
+        initialType={type}
+        seed={seed}
+        company={company}
+      />
     </div>
   );
 }

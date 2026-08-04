@@ -4,8 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Dokgen — Generator Dokumen Bisnis",
     short_name: "Dokgen",
-    description:
-      "Buat Surat Penawaran, Quotation, Invoice, BAST, dan Kontrak dalam satu pintu.",
+    description: "Buat Surat Penawaran, Quotation, Invoice, BAST, dan Kontrak dalam satu pintu.",
     id: "/",
     start_url: "/dashboard",
     scope: "/",

@@ -32,9 +32,7 @@ export function formatDate(date?: string | Date | null, withDay = false) {
 
 export function formatDateShort(date?: string | Date | null) {
   if (!date) return "-";
-  return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(
-    new Date(date)
-  );
+  return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(new Date(date));
 }
 
 export function todayISO() {
@@ -66,7 +64,20 @@ export function periodOf(date: string) {
 }
 
 export function numberToWordsIDR(amount: number): string {
-  const satuan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+  const satuan = [
+    "",
+    "Satu",
+    "Dua",
+    "Tiga",
+    "Empat",
+    "Lima",
+    "Enam",
+    "Tujuh",
+    "Delapan",
+    "Sembilan",
+    "Sepuluh",
+    "Sebelas",
+  ];
   const tingkatan = ["", "Ribu", "Juta", "Miliar", "Triliun"];
 
   const toWords = (n: number): string => {

@@ -8,15 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DocumentActions } from "@/components/documents/document-actions";
 import { DocumentFilters } from "@/components/documents/document-filters";
 import { Pagination } from "@/components/ui/pagination";
-import {
-  ChevronRight,
-  FileCheck2,
-  FileSignature,
-  FileSpreadsheet,
-  FileText,
-  Plus,
-  Receipt,
-} from "lucide-react";
+import { ChevronRight, FileCheck2, FileSignature, FileSpreadsheet, FileText, Plus, Receipt } from "lucide-react";
 import Link from "next/link";
 import { getCompany, listClients, listDocumentItems, listDocumentsPage, PAGE_SIZE } from "@/lib/data";
 
@@ -45,11 +37,15 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
   const companyData = await getCompany();
   const company = companyData!.company;
 
-  const { rows: docs, total, totalPages } = await listDocumentsPage(
-    company.id,
-    page,
-    { type: typeFilter || undefined, status: statusFilter || undefined, q: search || undefined }
-  );
+  const {
+    rows: docs,
+    total,
+    totalPages,
+  } = await listDocumentsPage(company.id, page, {
+    type: typeFilter || undefined,
+    status: statusFilter || undefined,
+    q: search || undefined,
+  });
 
   const clientMap = new Map((await listClients(company.id)).map((c) => [c.id, c.name]));
 
@@ -73,7 +69,9 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Dokumen</h1>
-          <p className="text-sm text-muted-foreground">History semua dokumen: penawaran, quotation, invoice, BAST, dan kontrak.</p>
+          <p className="text-sm text-muted-foreground">
+            History semua dokumen: penawaran, quotation, invoice, BAST, dan kontrak.
+          </p>
         </div>
         <Button asChild>
           <Link href="/documents/new">
@@ -150,14 +148,14 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
                         href={`/documents/${doc.id}`}
                         className="flex items-center gap-3 px-4 py-3.5 transition-colors active:bg-slate-50"
                       >
-                        <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", style.tone)}>
+                        <span
+                          className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", style.tone)}
+                        >
                           <Icon className="h-5 w-5" />
                         </span>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{DOC_TYPES[doc.type].label}</p>
-                          <p className="truncate font-mono text-[11px] text-muted-foreground">
-                            {doc.number}
-                          </p>
+                          <p className="truncate font-mono text-[11px] text-muted-foreground">{doc.number}</p>
                           <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                             <span className="truncate">{clientMap.get(doc.client_id || "") || "Tanpa klien"}</span>
                             <span className="shrink-0 text-slate-300">·</span>
@@ -166,7 +164,10 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
                         </div>
                         <div className="shrink-0 text-right">
                           <p className="text-sm font-semibold">{formatIDR(totalDoc)}</p>
-                          <Badge variant={statusMeta.tone as "success" | "info" | "secondary" | "destructive"} className="mt-1 px-2 py-0 text-[10px]">
+                          <Badge
+                            variant={statusMeta.tone as "success" | "info" | "secondary" | "destructive"}
+                            className="mt-1 px-2 py-0 text-[10px]"
+                          >
                             {statusMeta.label}
                           </Badge>
                         </div>

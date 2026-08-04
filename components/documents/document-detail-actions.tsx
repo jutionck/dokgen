@@ -47,6 +47,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { DOC_STATUS, DOC_TYPES } from "@/lib/types";
 import type { DocStatus, DocType } from "@/lib/types";
 import { updateDocumentStatusAction, deleteDocumentAction, duplicateDocumentAction } from "@/lib/actions/documents";
@@ -85,6 +86,15 @@ export function DocumentDetailActions({
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [cc, setCc] = useState("");
+
+  const handleOpenEmail = () => {
+    setToEmail(clientEmail || "");
+    setSubject(`[${DOC_TYPES[docType]?.label || "Dokumen"}] ${docNumber} dari ${clientName || "perusahaan kami"}`);
+    setMessage(
+      `Kepada Yth. Bapak/Ibu,\n\nTerlampir kami kirimkan ${DOC_TYPES[docType]?.label || "dokumen"} ${docNumber} untuk Anda.\n\nTerima kasih.`
+    );
+    setEmailOpen(true);
+  };
 
   const pdfUrl = `/api/documents/${docId}/pdf`;
   const docxUrl = `/api/documents/${docId}/docx`;
@@ -173,7 +183,7 @@ export function DocumentDetailActions({
         </Button>
 
         {/* Kirim Email */}
-        <Button variant="outline" size="sm" onClick={() => setEmailOpen(true)} className="gap-1.5">
+        <Button variant="outline" size="sm" onClick={handleOpenEmail} className="gap-1.5">
           <Mail className="h-4 w-4" />
           <span className="hidden xl:inline">Kirim Email</span>
           <span className="xl:hidden">Email</span>
@@ -263,7 +273,7 @@ export function DocumentDetailActions({
           </Button>
 
           {/* Kirim Email */}
-          <Button variant="outline" size="sm" className="px-2.5" onClick={() => setEmailOpen(true)} title="Kirim Email">
+          <Button variant="outline" size="sm" className="px-2.5" onClick={handleOpenEmail} title="Kirim Email">
             <Mail className="h-4 w-4" />
           </Button>
 
@@ -357,7 +367,7 @@ export function DocumentDetailActions({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="to">Kepada *</Label>
               <Input
                 id="to"
@@ -366,6 +376,15 @@ export function DocumentDetailActions({
                 onChange={(e) => setToEmail(e.target.value)}
                 placeholder="email@klien.com"
               />
+              {clientEmail ? (
+                <p className="text-[11px] text-emerald-600 font-medium">
+                  ✓ Otomatis terisi dari email klien ({clientEmail})
+                </p>
+              ) : (
+                <p className="text-[11px] text-amber-600 font-medium">
+                  * Klien belum memiliki email tersimpan. Silakan ketik alamat email penerima.
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="cc">CC (opsional, pisah koma)</Label>

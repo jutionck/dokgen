@@ -23,7 +23,11 @@ export default async function SettingsPage() {
             <p className="text-xs text-muted-foreground">Akhiri sesi di perangkat ini.</p>
           </div>
           <form action={logoutAction} className="w-full sm:w-auto">
-            <Button type="submit" variant="outline" className="w-full sm:w-auto text-red-600 hover:bg-red-50 hover:text-red-700">
+            <Button
+              type="submit"
+              variant="outline"
+              className="w-full sm:w-auto text-red-600 hover:bg-red-50 hover:text-red-700"
+            >
               <LogOut className="h-4 w-4" /> Keluar
             </Button>
           </form>

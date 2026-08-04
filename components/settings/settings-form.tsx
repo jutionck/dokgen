@@ -134,8 +134,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const roleLabel = (role: string) =>
-    role === "owner" ? "Pemilik" : role === "admin" ? "Admin" : "Anggota";
+  const roleLabel = (role: string) => (role === "owner" ? "Pemilik" : role === "admin" ? "Admin" : "Anggota");
 
   return (
     <div className="space-y-6">
@@ -254,7 +253,13 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                   Muncul di invoice dan dokumen pembayaran. Anda dapat menambahkan lebih dari 1 rekening bank.
                 </CardDescription>
               </div>
-              <Button type="button" variant="outline" size="sm" onClick={addBankRow} className="gap-1.5 text-xs font-semibold">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addBankRow}
+                className="gap-1.5 text-xs font-semibold"
+              >
                 <Plus className="h-3.5 w-3.5" /> Tambah Rekening
               </Button>
             </CardHeader>
@@ -341,7 +346,11 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 </div>
                 <div className="space-y-2">
                   <Label>Jabatan</Label>
-                  <Input value={signerForm.signer_position} onChange={setSigner("signer_position")} placeholder="Direktur" />
+                  <Input
+                    value={signerForm.signer_position}
+                    onChange={setSigner("signer_position")}
+                    placeholder="Direktur"
+                  />
                 </div>
                 <div className="space-y-2 sm:col-span-3 lg:col-span-1">
                   <Label>NIP / NIK (opsional)</Label>
@@ -349,7 +358,11 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 </div>
               </div>
               <div>
-                <Button className="w-full sm:w-auto" onClick={() => save("signer", signerForm)} disabled={saving === "signer"}>
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={() => save("signer", signerForm)}
+                  disabled={saving === "signer"}
+                >
                   {saving === "signer" ? "Menyimpan..." : "Simpan Penandatangan"}
                 </Button>
               </div>
@@ -361,9 +374,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
           <Card>
             <CardHeader>
               <CardTitle>Anggota Tim</CardTitle>
-              <CardDescription>
-                Anggota bisa login dan mengakses semua dokumen perusahaan.
-              </CardDescription>
+              <CardDescription>Anggota bisa login dan mengakses semua dokumen perusahaan.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {isOwner && company.join_code && (
@@ -379,12 +390,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                     <span className="rounded border bg-white px-4 py-2 font-mono text-lg font-bold tracking-[0.3em] text-blue-800">
                       {company.join_code}
                     </span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={copyCode}
-                      title="Salin kode"
-                    >
+                    <Button variant="outline" size="icon" onClick={copyCode} title="Salin kode">
                       {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>

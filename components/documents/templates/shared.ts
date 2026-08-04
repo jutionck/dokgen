@@ -34,9 +34,7 @@ export function fmt(n: number, currency = "IDR") {
 
 export function fmtDate(d?: string | null) {
   if (!d) return "";
-  return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric" }).format(
-    new Date(d)
-  );
+  return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d));
 }
 
 export function fmtDateLong(d?: string | null) {
@@ -56,7 +54,20 @@ export function fmtNum(n: number, currency = "IDR") {
 }
 
 export function terbilang(n: number) {
-  const satuan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+  const satuan = [
+    "",
+    "Satu",
+    "Dua",
+    "Tiga",
+    "Empat",
+    "Lima",
+    "Enam",
+    "Tujuh",
+    "Delapan",
+    "Sembilan",
+    "Sepuluh",
+    "Sebelas",
+  ];
   const tingkat = ["", "Ribu", "Juta", "Miliar", "Triliun"];
 
   const words = (num: number): string => {

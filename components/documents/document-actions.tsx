@@ -62,7 +62,12 @@ export function DocumentActions({ docId }: { docId: string }) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <a href={`/api/documents/${docId}/pdf`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 cursor-pointer">
+            <a
+              href={`/api/documents/${docId}/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <Download /> Download PDF
             </a>
           </DropdownMenuItem>

@@ -1,6 +1,15 @@
 import type { TemplateData } from "./shared";
 import { fmtDate } from "./shared";
-import { DocHeader, ClientBlock, ItemsTable, TotalsBlock, SignatureBlock, TermsBlock, NotesBlock, ScopeTable } from "./blocks";
+import {
+  DocHeader,
+  ClientBlock,
+  ItemsTable,
+  TotalsBlock,
+  SignatureBlock,
+  TermsBlock,
+  NotesBlock,
+  ScopeTable,
+} from "./blocks";
 
 export function PenawaranTemplate({ data }: { data: TemplateData }) {
   const { company, doc, client } = data;
@@ -19,13 +28,10 @@ export function PenawaranTemplate({ data }: { data: TemplateData }) {
       <ClientBlock data={data} />
 
       <div className="space-y-3 text-sm leading-relaxed">
+        <p>Dengan hormat,</p>
         <p>
-          Dengan hormat,
-        </p>
-        <p>
-          Bersama ini kami sampaikan penawaran jasa {extra.project_title || "sesuai kebutuhan Anda"}{" "}
-          kepada {client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami
-          adalah sebagai berikut:
+          Bersama ini kami sampaikan penawaran jasa {extra.project_title || "sesuai kebutuhan Anda"} kepada{" "}
+          {client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:
         </p>
         {extra.intro && <p>{extra.intro}</p>}
       </div>
@@ -52,9 +58,8 @@ export function PenawaranTemplate({ data }: { data: TemplateData }) {
 
       <div className="space-y-2 text-sm leading-relaxed">
         <p>
-          Demikian penawaran ini kami sampaikan. Apabila Bapak/Ibu berkenan, kami siap
-          membahas lebih lanjut dan menunggu balasan positif dari pihak{" "}
-          {client?.company || client?.name || "Bapak/Ibu"}.
+          Demikian penawaran ini kami sampaikan. Apabila Bapak/Ibu berkenan, kami siap membahas lebih lanjut dan
+          menunggu balasan positif dari pihak {client?.company || client?.name || "Bapak/Ibu"}.
         </p>
         <p className="font-medium">Terima kasih atas kepercayaan dan kerjasamanya.</p>
       </div>

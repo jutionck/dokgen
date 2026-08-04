@@ -14,12 +14,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
     const [visible, setVisible] = React.useState(false);
     return (
       <div className={cn("relative", containerClassName)}>
-        <Input
-          ref={ref}
-          type={visible ? "text" : "password"}
-          className={cn("pr-10", className)}
-          {...props}
-        />
+        <Input ref={ref} type={visible ? "text" : "password"} className={cn("pr-10", className)} {...props} />
         <button
           type="button"
           tabIndex={-1}

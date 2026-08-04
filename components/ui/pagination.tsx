@@ -16,14 +16,7 @@ interface PaginationProps {
  * Navigasi halaman reusable — server-safe (pakai <Link>).
  * Menampilkan "Menampilkan x–y dari z" + tombol Sebelumnya/Berikutnya.
  */
-export function Pagination({
-  page,
-  totalPages,
-  total,
-  pageSize = 10,
-  buildHref,
-  className,
-}: PaginationProps) {
+export function Pagination({ page, totalPages, total, pageSize = 10, buildHref, className }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const start = (page - 1) * pageSize + 1;
@@ -34,8 +27,11 @@ export function Pagination({
       <p className="text-xs text-muted-foreground">
         {total !== undefined ? (
           <>
-            Menampilkan <span className="font-medium text-foreground">{start}–{end}</span> dari{" "}
-            <span className="font-medium text-foreground">{total}</span>
+            Menampilkan{" "}
+            <span className="font-medium text-foreground">
+              {start}–{end}
+            </span>{" "}
+            dari <span className="font-medium text-foreground">{total}</span>
           </>
         ) : (
           <>
@@ -46,7 +42,7 @@ export function Pagination({
       <div className="flex items-center gap-2">
         {page > 1 ? (
           <Button asChild variant="outline" size="sm">
-            <Link href={buildHref(page - 1)}>
+            <Link href={buildHref(page - 1)} prefetch={true}>
               <ChevronLeft className="h-4 w-4" /> Sebelumnya
             </Link>
           </Button>
@@ -57,7 +53,7 @@ export function Pagination({
         )}
         {page < totalPages ? (
           <Button asChild variant="outline" size="sm">
-            <Link href={buildHref(page + 1)}>
+            <Link href={buildHref(page + 1)} prefetch={true}>
               Berikutnya <ChevronRight className="h-4 w-4" />
             </Link>
           </Button>

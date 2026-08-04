@@ -117,7 +117,9 @@ export const companyMembers = pgTable(
     user_id: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    role: text("role", { enum: ["owner", "admin", "member"] }).notNull().default("member"),
+    role: text("role", { enum: ["owner", "admin", "member"] })
+      .notNull()
+      .default("member"),
     created_at: ts("created_at").notNull().defaultNow(),
   },
   (t) => [
@@ -168,7 +170,10 @@ export const documents = pgTable(
     discount: money("discount"),
     notes: text("notes"),
     terms: text("terms"),
-    extra: jsonb("extra").$type<DocExtra>().notNull().default(sql`'{}'::jsonb`),
+    extra: jsonb("extra")
+      .$type<DocExtra>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     created_at: ts("created_at").notNull().defaultNow(),
     updated_at: ts("updated_at").notNull().defaultNow(),
   },
@@ -224,7 +229,5 @@ export const docSequences = pgTable(
     period: text("period").notNull(),
     seq: integer("seq").notNull().default(0),
   },
-  (t) => [
-    primaryKey({ columns: [t.company_id, t.doc_type, t.period], name: "doc_sequences_pk" }),
-  ]
+  (t) => [primaryKey({ columns: [t.company_id, t.doc_type, t.period], name: "doc_sequences_pk" })]
 );

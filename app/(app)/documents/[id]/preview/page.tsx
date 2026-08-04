@@ -26,9 +26,7 @@ export default async function PreviewPage(props: PageProps<"/documents/[id]/prev
 
   const [items, clientRows] = await Promise.all([
     listDocumentItems(id),
-    doc.client_id
-      ? db.select().from(clients).where(eq(clients.id, doc.client_id)).limit(1)
-      : Promise.resolve([]),
+    doc.client_id ? db.select().from(clients).where(eq(clients.id, doc.client_id)).limit(1) : Promise.resolve([]),
   ]);
   const client = clientRows[0] ?? null;
 
@@ -44,7 +42,10 @@ export default async function PreviewPage(props: PageProps<"/documents/[id]/prev
   return (
     <main className="bg-slate-200">
       <div className="no-print sticky top-0 z-10 flex items-center justify-between border-b bg-white px-4 py-2.5 shadow-sm">
-        <Link href={`/documents/${id}`} className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900">
+        <Link
+          href={`/documents/${id}`}
+          className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900"
+        >
           <ArrowLeft className="h-4 w-4" /> Kembali
         </Link>
         <p className="font-mono text-xs text-muted-foreground">{doc.number}</p>
