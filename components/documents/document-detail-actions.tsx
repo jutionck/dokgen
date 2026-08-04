@@ -47,8 +47,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { DOC_STATUS } from "@/lib/types";
+import { DOC_STATUS, DOC_TYPES } from "@/lib/types";
 import type { DocStatus, DocType } from "@/lib/types";
 import { updateDocumentStatusAction, deleteDocumentAction, duplicateDocumentAction } from "@/lib/actions/documents";
 import { TerminDialog } from "@/components/documents/termin-dialog";
@@ -201,7 +200,10 @@ export function DocumentDetailActions({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
-            <DropdownMenuItem onClick={handleShareWhatsApp} className="flex items-center gap-2 cursor-pointer text-emerald-700 font-medium">
+            <DropdownMenuItem
+              onClick={handleShareWhatsApp}
+              className="flex items-center gap-2 cursor-pointer text-emerald-700 font-medium"
+            >
               <MessageSquare className="h-4 w-4 text-emerald-600" /> Kirim via WhatsApp
             </DropdownMenuItem>
 
@@ -223,7 +225,11 @@ export function DocumentDetailActions({
               </DropdownMenuItem>
             )}
 
-            <DropdownMenuItem onClick={handleDuplicate} disabled={busy === "duplicate"} className="flex items-center gap-2 cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleDuplicate}
+              disabled={busy === "duplicate"}
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <Copy className="h-4 w-4 text-purple-600" /> Duplikat Dokumen
             </DropdownMenuItem>
 
@@ -280,7 +286,10 @@ export function DocumentDetailActions({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem onClick={handleShareWhatsApp} className="flex items-center gap-2 cursor-pointer text-emerald-700 font-medium">
+              <DropdownMenuItem
+                onClick={handleShareWhatsApp}
+                className="flex items-center gap-2 cursor-pointer text-emerald-700 font-medium"
+              >
                 <MessageSquare className="h-4 w-4 text-emerald-600" /> Kirim via WhatsApp
               </DropdownMenuItem>
 
@@ -297,12 +306,19 @@ export function DocumentDetailActions({
               </DropdownMenuItem>
 
               {docType === "invoice" && (
-                <DropdownMenuItem onClick={() => setTerminOpen(true)} className="flex items-center gap-2 cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => setTerminOpen(true)}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <Receipt className="h-4 w-4 text-emerald-600" /> Buat Invoice Termin
                 </DropdownMenuItem>
               )}
 
-              <DropdownMenuItem onClick={handleDuplicate} disabled={busy === "duplicate"} className="flex items-center gap-2 cursor-pointer">
+              <DropdownMenuItem
+                onClick={handleDuplicate}
+                disabled={busy === "duplicate"}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <Copy className="h-4 w-4 text-purple-600" /> Duplikat Dokumen
               </DropdownMenuItem>
 
@@ -333,19 +349,32 @@ export function DocumentDetailActions({
       <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Kirim {DOC_STATUS[status].label} {docNumber} via Email</DialogTitle>
+            <DialogTitle>
+              Kirim {DOC_TYPES[docType]?.label || "Dokumen"} {docNumber} via Email
+            </DialogTitle>
             <DialogDescription>
-              PDF dokumen otomatis dilampirkan. Email dikirim menggunakan Resend.
+              Berkas PDF resmi dokumen akan dilampirkan secara otomatis ke dalam email pengiriman ini.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="to">Kepada *</Label>
-              <Input id="to" type="email" value={toEmail} onChange={(e) => setToEmail(e.target.value)} placeholder="email@klien.com" />
+              <Input
+                id="to"
+                type="email"
+                value={toEmail}
+                onChange={(e) => setToEmail(e.target.value)}
+                placeholder="email@klien.com"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="cc">CC (opsional, pisah koma)</Label>
-              <Input id="cc" value={cc} onChange={(e) => setCc(e.target.value)} placeholder="cc1@email.com, cc2@email.com" />
+              <Input
+                id="cc"
+                value={cc}
+                onChange={(e) => setCc(e.target.value)}
+                placeholder="cc1@email.com, cc2@email.com"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="subject">Subjek</Label>
@@ -363,9 +392,7 @@ export function DocumentDetailActions({
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={4}
-                placeholder={
-                  "Kepada Yth. Bapak/Ibu,\n\nTerlampir kami kirimkan dokumen untuk Anda.\n\nTerima kasih."
-                }
+                placeholder={"Kepada Yth. Bapak/Ibu,\n\nTerlampir kami kirimkan dokumen untuk Anda.\n\nTerima kasih."}
               />
             </div>
           </div>
@@ -388,7 +415,11 @@ export function DocumentDetailActions({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700" disabled={busy === "delete"}>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={busy === "delete"}
+            >
               {busy === "delete" ? <Loader2 className="animate-spin" /> : <Trash2 />} Hapus
             </AlertDialogAction>
           </AlertDialogFooter>
