@@ -42,14 +42,14 @@ export default async function Image() {
             fontSize: "26px",
             fontWeight: "bold",
             color: "#ffffff",
-            boxShadow: "0 10px 15px -3px rgba(37, 99, 235, 0.4)",
           }}
         >
           D
         </div>
-        <span style={{ fontSize: "32px", fontWeight: 800, letterSpacing: "-0.025em" }}>
-          Dokgen<span style={{ color: "#3b82f6" }}>.</span>
-        </span>
+        <div style={{ display: "flex", fontSize: "32px", fontWeight: 800, letterSpacing: "-0.025em" }}>
+          <span>Dokgen</span>
+          <span style={{ color: "#3b82f6" }}>.</span>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -72,28 +72,42 @@ export default async function Image() {
           dokgen.mipdevp.com
         </div>
 
-        <div style={{ fontSize: "52px", fontWeight: 900, lineHeight: 1.15, color: "#f8fafc" }}>
-          Buat Invoice, Penawaran & Kontrak Bisnis <span style={{ color: "#3b82f6" }}>Standar Indonesia</span>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            fontSize: "52px",
+            fontWeight: 900,
+            lineHeight: 1.15,
+            color: "#f8fafc",
+          }}
+        >
+          <span>Buat Invoice, Penawaran & Kontrak Bisnis&nbsp;</span>
+          <span style={{ color: "#3b82f6" }}>Standar Indonesia</span>
         </div>
 
-        <div style={{ fontSize: "22px", color: "#94a3b8", lineHeight: 1.4 }}>
-          Ekspor PDF & Word (.docx) Presisi · Multi-Rekening Bank · Kirim WA & Email
+        <div style={{ display: "flex", fontSize: "22px", color: "#94a3b8", lineHeight: 1.4 }}>
+          <span>Ekspor PDF & Word (.docx) Presisi · Multi-Rekening Bank · Kirim WA & Email</span>
         </div>
       </div>
 
       {/* Bottom Badges */}
       <div style={{ display: "flex", alignItems: "center", gap: "24px", fontSize: "16px", color: "#cbd5e1" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ color: "#10b981", fontWeight: "bold" }}>✓</span> Faktur (Invoice)
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ color: "#10b981", fontWeight: "bold" }}>+</span>
+          <span>Faktur (Invoice)</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ color: "#10b981", fontWeight: "bold" }}>✓</span> Surat Penawaran
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ color: "#10b981", fontWeight: "bold" }}>+</span>
+          <span>Surat Penawaran</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ color: "#10b981", fontWeight: "bold" }}>✓</span> Estimasi Biaya
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ color: "#10b981", fontWeight: "bold" }}>+</span>
+          <span>Estimasi Biaya</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ color: "#10b981", fontWeight: "bold" }}>✓</span> BAST & Kontrak
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ color: "#10b981", fontWeight: "bold" }}>+</span>
+          <span>BAST & Kontrak</span>
         </div>
       </div>
     </div>,
