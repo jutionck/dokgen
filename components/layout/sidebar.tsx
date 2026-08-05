@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { FileText, LayoutDashboard, LogOut, PlusCircle, Settings, Users, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LogoutButton } from "@/components/auth/logout-button";
+import { authClient } from "@/lib/auth-client";
 import { logoutAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -90,22 +92,15 @@ function NavContent({ companyName, isOwner }: { companyName: string; isOwner: bo
             <p className="truncate text-[11px] text-muted-foreground">{companyName}</p>
           </div>
         </div>
-        <form action={logoutAction}>
-          <Button
-            type="submit"
-            variant="ghost"
-            className="w-full justify-start text-muted-foreground hover:bg-red-50 hover:text-red-600"
-          >
-            <LogOut className="h-4 w-4" />
-            Keluar
-          </Button>
-        </form>
+        <LogoutButton className="w-full justify-start text-muted-foreground hover:bg-red-50 hover:text-red-600" />
       </div>
     </div>
   );
 }
 
 export function Sidebar({ companyName, isOwner }: { companyName: string; isOwner: boolean }) {
+  const router = useRouter();
+
   return (
     <>
       {/* Desktop */}
@@ -144,13 +139,25 @@ export function Sidebar({ companyName, isOwner }: { companyName: string; isOwner
                 <Settings className="h-4 w-4" /> Pengaturan
               </Link>
             </DropdownMenuItem>
-            <form action={logoutAction}>
-              <DropdownMenuItem asChild>
-                <button type="submit" className="w-full text-red-600 focus:text-red-700">
-                  <LogOut className="h-4 w-4" /> Keluar
-                </button>
-              </DropdownMenuItem>
-            </form>
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer"
+              onSelect={async (e) => {
+                e.preventDefault();
+                try {
+                  await authClient.signOut();
+                } catch {
+                  // fallback
+                }
+                try {
+                  await logoutAction();
+                } catch {
+                  router.push("/login");
+                  router.refresh();
+                }
+              }}
+            >
+              <LogOut className="h-4 w-4 mr-2" /> Keluar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </header>
