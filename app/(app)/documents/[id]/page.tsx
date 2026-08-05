@@ -64,7 +64,7 @@ export default async function DocumentDetailPage(props: PageProps<"/documents/[i
       : 1;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-28 sm:pb-0">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <Link href="/documents">

@@ -256,7 +256,7 @@ export function DocumentDetailActions({
       </div>
 
       {/* Floating Bottom Toolbar untuk Mobile (< sm) */}
-      <div className="no-print fixed inset-x-0 bottom-16 z-30 border-t border-slate-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur sm:hidden">
+      <div className="no-print fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-30 border-t border-slate-200 bg-white/95 px-3 py-2.5 shadow-lg backdrop-blur sm:hidden">
         <div className="mx-auto flex max-w-md items-center gap-2">
           {/* Download PDF */}
           <Button asChild size="sm" className="flex-1 gap-1.5 text-xs font-semibold shadow-xs">

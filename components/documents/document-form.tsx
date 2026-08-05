@@ -1024,7 +1024,7 @@ export function DocumentForm({
       </Card>
 
       {/* Floating Action Bar khusus Mobile */}
-      <div className="no-print fixed inset-x-0 bottom-16 z-30 border-t border-slate-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:hidden">
+      <div className="no-print fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-30 border-t border-slate-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-2">
           <Button
             type="button"
