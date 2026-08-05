@@ -1,6 +1,7 @@
 "use server";
 
-import { and, asc, eq, sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
+import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { docSequences, documentItems, documents } from "@/db/schema";
@@ -23,19 +24,18 @@ export interface DocumentInput {
   discount: number;
   notes?: string;
   terms?: string;
-  extra: DocExtra;
+  extra?: DocExtra;
   items: DocumentItem[];
 }
 
-function toNumber(v: unknown, fallback = 0) {
-  const n = Number(v);
+function toNumber(val: unknown, fallback = 0): number {
+  const n = Number(val);
   return Number.isFinite(n) ? n : fallback;
 }
 
-function sanitizeItems(items: unknown): DocumentItem[] {
-  if (!Array.isArray(items)) return [];
-  return items
-    .filter((i) => i && typeof i === "object")
+function sanitizeItems(rawItems: unknown[]): Omit<DocumentItem, "id" | "document_id">[] {
+  if (!Array.isArray(rawItems)) return [];
+  return rawItems
     .map((i) => ({
       description: String((i as Record<string, unknown>).description || "").trim(),
       qty: toNumber((i as Record<string, unknown>).qty, 1),
@@ -47,16 +47,28 @@ function sanitizeItems(items: unknown): DocumentItem[] {
 
 async function nextDocNumber(company_id: string, type: DocType, issue_date: string): Promise<string> {
   const period = issue_date.slice(0, 7);
-  const [seqRow] = await db
-    .insert(docSequences)
-    .values({ company_id, doc_type: type, period, seq: 1 })
-    .onConflictDoUpdate({
-      target: [docSequences.company_id, docSequences.doc_type, docSequences.period],
-      set: { seq: sql`${docSequences.seq} + 1` },
-    })
-    .returning({ seq: docSequences.seq });
 
-  const seq = seqRow?.seq ?? 1;
+  const [existing] = await db
+    .select({ seq: docSequences.seq })
+    .from(docSequences)
+    .where(
+      and(eq(docSequences.company_id, company_id), eq(docSequences.doc_type, type), eq(docSequences.period, period))
+    )
+    .limit(1);
+
+  let seq = 1;
+  if (existing) {
+    seq = existing.seq + 1;
+    await db
+      .update(docSequences)
+      .set({ seq })
+      .where(
+        and(eq(docSequences.company_id, company_id), eq(docSequences.doc_type, type), eq(docSequences.period, period))
+      );
+  } else {
+    await db.insert(docSequences).values({ company_id, doc_type: type, period, seq: 1 });
+  }
+
   const code = DOC_TYPES[type].code;
   const month = period.slice(5);
   const year = period.slice(0, 4);
@@ -70,33 +82,30 @@ export async function createDocumentAction(input: DocumentInput): Promise<DocAct
   const issue_date = input.issue_date || new Date().toISOString().slice(0, 10);
   const number = await nextDocNumber(company_id, input.type, issue_date);
   const items = sanitizeItems(input.items);
+  const docId = randomUUID();
 
-  const [doc] = await db
-    .insert(documents)
-    .values({
-      company_id,
-      type: input.type,
-      number,
-      title: input.title || DOC_TYPES[input.type].defaultTitle,
-      client_id: input.client_id || null,
-      status: input.status,
-      issue_date,
-      due_date: input.due_date || null,
-      currency: input.currency || "IDR",
-      tax_rate: input.tax_rate || 0,
-      discount: input.discount || 0,
-      notes: input.notes || null,
-      terms: input.terms || null,
-      extra: input.extra || {},
-    })
-    .returning({ id: documents.id });
-
-  if (!doc) return { error: "Gagal menyimpan dokumen" };
+  await db.insert(documents).values({
+    id: docId,
+    company_id,
+    type: input.type,
+    number,
+    title: input.title || DOC_TYPES[input.type].defaultTitle,
+    client_id: input.client_id || null,
+    status: input.status,
+    issue_date,
+    due_date: input.due_date || null,
+    currency: input.currency || "IDR",
+    tax_rate: input.tax_rate || 0,
+    discount: input.discount || 0,
+    notes: input.notes || null,
+    terms: input.terms || null,
+    extra: input.extra || {},
+  });
 
   if (items.length > 0) {
     await db.insert(documentItems).values(
       items.map((item, idx) => ({
-        document_id: doc.id,
+        document_id: docId,
         description: item.description,
         qty: item.qty,
         unit: item.unit,
@@ -108,7 +117,7 @@ export async function createDocumentAction(input: DocumentInput): Promise<DocAct
 
   revalidatePath("/documents");
   revalidatePath("/dashboard");
-  return { success: true, id: doc.id, number };
+  return { success: true, id: docId, number };
 }
 
 export async function updateDocumentAction(id: string, input: DocumentInput): Promise<DocActionResult> {
@@ -190,32 +199,29 @@ export async function duplicateDocumentAction(id: string): Promise<DocActionResu
 
   const issue_date = new Date().toISOString().slice(0, 10);
   const number = await nextDocNumber(company_id, doc.type, issue_date);
+  const copyId = randomUUID();
 
-  const [copy] = await db
-    .insert(documents)
-    .values({
-      company_id,
-      type: doc.type,
-      number,
-      title: doc.title,
-      client_id: doc.client_id,
-      status: "draft",
-      issue_date,
-      currency: doc.currency,
-      tax_rate: doc.tax_rate,
-      discount: doc.discount,
-      notes: doc.notes,
-      terms: doc.terms,
-      extra: doc.extra,
-    })
-    .returning({ id: documents.id });
-
-  if (!copy) return { error: "Gagal menduplikasi dokumen" };
+  await db.insert(documents).values({
+    id: copyId,
+    company_id,
+    type: doc.type,
+    number,
+    title: doc.title,
+    client_id: doc.client_id,
+    status: "draft",
+    issue_date,
+    currency: doc.currency,
+    tax_rate: doc.tax_rate,
+    discount: doc.discount,
+    notes: doc.notes,
+    terms: doc.terms,
+    extra: doc.extra,
+  });
 
   if (items.length > 0) {
     await db.insert(documentItems).values(
       items.map((item, idx) => ({
-        document_id: copy.id,
+        document_id: copyId,
         description: item.description,
         qty: item.qty,
         unit: item.unit,
@@ -226,7 +232,7 @@ export async function duplicateDocumentAction(id: string): Promise<DocActionResu
   }
 
   revalidatePath("/documents");
-  return { success: true, id: copy.id };
+  return { success: true, id: copyId };
 }
 
 export interface TerminInput {
@@ -236,13 +242,6 @@ export interface TerminInput {
   notes?: string;
 }
 
-/**
- * Membuat invoice termin berikutnya dari sebuah invoice sumber:
- * - nomor baru otomatis (urutan per bulan)
- * - 1 item tunggal: "Termin N — {judul sumber}" senilai nominal
- * - jatuh tempo default +30 hari dari tanggal terbit
- * - item, pajak, diskon di-set 0 — bisa diedit setelahnya
- */
 export async function createNextTerminAction(sourceId: string, input: TerminInput): Promise<DocActionResult> {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
@@ -265,31 +264,30 @@ export async function createNextTerminAction(sourceId: string, input: TerminInpu
   const number = await nextDocNumber(company_id, "invoice", issue_date);
 
   const title = input.title?.trim() || "Invoice Termin";
-  const [doc] = await db
-    .insert(documents)
-    .values({
-      company_id,
-      type: "invoice",
-      number,
-      title,
-      client_id: src.client_id,
-      status: "draft",
-      issue_date,
-      due_date,
-      currency: src.currency,
-      tax_rate: 0,
-      discount: 0,
-      notes: input.notes?.trim() || null,
-      terms: "",
-      extra: {
-        payment_terms: src.extra?.payment_terms || "",
-      },
-    })
-    .returning({ id: documents.id });
-  if (!doc) return { error: "Gagal membuat invoice termin" };
+  const docId = randomUUID();
+
+  await db.insert(documents).values({
+    id: docId,
+    company_id,
+    type: "invoice",
+    number,
+    title,
+    client_id: src.client_id,
+    status: "draft",
+    issue_date,
+    due_date,
+    currency: src.currency,
+    tax_rate: 0,
+    discount: 0,
+    notes: input.notes?.trim() || null,
+    terms: "",
+    extra: {
+      payment_terms: src.extra?.payment_terms || "",
+    },
+  });
 
   await db.insert(documentItems).values({
-    document_id: doc.id,
+    document_id: docId,
     description: `${title} — ${src.title} (${src.number})`,
     qty: 1,
     unit: "ls",
@@ -297,7 +295,7 @@ export async function createNextTerminAction(sourceId: string, input: TerminInpu
     sort_order: 0,
   });
 
-  revalidatePath(`/documents/${doc.id}`);
+  revalidatePath(`/documents/${docId}`);
   revalidatePath("/documents");
-  return { success: true, id: doc.id, number };
+  return { success: true, id: docId, number };
 }

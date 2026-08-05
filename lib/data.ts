@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { and, asc, count, desc, eq, like, or } from "drizzle-orm";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
@@ -5,12 +6,12 @@ import { db } from "@/lib/db";
 import { clients, companies, companyMembers, documentItems, documents, emailLogs, user } from "@/db/schema";
 import type { Company } from "@/lib/types";
 
-export async function getSessionUser() {
+export const getSessionUser = cache(async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   return session?.user ?? null;
-}
+});
 
-export async function getCompany(): Promise<{ company: Company; isOwner: boolean } | null> {
+export const getCompany = cache(async (): Promise<{ company: Company; isOwner: boolean } | null> => {
   const userSession = await getSessionUser();
   if (!userSession) return null;
 
@@ -23,7 +24,7 @@ export async function getCompany(): Promise<{ company: Company; isOwner: boolean
 
   if (rows.length === 0) return null;
   return { company: rows[0].company, isOwner: rows[0].role === "owner" };
-}
+});
 
 export async function listClients(companyId: string) {
   return db.select().from(clients).where(eq(clients.company_id, companyId)).orderBy(desc(clients.created_at));
@@ -42,15 +43,19 @@ export async function listClientsPage(
   page: number
 ): Promise<PageResult<typeof clients.$inferSelect>> {
   const safePage = Math.max(1, page);
-  const [totalRow] = await db.select({ c: count() }).from(clients).where(eq(clients.company_id, companyId));
-  const total = totalRow?.c ?? 0;
-  const rows = await db
-    .select()
-    .from(clients)
-    .where(eq(clients.company_id, companyId))
-    .orderBy(desc(clients.created_at))
-    .limit(PAGE_SIZE)
-    .offset((safePage - 1) * PAGE_SIZE);
+
+  const [totalRes, rows] = await Promise.all([
+    db.select({ c: count() }).from(clients).where(eq(clients.company_id, companyId)),
+    db
+      .select()
+      .from(clients)
+      .where(eq(clients.company_id, companyId))
+      .orderBy(desc(clients.created_at))
+      .limit(PAGE_SIZE)
+      .offset((safePage - 1) * PAGE_SIZE),
+  ]);
+
+  const total = totalRes[0]?.c ?? 0;
   return { rows, total, totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
 }
 
@@ -85,18 +90,22 @@ export async function listDocumentsPage(
   opts?: DocumentFilters
 ): Promise<PageResult<typeof documents.$inferSelect>> {
   const safePage = Math.max(1, page);
-  const [totalRow] = await db
-    .select({ c: count() })
-    .from(documents)
-    .where(and(...documentConditions(companyId, opts)));
-  const total = totalRow?.c ?? 0;
-  const rows = await db
-    .select()
-    .from(documents)
-    .where(and(...documentConditions(companyId, opts)))
-    .orderBy(desc(documents.created_at))
-    .limit(PAGE_SIZE)
-    .offset((safePage - 1) * PAGE_SIZE);
+
+  const [totalRes, rows] = await Promise.all([
+    db
+      .select({ c: count() })
+      .from(documents)
+      .where(and(...documentConditions(companyId, opts))),
+    db
+      .select()
+      .from(documents)
+      .where(and(...documentConditions(companyId, opts)))
+      .orderBy(desc(documents.created_at))
+      .limit(PAGE_SIZE)
+      .offset((safePage - 1) * PAGE_SIZE),
+  ]);
+
+  const total = totalRes[0]?.c ?? 0;
   return { rows, total, totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
 }
 
@@ -128,12 +137,14 @@ export async function getMembers(companyId: string) {
 
 export async function getLandingPageStats() {
   try {
-    const [docRow] = await db.select({ c: count() }).from(documents);
-    const [compRow] = await db.select({ c: count() }).from(companies);
+    const [docRow, compRow] = await Promise.all([
+      db.select({ c: count() }).from(documents),
+      db.select({ c: count() }).from(companies),
+    ]);
 
     return {
-      totalDocuments: docRow?.c ?? 0,
-      totalCompanies: compRow?.c ?? 0,
+      totalDocuments: docRow[0]?.c ?? 0,
+      totalCompanies: compRow[0]?.c ?? 0,
     };
   } catch {
     return {

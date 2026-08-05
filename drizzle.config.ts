@@ -1,13 +1,13 @@
 import { config as loadEnv } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
-// drizzle-kit tidak membaca .env.local otomatis — muat manual sebelum config dibaca
-loadEnv({ path: [".env.local", ".env"], quiet: true });
+// Load env files in priority order: .env.development -> .env.local -> .env.production -> .env
+loadEnv({ path: [".env.development", ".env.local", ".env.production", ".env"], quiet: true });
 
 export default defineConfig({
   schema: "./db/schema.ts",
   out: "./db/migrations",
-  dialect: "postgresql",
+  dialect: "mysql",
   dbCredentials: {
     url: process.env.DATABASE_URL ?? "",
   },

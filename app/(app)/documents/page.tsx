@@ -37,22 +37,22 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
   const companyData = await getCompany();
   const company = companyData!.company;
 
-  const {
-    rows: docs,
-    total,
-    totalPages,
-  } = await listDocumentsPage(company.id, page, {
-    type: typeFilter || undefined,
-    status: statusFilter || undefined,
-    q: search || undefined,
-  });
+  const [{ rows: docs, total, totalPages }, allClients] = await Promise.all([
+    listDocumentsPage(company.id, page, {
+      type: typeFilter || undefined,
+      status: statusFilter || undefined,
+      q: search || undefined,
+    }),
+    listClients(company.id),
+  ]);
 
-  const clientMap = new Map((await listClients(company.id)).map((c) => [c.id, c.name]));
+  const clientMap = new Map(allClients.map((c) => [c.id, c.name]));
 
+  const itemResults = await Promise.all(docs.map((doc) => listDocumentItems(doc.id)));
   const itemsByDoc = new Map<string, { qty: number; unit_price: number }[]>();
-  for (const doc of docs) {
-    itemsByDoc.set(doc.id, await listDocumentItems(doc.id));
-  }
+  docs.forEach((doc, idx) => {
+    itemsByDoc.set(doc.id, itemResults[idx]);
+  });
 
   const buildHref = (p: number) => {
     const params = new URLSearchParams();

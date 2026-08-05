@@ -60,15 +60,11 @@ export async function registerAction(_prevState: { error: string } | null, formD
   try {
     if (mode === "create") {
       const code = randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
-      const [company] = await db
-        .insert(companies)
-        .values({ name: companyName, city: city || "", join_code: code })
-        .returning({ id: companies.id });
-      if (!company) throw new Error("company insert gagal");
-      companyId = company.id;
+      companyId = randomUUID();
+      await db.insert(companies).values({ id: companyId, name: companyName, city: city || "", join_code: code });
 
       await db.insert(companyMembers).values({
-        company_id: company.id,
+        company_id: companyId,
         user_id,
         role: "owner",
       });

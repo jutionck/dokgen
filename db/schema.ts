@@ -1,17 +1,17 @@
 import {
   boolean,
-  doublePrecision,
+  double,
   index,
-  integer,
-  jsonb,
-  pgTable,
+  int,
+  json,
+  mysqlEnum,
+  mysqlTable,
   primaryKey,
   text,
   timestamp,
   unique,
-  uuid,
-} from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+  varchar,
+} from "drizzle-orm/mysql-core";
 
 interface DocExtra {
   intro?: string | null;
@@ -31,38 +31,39 @@ interface DocExtra {
   selected_banks?: string[] | null;
 }
 
-const ts = (name: string) => timestamp(name, { withTimezone: true, mode: "date" });
-const money = (name: string) => doublePrecision(name).default(0).notNull();
+const ts = (name: string) => timestamp(name, { mode: "date" });
+const money = (name: string) => double(name).default(0).notNull();
+const idUuid = (name: string = "id") => varchar(name, { length: 36 }).$defaultFn(() => crypto.randomUUID());
 
 // ---------- Better Auth core tables ----------
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
+export const user = mysqlTable("user", {
+  id: varchar("id", { length: 255 }).primaryKey(),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
   createdAt: ts("created_at").notNull().defaultNow(),
   updatedAt: ts("updated_at").notNull().defaultNow(),
 });
 
-export const session = pgTable("session", {
-  id: text("id").primaryKey(),
+export const session = mysqlTable("session", {
+  id: varchar("id", { length: 255 }).primaryKey(),
   expiresAt: ts("expires_at").notNull(),
-  token: text("token").notNull().unique(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
   createdAt: ts("created_at").notNull().defaultNow(),
   updatedAt: ts("updated_at").notNull().defaultNow(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  userId: text("user_id")
+  userId: varchar("user_id", { length: 255 })
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
-export const account = pgTable("account", {
-  id: text("id").primaryKey(),
+export const account = mysqlTable("account", {
+  id: varchar("id", { length: 255 }).primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
-  userId: text("user_id")
+  userId: varchar("user_id", { length: 255 })
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   accessToken: text("access_token"),
@@ -76,8 +77,8 @@ export const account = pgTable("account", {
   updatedAt: ts("updated_at").notNull().defaultNow(),
 });
 
-export const verification = pgTable("verification", {
-  id: text("id").primaryKey(),
+export const verification = mysqlTable("verification", {
+  id: varchar("id", { length: 255 }).primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: ts("expires_at").notNull(),
@@ -86,8 +87,8 @@ export const verification = pgTable("verification", {
 });
 
 // ---------- Business tables ----------
-export const companies = pgTable("companies", {
-  id: uuid("id").primaryKey().defaultRandom(),
+export const companies = mysqlTable("companies", {
+  id: idUuid("id").primaryKey(),
   name: text("name").notNull(),
   tagline: text("tagline"),
   address: text("address"),
@@ -103,23 +104,21 @@ export const companies = pgTable("companies", {
   signer_name: text("signer_name"),
   signer_position: text("signer_position"),
   signer_nip: text("signer_nip"),
-  join_code: text("join_code").unique(),
+  join_code: varchar("join_code", { length: 255 }).unique(),
   created_at: ts("created_at").notNull().defaultNow(),
 });
 
-export const companyMembers = pgTable(
+export const companyMembers = mysqlTable(
   "company_members",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    company_id: uuid("company_id")
+    id: idUuid("id").primaryKey(),
+    company_id: varchar("company_id", { length: 36 })
       .notNull()
       .references(() => companies.id, { onDelete: "cascade" }),
-    user_id: text("user_id")
+    user_id: varchar("user_id", { length: 255 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    role: text("role", { enum: ["owner", "admin", "member"] })
-      .notNull()
-      .default("member"),
+    role: mysqlEnum("role", ["owner", "admin", "member"]).notNull().default("member"),
     created_at: ts("created_at").notNull().defaultNow(),
   },
   (t) => [
@@ -128,9 +127,9 @@ export const companyMembers = pgTable(
   ]
 );
 
-export const clients = pgTable("clients", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  company_id: uuid("company_id")
+export const clients = mysqlTable("clients", {
+  id: idUuid("id").primaryKey(),
+  company_id: varchar("company_id", { length: 36 })
     .notNull()
     .references(() => companies.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -144,36 +143,27 @@ export const clients = pgTable("clients", {
   created_at: ts("created_at").notNull().defaultNow(),
 });
 
-export const documents = pgTable(
+export const documents = mysqlTable(
   "documents",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    company_id: uuid("company_id")
+    id: idUuid("id").primaryKey(),
+    company_id: varchar("company_id", { length: 36 })
       .notNull()
       .references(() => companies.id, { onDelete: "cascade" }),
-    created_by: text("created_by").references(() => user.id, { onDelete: "set null" }),
-    client_id: uuid("client_id").references(() => clients.id, { onDelete: "set null" }),
-    type: text("type", {
-      enum: ["penawaran", "quotation", "invoice", "bast", "kontrak"],
-    }).notNull(),
+    created_by: varchar("created_by", { length: 255 }).references(() => user.id, { onDelete: "set null" }),
+    client_id: varchar("client_id", { length: 36 }).references(() => clients.id, { onDelete: "set null" }),
+    type: mysqlEnum("type", ["penawaran", "quotation", "invoice", "bast", "kontrak"]).notNull(),
     number: text("number").notNull(),
     title: text("title").notNull(),
-    status: text("status", {
-      enum: ["draft", "sent", "paid", "done", "cancelled"],
-    })
-      .notNull()
-      .default("draft"),
+    status: mysqlEnum("status", ["draft", "sent", "paid", "done", "cancelled"]).notNull().default("draft"),
     issue_date: text("issue_date").notNull(),
     due_date: text("due_date"),
     currency: text("currency").notNull().default("IDR"),
-    tax_rate: doublePrecision("tax_rate").default(0).notNull(),
+    tax_rate: double("tax_rate").default(0).notNull(),
     discount: money("discount"),
     notes: text("notes"),
     terms: text("terms"),
-    extra: jsonb("extra")
-      .$type<DocExtra>()
-      .notNull()
-      .default(sql`'{}'::jsonb`),
+    extra: json("extra").$type<DocExtra>().notNull(),
     created_at: ts("created_at").notNull().defaultNow(),
     updated_at: ts("updated_at").notNull().defaultNow(),
   },
@@ -185,33 +175,33 @@ export const documents = pgTable(
   ]
 );
 
-export const documentItems = pgTable(
+export const documentItems = mysqlTable(
   "document_items",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    document_id: uuid("document_id")
+    id: idUuid("id").primaryKey(),
+    document_id: varchar("document_id", { length: 36 })
       .notNull()
       .references(() => documents.id, { onDelete: "cascade" }),
     description: text("description").notNull(),
-    qty: doublePrecision("qty").default(1).notNull(),
+    qty: double("qty").default(1).notNull(),
     unit: text("unit").notNull().default("pcs"),
     unit_price: money("unit_price"),
-    sort_order: integer("sort_order").notNull().default(0),
+    sort_order: int("sort_order").notNull().default(0),
   },
   (t) => [index("document_items_document_id_idx").on(t.document_id)]
 );
 
-export const emailLogs = pgTable(
+export const emailLogs = mysqlTable(
   "email_logs",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    document_id: uuid("document_id")
+    id: idUuid("id").primaryKey(),
+    document_id: varchar("document_id", { length: 36 })
       .notNull()
       .references(() => documents.id, { onDelete: "cascade" }),
-    sent_by: text("sent_by").references(() => user.id, { onDelete: "set null" }),
+    sent_by: varchar("sent_by", { length: 255 }).references(() => user.id, { onDelete: "set null" }),
     to_email: text("to_email").notNull(),
     subject: text("subject"),
-    status: text("status", { enum: ["sent", "failed"] }).notNull(),
+    status: mysqlEnum("status", ["sent", "failed"]).notNull(),
     error: text("error"),
     resend_id: text("resend_id"),
     sent_at: ts("sent_at").notNull().defaultNow(),
@@ -219,15 +209,15 @@ export const emailLogs = pgTable(
   (t) => [index("email_logs_document_id_idx").on(t.document_id)]
 );
 
-export const docSequences = pgTable(
+export const docSequences = mysqlTable(
   "doc_sequences",
   {
-    company_id: uuid("company_id")
+    company_id: varchar("company_id", { length: 36 })
       .notNull()
       .references(() => companies.id, { onDelete: "cascade" }),
-    doc_type: text("doc_type").notNull(),
-    period: text("period").notNull(),
-    seq: integer("seq").notNull().default(0),
+    doc_type: varchar("doc_type", { length: 64 }).notNull(),
+    period: varchar("period", { length: 32 }).notNull(),
+    seq: int("seq").notNull().default(0),
   },
   (t) => [primaryKey({ columns: [t.company_id, t.doc_type, t.period], name: "doc_sequences_pk" })]
 );
