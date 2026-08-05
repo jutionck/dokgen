@@ -52,69 +52,92 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md border-0 bg-transparent shadow-none sm:border sm:border-slate-200 sm:bg-white sm:shadow-xl sm:shadow-blue-900/10 sm:rounded-2xl">
-      <CardHeader className="items-center space-y-1.5 pb-2 pt-2 sm:pt-8 text-center px-0 sm:px-6">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon.svg" alt="Dokgen" className="mb-2 h-14 w-14 rounded-2xl shadow-md shadow-blue-900/20" />
-        <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-          Selamat datang kembali
+    <Card className="w-full max-w-md border-0 bg-transparent shadow-none sm:border sm:border-slate-200/80 sm:bg-white sm:shadow-2xl sm:shadow-blue-900/10 sm:rounded-3xl">
+      <CardHeader className="items-center space-y-2 pb-3 pt-2 sm:pt-9 text-center px-0 sm:px-8">
+        <div className="relative mb-1">
+          <div className="absolute -inset-1 rounded-2xl bg-blue-600/20 blur-sm sm:hidden" />
+          <img
+            src="/icon.svg"
+            alt="Dokgen"
+            className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-2xl shadow-lg shadow-blue-900/25"
+          />
+        </div>
+        <CardTitle className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+          Selamat Datang
         </CardTitle>
-        <CardDescription className="text-xs sm:text-sm text-slate-500">
-          Masuk untuk mengelola seluruh dokumen bisnis Anda.
+        <CardDescription className="text-xs sm:text-sm text-slate-500 max-w-xs">
+          Masuk ke akun Dokgen untuk mengelola faktur & dokumen bisnis Anda.
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-0 sm:px-7 pb-4 sm:pb-8 pt-2 sm:pt-4">
+      <CardContent className="px-0 sm:px-8 pb-4 sm:pb-9 pt-2 sm:pt-4">
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {registered && (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-xs sm:text-sm font-medium text-emerald-800 shadow-2xs">
               ✅ Registrasi berhasil. Silakan masuk dengan akun Anda.
             </div>
           )}
           {error && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              <AlertCircle className="h-4 w-4 shrink-0" />
+            <div className="flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50/90 px-4 py-3 text-xs sm:text-sm font-medium text-red-700 shadow-2xs animate-in fade-in-50">
+              <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
               {error}
             </div>
           )}
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              autoCorrect="off"
               placeholder="nama@perusahaan.com"
-              className="h-11 bg-white sm:bg-slate-50/50"
+              className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                Password
+              </Label>
+            </div>
             <PasswordInput
               id="password"
-              containerClassName="[&>input]:h-11 [&>input]:bg-white sm:[&>input]:bg-slate-50/50"
+              autoComplete="current-password"
+              containerClassName="[&>input]:h-12 [&>input]:rounded-xl [&>input]:bg-white [&>input]:text-base sm:[&>input]:text-sm [&>input]:border-slate-200 [&>input]:focus:border-blue-600 [&>input]:focus:ring-2 [&>input]:focus:ring-blue-600/20 [&>input]:shadow-2xs"
               placeholder="Masukkan password Anda"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <Button type="submit" className="h-11 w-full text-base font-semibold shadow-2xs" disabled={pending}>
+          <Button
+            type="submit"
+            className="h-12 w-full text-base font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-blue-600/25 mt-2"
+            disabled={pending}
+          >
             {pending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Memproses...
+                <Loader2 className="h-5 w-5 animate-spin" /> Memproses...
               </>
             ) : (
               <>
-                <LogIn className="h-4 w-4" /> Masuk
+                <LogIn className="h-5 w-5" /> Masuk
               </>
             )}
           </Button>
         </form>
-        <p className="mt-5 text-center text-sm text-muted-foreground">
-          Belum punya akun?{" "}
-          <a href="/register" className="font-semibold text-blue-700 hover:underline">
-            Daftar di sini
-          </a>
-        </p>
+        <div className="mt-6 pt-5 border-t border-slate-200/60 sm:border-slate-100 text-center">
+          <p className="text-sm text-slate-600">
+            Belum punya akun?{" "}
+            <a href="/register" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">
+              Daftar Sekarang
+            </a>
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

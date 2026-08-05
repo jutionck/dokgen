@@ -45,135 +45,165 @@ export default function RegisterPage() {
     <main className="dot-grid relative flex min-h-screen items-center justify-center px-4 py-8 sm:p-4">
       <div className="w-full max-w-md">
         <div className="mb-4 sm:mb-6 flex flex-col items-center text-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/icon.svg"
-            alt="Dokgen"
-            className="mb-2.5 h-14 w-14 sm:h-16 sm:w-16 rounded-2xl shadow-md shadow-blue-900/20"
-          />
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Mulai pakai Dokgen</h1>
+          <div className="relative mb-1">
+            <div className="absolute -inset-1 rounded-2xl bg-blue-600/20 blur-sm sm:hidden" />
+            <img
+              src="/icon.svg"
+              alt="Dokgen"
+              className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-2xl shadow-lg shadow-blue-900/25"
+            />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Mulai Pakai Dokgen</h1>
           <p className="mt-1 max-w-xs text-xs sm:text-sm text-slate-500">
-            Buat perusahaan baru, atau gabung ke perusahaan tim dengan kode.
+            Buat akun perusahaan baru atau gabung ke tim dengan kode.
           </p>
         </div>
 
-        <Card className="w-full border-0 bg-transparent shadow-none sm:border sm:border-slate-200 sm:bg-white sm:shadow-xl sm:shadow-blue-900/10 sm:rounded-2xl">
-          <CardContent className="px-0 sm:px-7 py-2 sm:py-7">
+        <Card className="w-full border-0 bg-transparent shadow-none sm:border sm:border-slate-200/80 sm:bg-white sm:shadow-2xl sm:shadow-blue-900/10 sm:rounded-3xl">
+          <CardContent className="px-0 sm:px-8 py-2 sm:py-9">
             <Tabs value={mode} onValueChange={setMode}>
               <form action={action} onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <input type="hidden" name="mode" value={mode} />
                 {(state?.error || clientError) && (
-                  <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <AlertCircle className="h-4 w-4 shrink-0" />
+                  <div className="flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50/90 px-4 py-3 text-xs sm:text-sm font-medium text-red-700 shadow-2xs animate-in fade-in-50">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
                     {clientError || state?.error}
                   </div>
                 )}
 
-                <TabsList className="grid w-full grid-cols-2 bg-slate-200/60 sm:bg-slate-100">
-                  <TabsTrigger value="create" className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold">
-                    <Building2 className="h-3.5 w-3.5" /> Perusahaan Baru
+                <TabsList className="grid w-full grid-cols-2 p-1 h-12 bg-slate-200/60 sm:bg-slate-100 rounded-xl">
+                  <TabsTrigger
+                    value="create"
+                    className="flex items-center justify-center gap-1.5 h-10 rounded-lg text-xs sm:text-sm font-semibold transition-all data-[state=active]:bg-white data-[state=active]:shadow-xs"
+                  >
+                    <Building2 className="h-4 w-4" /> Perusahaan Baru
                   </TabsTrigger>
-                  <TabsTrigger value="join" className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold">
-                    <KeyRound className="h-3.5 w-3.5" /> Gabung Tim
+                  <TabsTrigger
+                    value="join"
+                    className="flex items-center justify-center gap-1.5 h-10 rounded-lg text-xs sm:text-sm font-semibold transition-all data-[state=active]:bg-white data-[state=active]:shadow-xs"
+                  >
+                    <KeyRound className="h-4 w-4" /> Gabung Tim
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="create" className="mt-0 space-y-4 pt-1">
                   <div className="space-y-1.5">
-                    <Label htmlFor="company_name">
+                    <Label
+                      htmlFor="company_name"
+                      className="text-xs font-semibold uppercase tracking-wider text-slate-600"
+                    >
                       Nama Perusahaan <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="company_name"
                       name="company_name"
                       placeholder="PT Contoh Karya"
-                      className="h-11 bg-white sm:bg-slate-50/50"
+                      className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="city">Kota</Label>
-                    <Input id="city" name="city" placeholder="Jakarta" className="h-11 bg-white sm:bg-slate-50/50" />
+                    <Label htmlFor="city" className="text-xs font-semibold uppercase tracking-wider text-slate-600">
+                      Kota
+                    </Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      placeholder="Jakarta"
+                      className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
+                    />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="join" className="mt-0 space-y-4 pt-1">
                   <div className="space-y-1.5">
-                    <Label htmlFor="join_code">
+                    <Label
+                      htmlFor="join_code"
+                      className="text-xs font-semibold uppercase tracking-wider text-slate-600"
+                    >
                       Kode Perusahaan <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="join_code"
                       name="join_code"
                       placeholder="Contoh: ABC123"
-                      className="h-11 uppercase tracking-widest bg-white sm:bg-slate-50/50"
+                      className="h-12 rounded-xl uppercase tracking-widest bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs font-semibold"
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-slate-500">
                       Minta kode dari pemilik perusahaan di menu Pengaturan → Tim.
                     </p>
                   </div>
                 </TabsContent>
 
-                <div className="my-5 h-px bg-slate-200/80 sm:bg-slate-100" />
-                <p className="-mt-1 text-xs text-muted-foreground">
-                  Kolom bertanda <span className="text-red-500">*</span> wajib diisi
-                </p>
+                <div className="my-5 h-px bg-slate-200/70 sm:bg-slate-100" />
 
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="name">
+                    <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-slate-600">
                       Nama Anda <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="name"
                       name="name"
+                      autoComplete="name"
                       placeholder="Nama lengkap"
-                      className="h-11 bg-white sm:bg-slate-50/50"
+                      className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="email">
+                    <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-slate-600">
                       Email <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="email"
                       name="email"
                       type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      autoCapitalize="none"
+                      autoCorrect="off"
                       placeholder="nama@email.com"
-                      className="h-11 bg-white sm:bg-slate-50/50"
+                      className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="password">
+                    <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-slate-600">
                       Password <span className="text-red-500">*</span>
                     </Label>
                     <PasswordInput
                       id="password"
                       name="password"
-                      containerClassName="[&>input]:h-11 [&>input]:bg-white sm:[&>input]:bg-slate-50/50"
+                      autoComplete="new-password"
+                      containerClassName="[&>input]:h-12 [&>input]:rounded-xl [&>input]:bg-white [&>input]:text-base sm:[&>input]:text-sm [&>input]:border-slate-200 [&>input]:focus:border-blue-600 [&>input]:focus:ring-2 [&>input]:focus:ring-blue-600/20 [&>input]:shadow-2xs"
                       placeholder="Minimal 6 karakter"
                     />
                   </div>
                 </div>
 
-                <Button type="submit" className="h-11 w-full text-base font-semibold shadow-2xs" disabled={pending}>
+                <Button
+                  type="submit"
+                  className="h-12 w-full text-base font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-blue-600/25 mt-2"
+                  disabled={pending}
+                >
                   {pending ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" /> Mendaftarkan...
+                      <Loader2 className="h-5 w-5 animate-spin" /> Mendaftarkan...
                     </>
                   ) : (
                     <>
-                      <UserPlus className="h-4 w-4" /> Daftar
+                      <UserPlus className="h-5 w-5" /> Daftar Sekarang
                     </>
                   )}
                 </Button>
               </form>
             </Tabs>
-            <p className="mt-5 text-center text-sm text-muted-foreground">
-              Sudah punya akun?{" "}
-              <a href="/login" className="font-semibold text-blue-700 hover:underline">
-                Masuk
-              </a>
-            </p>
+            <div className="mt-6 pt-5 border-t border-slate-200/60 sm:border-slate-100 text-center">
+              <p className="text-sm text-slate-600">
+                Sudah punya akun?{" "}
+                <a href="/login" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">
+                  Masuk di sini
+                </a>
+              </p>
+            </div>
           </CardContent>
         </Card>
         <AuthFooter />
