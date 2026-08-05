@@ -9,7 +9,7 @@ const baseUrl = "https://dokgen.mipdevp.com";
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Dokgen — Generator Dokumen Bisnis & Invoice Standar Indonesia",
+    default: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
     template: "%s | Dokgen",
   },
   description:
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     locale: "id_ID",
     url: baseUrl,
     siteName: "Dokgen",
-    title: "Dokgen — Generator Dokumen Bisnis & Invoice Standar Indonesia",
+    title: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
     description:
       "Platform otomatisasi pembuatan Invoice, Surat Penawaran, Quotation, BAST, dan Kontrak Kerja profesional standar bisnis Indonesia. Ekspor PDF & Word presisi.",
     images: [
@@ -60,13 +60,13 @@ export const metadata: Metadata = {
         url: `${baseUrl}/opengraph-image`,
         width: 1200,
         height: 630,
-        alt: "Dokgen — Generator Dokumen Bisnis & Invoice Standar Indonesia",
+        alt: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dokgen — Generator Dokumen Bisnis & Invoice Standar Indonesia",
+    title: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
     description:
       "Platform otomatisasi pembuatan Invoice, Surat Penawaran, Quotation, BAST, dan Kontrak Kerja profesional.",
     images: [`${baseUrl}/opengraph-image`],

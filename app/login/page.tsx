@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,7 @@ function LoginForm() {
       <CardHeader className="items-center space-y-2 pb-3 pt-2 sm:pt-9 text-center px-0 sm:px-8">
         <div className="relative mb-1">
           <div className="absolute -inset-1 rounded-2xl bg-blue-600/20 blur-sm sm:hidden" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/icon.svg"
             alt="Dokgen"
@@ -151,9 +153,9 @@ function LoginForm() {
         <div className="mt-6 pt-5 border-t border-slate-200/60 sm:border-slate-100 text-center">
           <p className="text-sm text-slate-600">
             Belum punya akun?{" "}
-            <a href="/register" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">
+            <Link href="/register" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">
               Daftar Sekarang
-            </a>
+            </Link>
           </p>
         </div>
       </CardContent>

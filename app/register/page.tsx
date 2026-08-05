@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { Building2, KeyRound, AlertCircle, Loader2, UserPlus } from "lucide-react";
 import { registerAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ export default function RegisterPage() {
         <div className="mb-4 sm:mb-6 flex flex-col items-center text-center">
           <div className="relative mb-1">
             <div className="absolute -inset-1 rounded-2xl bg-blue-600/20 blur-sm sm:hidden" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/icon.svg"
               alt="Dokgen"
@@ -221,9 +223,9 @@ export default function RegisterPage() {
             <div className="mt-6 pt-5 border-t border-slate-200/60 sm:border-slate-100 text-center">
               <p className="text-sm text-slate-600">
                 Sudah punya akun?{" "}
-                <a href="/login" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">
+                <Link href="/login" className="font-bold text-blue-600 hover:text-blue-700 hover:underline">
                   Masuk di sini
-                </a>
+                </Link>
               </p>
             </div>
           </CardContent>

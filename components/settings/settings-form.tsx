@@ -3,12 +3,13 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Building2, Landmark, PenLine, Copy, Check, Trash2, Upload, Users, Plus } from "lucide-react";
+import { Building2, Landmark, PenLine, Copy, Check, Trash2, Upload, Users, Plus, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { updateCompanyAction, uploadLogoAction, removeLogoAction } from "@/lib/actions/settings";
 import type { Company } from "@/lib/types";
 import { parseBankAccounts } from "@/components/documents/templates/blocks";
@@ -100,11 +101,10 @@ export function SettingsForm({ company, members, isOwner }: Props) {
 
   const save = async (which: "profil" | "bank" | "signer", payload: Record<string, string>) => {
     setSaving(which);
-    // nama perusahaan selalu disertakan (wajib di server action)
     const res = await updateCompanyAction({ ...payload, name: companyForm.name } as never);
     setSaving(null);
     if (res.error) return toast.error(res.error);
-    toast.success("Pengaturan disimpan");
+    toast.success("Pengaturan berhasil disimpan");
     router.refresh();
   };
 
@@ -116,7 +116,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
     const res = await uploadLogoAction(fd);
     setUploading(false);
     if (res.error) return toast.error(res.error);
-    toast.success("Logo diperbarui");
+    toast.success("Logo perusahaan diperbarui");
     router.refresh();
   };
 
@@ -131,6 +131,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
     if (!company.join_code) return;
     await navigator.clipboard.writeText(company.join_code);
     setCopied(true);
+    toast.success("Kode tim berhasil disalin");
     setTimeout(() => setCopied(false), 1500);
   };
 
@@ -138,119 +139,188 @@ export function SettingsForm({ company, members, isOwner }: Props) {
 
   return (
     <div className="space-y-6">
+      {/* ===== Page Header ===== */}
       <div>
-        <h1 className="text-2xl font-bold">Pengaturan</h1>
-        <p className="text-sm text-muted-foreground">
-          Data perusahaan ini otomatis muncul di semua dokumen yang Anda buat.
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Pengaturan Perusahaan</h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          Informasi profil, bank, dan penandatangan ini otomatis terintegrasi di seluruh dokumen bisnis Anda.
         </p>
       </div>
 
-      <Tabs defaultValue="profil">
-        <TabsList className="w-full max-w-full overflow-x-auto flex justify-start sm:justify-center p-1 gap-1 bg-slate-100/90 rounded-lg">
-          <TabsTrigger value="profil" className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-medium">
-            <Building2 className="h-3.5 w-3.5" /> Profil
+      {/* ===== Main Tabs Navigation ===== */}
+      <Tabs defaultValue="profil" className="space-y-6">
+        <TabsList className="w-full max-w-full overflow-x-auto flex justify-start p-1.5 gap-1.5 bg-slate-100/80 border border-slate-200/60 rounded-2xl">
+          <TabsTrigger
+            value="profil"
+            className="shrink-0 flex items-center gap-2 text-xs sm:text-sm font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-xs py-2 px-3.5 transition-all"
+          >
+            <Building2 className="h-4 w-4" /> Profil Perusahaan
           </TabsTrigger>
-          <TabsTrigger value="bank" className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-medium">
-            <Landmark className="h-3.5 w-3.5" /> Bank
+          <TabsTrigger
+            value="bank"
+            className="shrink-0 flex items-center gap-2 text-xs sm:text-sm font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-xs py-2 px-3.5 transition-all"
+          >
+            <Landmark className="h-4 w-4" /> Bank & Pembayaran
           </TabsTrigger>
-          <TabsTrigger value="signer" className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-medium">
-            <PenLine className="h-3.5 w-3.5" /> Penandatangan
+          <TabsTrigger
+            value="signer"
+            className="shrink-0 flex items-center gap-2 text-xs sm:text-sm font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-xs py-2 px-3.5 transition-all"
+          >
+            <PenLine className="h-4 w-4" /> Penandatangan
           </TabsTrigger>
-          <TabsTrigger value="team" className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-medium">
-            <Users className="h-3.5 w-3.5" /> Tim
+          <TabsTrigger
+            value="team"
+            className="shrink-0 flex items-center gap-2 text-xs sm:text-sm font-semibold rounded-xl data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-xs py-2 px-3.5 transition-all"
+          >
+            <Users className="h-4 w-4" /> Anggota Tim
           </TabsTrigger>
         </TabsList>
 
+        {/* ===== TAB 1: PROFIL PERUSAHAAN ===== */}
         <TabsContent value="profil">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profil Perusahaan</CardTitle>
-              <CardDescription>Logo, identitas, dan kontak perusahaan.</CardDescription>
+          <Card className="border-slate-200/80 shadow-xs rounded-2xl overflow-hidden">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="text-base font-bold text-slate-900">Profil & Identitas Perusahaan</CardTitle>
+              <CardDescription className="text-xs text-slate-500">
+                Informasi ini akan dicetak pada kop surat penawaran, invoice, dan SPK.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-slate-50">
+            <CardContent className="p-5 sm:p-6 space-y-6">
+              {/* Logo Uploader */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 p-4 rounded-2xl bg-slate-50/80 border border-slate-200/70">
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
                   {company.logo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={company.logo_url} alt="logo" className="h-full w-full object-contain" />
+                    <img src={company.logo_url} alt="Logo Perusahaan" className="h-full w-full object-contain p-1" />
                   ) : (
-                    <Building2 className="h-8 w-8 text-slate-300" />
+                    <Building2 className="h-9 w-9 text-slate-300" />
                   )}
                 </div>
-                <div className="flex flex-col gap-1.5 w-full sm:w-auto">
-                  <label className="inline-flex items-center justify-center sm:justify-start gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-slate-50 cursor-pointer">
-                    <Upload className="h-4 w-4" />
-                    {uploading ? "Mengunggah..." : "Upload Logo"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleUpload(e.target.files?.[0])}
-                    />
-                  </label>
-                  {company.logo_url && (
-                    <button
-                      onClick={handleRemoveLogo}
-                      className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" /> Hapus logo
-                    </button>
-                  )}
+                <div className="space-y-2 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs font-semibold cursor-pointer shadow-xs transition-all active:scale-95">
+                      <Upload className="h-3.5 w-3.5" />
+                      {uploading ? "Mengunggah..." : "Upload Logo"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleUpload(e.target.files?.[0])}
+                      />
+                    </label>
+                    {company.logo_url && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> Hapus Logo
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Format gambar PNG atau JPG (maksimal 2MB). Disarankan berlatar transparan.
+                  </p>
                 </div>
               </div>
 
+              {/* Form Grid */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Nama Perusahaan *</Label>
-                  <Input value={companyForm.name} onChange={setComp("name")} />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Nama Perusahaan *</Label>
+                  <Input
+                    value={companyForm.name}
+                    onChange={setComp("name")}
+                    placeholder="Nama PT / CV / Perusahaan"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Tagline (opsional)</Label>
-                  <Input value={companyForm.tagline} onChange={setComp("tagline")} />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Tagline / Slogan (opsional)</Label>
+                  <Input
+                    value={companyForm.tagline}
+                    onChange={setComp("tagline")}
+                    placeholder="Contoh: Digital Solutions Partner"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>Alamat</Label>
-                  <Input value={companyForm.address} onChange={setComp("address")} />
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label className="text-xs font-bold text-slate-700">Alamat Lengkap</Label>
+                  <Input
+                    value={companyForm.address}
+                    onChange={setComp("address")}
+                    placeholder="Jl. Jendral Sudirman No. 123"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Telepon</Label>
-                  <Input value={companyForm.phone} onChange={setComp("phone")} />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Nomor Telepon</Label>
+                  <Input
+                    value={companyForm.phone}
+                    onChange={setComp("phone")}
+                    placeholder="081234567890 / 021-123456"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input value={companyForm.email} onChange={setComp("email")} />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Email Resmi</Label>
+                  <Input
+                    value={companyForm.email}
+                    onChange={setComp("email")}
+                    placeholder="info@perusahaan.com"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Website</Label>
-                  <Input value={companyForm.website} onChange={setComp("website")} />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Website</Label>
+                  <Input
+                    value={companyForm.website}
+                    onChange={setComp("website")}
+                    placeholder="https://perusahaan.com"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Kota</Label>
-                  <Input value={companyForm.city} onChange={setComp("city")} placeholder="Cimahi" />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Kota / Kabupaten</Label>
+                  <Input
+                    value={companyForm.city}
+                    onChange={setComp("city")}
+                    placeholder="Jakarta Selatan"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>NPWP</Label>
-                  <Input value={companyForm.npwp} onChange={setComp("npwp")} />
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label className="text-xs font-bold text-slate-700">NPWP Perusahaan</Label>
+                  <Input
+                    value={companyForm.npwp}
+                    onChange={setComp("npwp")}
+                    placeholder="00.000.000.0-000.000"
+                    className="h-10 rounded-xl font-mono"
+                  />
                 </div>
               </div>
-              <Button
-                className="w-full sm:w-auto"
-                onClick={() => save("profil", companyForm)}
-                disabled={saving === "profil"}
-              >
-                {saving === "profil" ? "Menyimpan..." : "Simpan Profil"}
-              </Button>
+
+              <div className="pt-2">
+                <Button
+                  className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-xs"
+                  onClick={() => save("profil", companyForm)}
+                  disabled={saving === "profil"}
+                >
+                  {saving === "profil" ? "Menyimpan Profil..." : "Simpan Profil Perusahaan"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
+        {/* ===== TAB 2: INFORMASI BANK ===== */}
         <TabsContent value="bank">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card className="border-slate-200/80 shadow-xs rounded-2xl overflow-hidden">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
-                <CardTitle>Informasi Bank</CardTitle>
-                <CardDescription>
-                  Muncul di invoice dan dokumen pembayaran. Anda dapat menambahkan lebih dari 1 rekening bank.
+                <CardTitle className="text-base font-bold text-slate-900">Rekening Bank & Pembayaran</CardTitle>
+                <CardDescription className="text-xs text-slate-500">
+                  Rekening ini akan dicetak di invoice agar klien dapat mentransfer pembayaran.
                 </CardDescription>
               </div>
               <Button
@@ -258,55 +328,64 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 variant="outline"
                 size="sm"
                 onClick={addBankRow}
-                className="gap-1.5 text-xs font-semibold"
+                className="gap-1.5 text-xs font-semibold rounded-xl border-dashed shrink-0"
               >
-                <Plus className="h-3.5 w-3.5" /> Tambah Rekening
+                <Plus className="h-3.5 w-3.5 text-blue-600" /> Tambah Rekening
               </Button>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-5 sm:p-6 space-y-5">
               <div className="space-y-4">
                 {bankRows.map((row, idx) => (
                   <div
                     key={row.key}
-                    className="relative flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50/50 p-4 shadow-2xs"
+                    className="relative flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 sm:p-5 shadow-2xs"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-700">Rekening Bank #{idx + 1}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-700 text-xs font-bold">
+                          #{idx + 1}
+                        </span>
+                        <span className="text-xs font-bold text-slate-800">Rekening Bank #{idx + 1}</span>
+                      </div>
                       {bankRows.length > 1 && (
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           onClick={() => removeBankRow(row.key)}
-                          className="h-7 px-2 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          className="h-8 px-2.5 text-xs font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl"
                         >
-                          <Trash2 className="h-3.5 w-3.5" /> Hapus
+                          <Trash2 className="h-3.5 w-3.5 mr-1" /> Hapus
                         </Button>
                       )}
                     </div>
+
                     <div className="grid gap-3 sm:grid-cols-3">
                       <div className="space-y-1">
-                        <Label className="text-xs">Nama Bank</Label>
+                        <Label className="text-xs font-bold text-slate-700">Nama Bank</Label>
                         <Input
                           value={row.bank_name}
                           onChange={(e) => updateBankRow(row.key, "bank_name", e.target.value)}
-                          placeholder="Contoh: BCA / Mandiri / BNI"
+                          placeholder="BCA / Mandiri / BNI / BRI"
+                          className="h-10 rounded-xl bg-white"
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">No. Rekening</Label>
+                        <Label className="text-xs font-bold text-slate-700">Nomor Rekening</Label>
                         <Input
                           value={row.bank_account_number}
                           onChange={(e) => updateBankRow(row.key, "bank_account_number", e.target.value)}
-                          placeholder="Contoh: 7030298629"
+                          placeholder="7030298629"
+                          className="h-10 rounded-xl font-mono bg-white"
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Atas Nama</Label>
+                        <Label className="text-xs font-bold text-slate-700">Atas Nama (Pemilik)</Label>
                         <Input
                           value={row.bank_account_holder}
                           onChange={(e) => updateBankRow(row.key, "bank_account_holder", e.target.value)}
-                          placeholder="Nama pemilik rekening"
+                          placeholder="PT Nama Perusahaan"
+                          className="h-10 rounded-xl bg-white"
                         />
                       </div>
                     </div>
@@ -320,98 +399,146 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                   variant="outline"
                   size="sm"
                   onClick={addBankRow}
-                  className="w-full sm:w-auto gap-1.5 text-xs font-semibold"
+                  className="w-full sm:w-auto gap-1.5 text-xs font-semibold rounded-xl border-slate-200"
                 >
-                  <Plus className="h-3.5 w-3.5" /> Tambah Rekening Lain
+                  <Plus className="h-3.5 w-3.5 text-blue-600" /> Tambah Rekening Lain
                 </Button>
-                <Button className="w-full sm:w-auto" onClick={saveBankAccounts} disabled={saving === "bank"}>
-                  {saving === "bank" ? "Menyimpan..." : "Simpan Bank"}
+                <Button
+                  className="w-full sm:w-auto rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-xs"
+                  onClick={saveBankAccounts}
+                  disabled={saving === "bank"}
+                >
+                  {saving === "bank" ? "Menyimpan Bank..." : "Simpan Informasi Bank"}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
+        {/* ===== TAB 3: PENANDATANGAN DOKUMEN ===== */}
         <TabsContent value="signer">
-          <Card>
-            <CardHeader>
-              <CardTitle>Penandatangan Dokumen</CardTitle>
-              <CardDescription>Nama yang tampil di kolom tanda tangan dokumen.</CardDescription>
+          <Card className="border-slate-200/80 shadow-xs rounded-2xl overflow-hidden">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="text-base font-bold text-slate-900">Penandatangan Dokumen Resmi</CardTitle>
+              <CardDescription className="text-xs text-slate-500">
+                Nama dan jabatan pejabat yang berwenang menandatangani surat penawaran, invoice, dan SPK.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-5 sm:p-6 space-y-5">
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <Label>Nama</Label>
-                  <Input value={signerForm.signer_name} onChange={setSigner("signer_name")} />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Nama Penandatangan</Label>
+                  <Input
+                    value={signerForm.signer_name}
+                    onChange={setSigner("signer_name")}
+                    placeholder="Nama Lengkap & Gelar"
+                    className="h-10 rounded-xl"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label>Jabatan</Label>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">Jabatan</Label>
                   <Input
                     value={signerForm.signer_position}
                     onChange={setSigner("signer_position")}
-                    placeholder="Direktur"
+                    placeholder="Direktur / Chief Executive Officer"
+                    className="h-10 rounded-xl"
                   />
                 </div>
-                <div className="space-y-2 sm:col-span-3 lg:col-span-1">
-                  <Label>NIP / NIK (opsional)</Label>
-                  <Input value={signerForm.signer_nip} onChange={setSigner("signer_nip")} />
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-bold text-slate-700">NIP / NIK (opsional)</Label>
+                  <Input
+                    value={signerForm.signer_nip}
+                    onChange={setSigner("signer_nip")}
+                    placeholder="Nomor Induk Pegawai"
+                    className="h-10 rounded-xl font-mono"
+                  />
                 </div>
               </div>
-              <div>
+
+              <div className="pt-2">
                 <Button
-                  className="w-full sm:w-auto"
+                  className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-xs"
                   onClick={() => save("signer", signerForm)}
                   disabled={saving === "signer"}
                 >
-                  {saving === "signer" ? "Menyimpan..." : "Simpan Penandatangan"}
+                  {saving === "signer" ? "Menyimpan Penandatangan..." : "Simpan Penandatangan"}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
+        {/* ===== TAB 4: ANGGOTA TIM ===== */}
         <TabsContent value="team">
-          <Card>
-            <CardHeader>
-              <CardTitle>Anggota Tim</CardTitle>
-              <CardDescription>Anggota bisa login dan mengakses semua dokumen perusahaan.</CardDescription>
+          <Card className="border-slate-200/80 shadow-xs rounded-2xl overflow-hidden">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="text-base font-bold text-slate-900">Anggota Tim & Kode Akses</CardTitle>
+              <CardDescription className="text-xs text-slate-500">
+                Kelola anggota tim yang memiliki hak akses untuk mengelola dokumen perusahaan.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-5 sm:p-6 space-y-6">
               {isOwner && company.join_code && (
-                <div className="flex flex-wrap items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-blue-200/80 bg-blue-50/70 p-4 sm:p-5">
                   <div>
-                    <p className="text-sm font-medium">Kode Bergabung Tim</p>
-                    <p className="text-xs text-slate-600">
-                      Bagikan kode ini ke rekan tim. Mereka mendaftar lewat halaman{" "}
-                      <span className="font-mono">/register</span> → &quot;Gabung Tim&quot;.
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">
+                      <ShieldCheck className="h-4 w-4" /> Kode Undangan Tim
+                    </div>
+                    <p className="text-xs text-slate-600 max-w-md">
+                      Bagikan kode unik ini kepada rekan tim. Rekan tim dapat mendaftar lewat{" "}
+                      <span className="font-mono font-semibold text-blue-800">/register</span> → pilih opsi &quot;Gabung
+                      Tim&quot;.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded border bg-white px-4 py-2 font-mono text-lg font-bold tracking-[0.3em] text-blue-800">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="rounded-xl border border-blue-200 bg-white px-4 py-2 font-mono text-xl font-black tracking-[0.3em] text-blue-800 shadow-2xs">
                       {company.join_code}
                     </span>
-                    <Button variant="outline" size="icon" onClick={copyCode} title="Salin kode">
-                      {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={copyCode}
+                      title="Salin kode tim"
+                      className="h-10 w-10 rounded-xl border-blue-200 bg-white hover:bg-blue-100/50"
+                    >
+                      {copied ? (
+                        <Check className="h-4 w-4 text-emerald-600" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-blue-700" />
+                      )}
                     </Button>
                   </div>
                 </div>
               )}
-              <ul className="divide-y rounded-lg border">
-                {members.map((m) => (
-                  <li key={m.id} className="flex items-center justify-between px-4 py-3">
-                    <div>
-                      <p className="text-sm font-medium">{m.name || m.email}</p>
-                      <p className="text-xs text-muted-foreground">{m.email}</p>
-                    </div>
-                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">
-                      {roleLabel(m.role)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+
+              <div className="space-y-2">
+                <p className="text-xs font-bold text-slate-700">Daftar Anggota Terdaftar ({members.length})</p>
+                <ul className="divide-y divide-slate-100 rounded-2xl border border-slate-200/80 overflow-hidden bg-white">
+                  {members.map((m) => (
+                    <li key={m.id} className="flex items-center justify-between px-4 py-3.5 sm:px-5">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 font-bold text-slate-600 text-xs">
+                          {(m.name || m.email || "U").slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">{m.name || m.email}</p>
+                          <p className="text-xs text-slate-400">{m.email}</p>
+                        </div>
+                      </div>
+                      <Badge
+                        variant={m.role === "owner" ? "info" : "secondary"}
+                        className="rounded-lg px-2.5 py-0.5 text-xs font-semibold"
+                      >
+                        {roleLabel(m.role)}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               {!isOwner && (
-                <p className="text-xs text-muted-foreground">
-                  Hanya pemilik yang bisa melihat kode tim dan mengelola keanggotaan.
+                <p className="text-xs text-slate-400 italic">
+                  * Hanya pemilik perusahaan (Owner) yang memiliki akses untuk melihat kode tim & mengelola keanggotaan.
                 </p>
               )}
             </CardContent>

@@ -102,6 +102,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2.5 group">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/icon.svg"
               alt="Dokgen"
@@ -159,6 +160,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
       <section className="pt-8 pb-12 sm:pt-12 sm:pb-20 md:pt-16 md:pb-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
           <div className="inline-flex max-w-[95%] items-center justify-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-semibold text-blue-700 sm:text-xs mb-4 sm:mb-6 leading-tight">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.svg" alt="Dokgen" className="h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-xs shadow-2xs shrink-0" />
             <span className="truncate sm:whitespace-normal">Generator Dokumen Bisnis & Invoice Standar Indonesia</span>
           </div>
@@ -756,6 +758,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
       <footer className="border-t border-slate-200 bg-white py-6 text-slate-500 text-xs">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.svg" alt="Dokgen" className="h-5 w-5 rounded-md shadow-2xs" />
             <span className="font-bold text-slate-900">Dokgen.</span>
           </div>
