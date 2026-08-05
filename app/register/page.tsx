@@ -203,7 +203,7 @@ export default function RegisterPage() {
 
                 <Button
                   type="submit"
-                  className="h-12 w-full text-base font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-blue-600/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none mt-2"
+                  className="h-12 w-full text-base font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white active:scale-[0.98] transition-all shadow-md shadow-blue-600/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none mt-2"
                   disabled={pending || !isFormValid}
                 >
                   {pending ? (
