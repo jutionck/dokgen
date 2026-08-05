@@ -15,6 +15,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered") === "1";
+  const verified = searchParams.get("verified") === "1";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,7 +45,17 @@ function LoginForm() {
     setPending(false);
 
     if (res.error) {
-      setError(res.error.message || "Email atau password salah");
+      const msg = res.error.message?.toLowerCase() || "";
+      if (
+        res.error.status === 403 ||
+        msg.includes("verify") ||
+        msg.includes("verifikasi") ||
+        res.error.code === "EMAIL_NOT_VERIFIED"
+      ) {
+        setError("Email Anda belum diverifikasi. Silakan cek inbox/spam email Anda.");
+      } else {
+        setError(res.error.message || "Email atau password salah");
+      }
       return;
     }
     router.push("/dashboard");
@@ -73,9 +84,14 @@ function LoginForm() {
       </CardHeader>
       <CardContent className="px-0 sm:px-8 pb-4 sm:pb-9 pt-2 sm:pt-4">
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          {registered && (
-            <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-4 py-3 text-xs sm:text-sm font-medium text-emerald-800 shadow-2xs">
-              ✅ Registrasi berhasil. Silakan masuk dengan akun Anda.
+          {verified && (
+            <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-3 py-2.5 text-center text-xs font-medium text-emerald-800 shadow-2xs">
+              Verifikasi email berhasil. Silakan masuk dengan akun Anda.
+            </div>
+          )}
+          {registered && !verified && (
+            <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/90 px-3 py-2.5 text-center text-xs font-medium text-emerald-800 shadow-2xs">
+              Registrasi berhasil. Silakan verifikasi email Anda sebelum masuk.
             </div>
           )}
           {error && (

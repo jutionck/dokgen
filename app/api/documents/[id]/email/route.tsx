@@ -7,6 +7,7 @@ import { emailLogs } from "@/db/schema";
 import { loadTemplateData } from "@/lib/documents/loader";
 import { pdfFilename } from "@/lib/documents/filename";
 import { PdfRenderer } from "@/lib/pdf/documents";
+import { renderDocumentEmailHtml } from "@/lib/email-template";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,9 +41,12 @@ export async function POST(request: Request, props: RouteContext<"/api/documents
   const session = await auth.api.getSession({ headers: await headers() });
 
   const subject = String(body.subject || "").trim() || `${data.doc.title} ${data.doc.number} - ${data.company.name}`;
+  const rawMessage = String(body.message || "").trim();
   const message =
-    String(body.message || "").trim() ||
+    rawMessage ||
     `Kepada Yth. Bapak/Ibu,\n\nTerlampir kami kirimkan ${data.doc.title.toLowerCase()} dengan nomor ${data.doc.number}.\n\nTerima kasih atas perhatian dan kerjasamanya.\n\nHormat kami,\n${data.company.name}`;
+
+  const html = renderDocumentEmailHtml({ data, customMessage: rawMessage });
 
   try {
     const pdfBuffer = await renderToBuffer(<PdfRenderer data={data} />);
@@ -58,6 +62,7 @@ export async function POST(request: Request, props: RouteContext<"/api/documents
       cc: ccList.length ? ccList : undefined,
       subject,
       text: message,
+      html,
       attachments: [
         {
           filename: pdfFilename(data.doc),

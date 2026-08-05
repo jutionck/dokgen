@@ -30,7 +30,12 @@ export async function registerAction(_prevState: { error: string } | null, formD
   // 1) Daftarkan user. Kalau email sudah terdaftar, pakai akun lama yang
   //    "yatim" (terdaftar tapi belum punya perusahaan).
   const signUpRes = await auth.api.signUpEmail({
-    body: { email, password, name: name || email.split("@")[0] },
+    body: {
+      email,
+      password,
+      name: name || email.split("@")[0],
+      callbackURL: "/login?verified=1",
+    },
   });
 
   let user_id: string;
