@@ -52,14 +52,18 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md border-none shadow-xl shadow-blue-900/10">
-      <CardHeader className="items-center space-y-1 pb-2 pt-8 text-center">
+    <Card className="w-full max-w-md border-0 bg-transparent shadow-none sm:border sm:border-slate-200 sm:bg-white sm:shadow-xl sm:shadow-blue-900/10 sm:rounded-2xl">
+      <CardHeader className="items-center space-y-1.5 pb-2 pt-2 sm:pt-8 text-center px-0 sm:px-6">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icon.svg" alt="Dokgen" className="mb-2 h-14 w-14 rounded-2xl shadow-md shadow-blue-900/20" />
-        <CardTitle className="text-2xl font-bold tracking-tight">Selamat datang kembali</CardTitle>
-        <CardDescription>Masuk untuk mengelola seluruh dokumen bisnis Anda.</CardDescription>
+        <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          Selamat datang kembali
+        </CardTitle>
+        <CardDescription className="text-xs sm:text-sm text-slate-500">
+          Masuk untuk mengelola seluruh dokumen bisnis Anda.
+        </CardDescription>
       </CardHeader>
-      <CardContent className="px-7 pb-8">
+      <CardContent className="px-0 sm:px-7 pb-4 sm:pb-8 pt-2 sm:pt-4">
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {registered && (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
@@ -78,7 +82,7 @@ function LoginForm() {
               id="email"
               type="email"
               placeholder="nama@perusahaan.com"
-              className="h-11"
+              className="h-11 bg-white sm:bg-slate-50/50"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -87,13 +91,13 @@ function LoginForm() {
             <Label htmlFor="password">Password</Label>
             <PasswordInput
               id="password"
-              containerClassName="[&>input]:h-11"
+              containerClassName="[&>input]:h-11 [&>input]:bg-white sm:[&>input]:bg-slate-50/50"
               placeholder="Masukkan password Anda"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <Button type="submit" className="h-11 w-full text-base" disabled={pending}>
+          <Button type="submit" className="h-11 w-full text-base font-semibold shadow-2xs" disabled={pending}>
             {pending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" /> Memproses...
@@ -118,9 +122,9 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="dot-grid relative flex min-h-screen items-center justify-center p-4">
-      <Suspense fallback={<Card className="h-80 w-full max-w-md" />}>
-        <div className="flex w-full flex-col items-center">
+    <main className="dot-grid relative flex min-h-screen items-center justify-center px-4 py-8 sm:p-4">
+      <Suspense fallback={<div className="h-80 w-full max-w-md" />}>
+        <div className="flex w-full max-w-md flex-col items-center">
           <LoginForm />
           <AuthFooter />
         </div>

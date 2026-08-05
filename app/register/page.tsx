@@ -42,19 +42,23 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="dot-grid relative flex min-h-screen items-center justify-center p-4">
+    <main className="dot-grid relative flex min-h-screen items-center justify-center px-4 py-8 sm:p-4">
       <div className="w-full max-w-md">
-        <div className="mb-6 flex flex-col items-center text-center">
+        <div className="mb-4 sm:mb-6 flex flex-col items-center text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.svg" alt="Dokgen" className="mb-3 h-16 w-16 rounded-2xl shadow-md shadow-blue-900/20" />
-          <h1 className="text-2xl font-bold tracking-tight">Mulai pakai Dokgen</h1>
-          <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+          <img
+            src="/icon.svg"
+            alt="Dokgen"
+            className="mb-2.5 h-14 w-14 sm:h-16 sm:w-16 rounded-2xl shadow-md shadow-blue-900/20"
+          />
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Mulai pakai Dokgen</h1>
+          <p className="mt-1 max-w-xs text-xs sm:text-sm text-slate-500">
             Buat perusahaan baru, atau gabung ke perusahaan tim dengan kode.
           </p>
         </div>
 
-        <Card className="w-full border-none shadow-xl shadow-blue-900/10">
-          <CardContent className="px-7 py-7">
+        <Card className="w-full border-0 bg-transparent shadow-none sm:border sm:border-slate-200 sm:bg-white sm:shadow-xl sm:shadow-blue-900/10 sm:rounded-2xl">
+          <CardContent className="px-0 sm:px-7 py-2 sm:py-7">
             <Tabs value={mode} onValueChange={setMode}>
               <form action={action} onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <input type="hidden" name="mode" value={mode} />
@@ -65,29 +69,34 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="create" className="flex items-center gap-1.5">
+                <TabsList className="grid w-full grid-cols-2 bg-slate-200/60 sm:bg-slate-100">
+                  <TabsTrigger value="create" className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold">
                     <Building2 className="h-3.5 w-3.5" /> Perusahaan Baru
                   </TabsTrigger>
-                  <TabsTrigger value="join" className="flex items-center gap-1.5">
+                  <TabsTrigger value="join" className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold">
                     <KeyRound className="h-3.5 w-3.5" /> Gabung Tim
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="create" className="mt-0 space-y-4">
+                <TabsContent value="create" className="mt-0 space-y-4 pt-1">
                   <div className="space-y-1.5">
                     <Label htmlFor="company_name">
                       Nama Perusahaan <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="company_name" name="company_name" placeholder="PT Contoh Karya" className="h-11" />
+                    <Input
+                      id="company_name"
+                      name="company_name"
+                      placeholder="PT Contoh Karya"
+                      className="h-11 bg-white sm:bg-slate-50/50"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="city">Kota</Label>
-                    <Input id="city" name="city" placeholder="Jakarta" className="h-11" />
+                    <Input id="city" name="city" placeholder="Jakarta" className="h-11 bg-white sm:bg-slate-50/50" />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="join" className="mt-0 space-y-4">
+                <TabsContent value="join" className="mt-0 space-y-4 pt-1">
                   <div className="space-y-1.5">
                     <Label htmlFor="join_code">
                       Kode Perusahaan <span className="text-red-500">*</span>
@@ -96,7 +105,7 @@ export default function RegisterPage() {
                       id="join_code"
                       name="join_code"
                       placeholder="Contoh: ABC123"
-                      className="h-11 uppercase tracking-widest"
+                      className="h-11 uppercase tracking-widest bg-white sm:bg-slate-50/50"
                     />
                     <p className="text-xs text-muted-foreground">
                       Minta kode dari pemilik perusahaan di menu Pengaturan → Tim.
@@ -104,7 +113,7 @@ export default function RegisterPage() {
                   </div>
                 </TabsContent>
 
-                <div className="my-5 h-px bg-slate-100" />
+                <div className="my-5 h-px bg-slate-200/80 sm:bg-slate-100" />
                 <p className="-mt-1 text-xs text-muted-foreground">
                   Kolom bertanda <span className="text-red-500">*</span> wajib diisi
                 </p>
@@ -114,13 +123,24 @@ export default function RegisterPage() {
                     <Label htmlFor="name">
                       Nama Anda <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="name" name="name" placeholder="Nama lengkap" className="h-11" />
+                    <Input
+                      id="name"
+                      name="name"
+                      placeholder="Nama lengkap"
+                      className="h-11 bg-white sm:bg-slate-50/50"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="email">
                       Email <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="email" name="email" type="email" placeholder="nama@email.com" className="h-11" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="nama@email.com"
+                      className="h-11 bg-white sm:bg-slate-50/50"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="password">
@@ -129,13 +149,13 @@ export default function RegisterPage() {
                     <PasswordInput
                       id="password"
                       name="password"
-                      containerClassName="[&>input]:h-11"
+                      containerClassName="[&>input]:h-11 [&>input]:bg-white sm:[&>input]:bg-slate-50/50"
                       placeholder="Minimal 6 karakter"
                     />
                   </div>
                 </div>
 
-                <Button type="submit" className="h-11 w-full text-base" disabled={pending}>
+                <Button type="submit" className="h-11 w-full text-base font-semibold shadow-2xs" disabled={pending}>
                   {pending ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" /> Mendaftarkan...
