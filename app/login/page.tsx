@@ -51,6 +51,8 @@ function LoginForm() {
     router.refresh();
   };
 
+  const isValid = email.trim().length > 0 && /^\S+@\S+\.\S+$/.test(email.trim()) && password.length > 0;
+
   return (
     <Card className="w-full max-w-md border-0 bg-transparent shadow-none sm:border sm:border-slate-200/80 sm:bg-white sm:shadow-2xl sm:shadow-blue-900/10 sm:rounded-3xl">
       <CardHeader className="items-center space-y-2 pb-3 pt-2 sm:pt-9 text-center px-0 sm:px-8">
@@ -116,8 +118,8 @@ function LoginForm() {
           </div>
           <Button
             type="submit"
-            className="h-12 w-full text-base font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-blue-600/25 mt-2"
-            disabled={pending}
+            className="h-12 w-full text-base font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-blue-600/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none mt-2"
+            disabled={pending || !isValid}
           >
             {pending ? (
               <>

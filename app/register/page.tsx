@@ -16,22 +16,34 @@ export default function RegisterPage() {
   const [mode, setMode] = useState("create");
   const [clientError, setClientError] = useState<string | null>(null);
 
+  const [companyName, setCompanyName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const isCompanyValid = mode === "create" ? companyName.trim().length > 0 : joinCode.trim().length > 0;
+  const isNameValid = name.trim().length > 0;
+  const isEmailValid = email.trim().length > 0 && /^\S+@\S+\.\S+$/.test(email.trim());
+  const isPasswordValid = password.length >= 6;
+  const isFormValid = isCompanyValid && isNameValid && isEmailValid && isPasswordValid;
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const form = new FormData(e.currentTarget);
-    const email = String(form.get("email") || "").trim();
-    const password = String(form.get("password") || "");
-    const name = String(form.get("name") || "").trim();
+    const emailVal = String(form.get("email") || "").trim();
+    const passwordVal = String(form.get("password") || "");
+    const nameVal = String(form.get("name") || "").trim();
     const currentMode = String(form.get("mode") || "create");
-    const companyName = String(form.get("company_name") || "").trim();
-    const joinCode = String(form.get("join_code") || "").trim();
+    const companyVal = String(form.get("company_name") || "").trim();
+    const codeVal = String(form.get("join_code") || "").trim();
 
     let err: string | null = null;
-    if (currentMode === "create" && !companyName) err = "Nama perusahaan wajib diisi";
-    else if (currentMode === "join" && !joinCode) err = "Kode perusahaan wajib diisi";
-    else if (!name) err = "Nama Anda wajib diisi";
-    else if (!email) err = "Email wajib diisi";
-    else if (!/^\S+@\S+\.\S+$/.test(email)) err = "Format email tidak valid";
-    else if (password.length < 6) err = "Password minimal 6 karakter";
+    if (currentMode === "create" && !companyVal) err = "Nama perusahaan wajib diisi";
+    else if (currentMode === "join" && !codeVal) err = "Kode perusahaan wajib diisi";
+    else if (!nameVal) err = "Nama Anda wajib diisi";
+    else if (!emailVal) err = "Email wajib diisi";
+    else if (!/^\S+@\S+\.\S+$/.test(emailVal)) err = "Format email tidak valid";
+    else if (passwordVal.length < 6) err = "Password minimal 6 karakter";
 
     if (err) {
       e.preventDefault();
@@ -99,6 +111,8 @@ export default function RegisterPage() {
                       name="company_name"
                       placeholder="PT Contoh Karya"
                       className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -127,6 +141,8 @@ export default function RegisterPage() {
                       name="join_code"
                       placeholder="Contoh: ABC123"
                       className="h-12 rounded-xl uppercase tracking-widest bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs font-semibold"
+                      value={joinCode}
+                      onChange={(e) => setJoinCode(e.target.value)}
                     />
                     <p className="text-xs text-slate-500">
                       Minta kode dari pemilik perusahaan di menu Pengaturan → Tim.
@@ -147,6 +163,8 @@ export default function RegisterPage() {
                       autoComplete="name"
                       placeholder="Nama lengkap"
                       className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -163,6 +181,8 @@ export default function RegisterPage() {
                       autoCorrect="off"
                       placeholder="nama@email.com"
                       className="h-12 rounded-xl bg-white text-base sm:text-sm border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 shadow-2xs"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -175,14 +195,16 @@ export default function RegisterPage() {
                       autoComplete="new-password"
                       containerClassName="[&>input]:h-12 [&>input]:rounded-xl [&>input]:bg-white [&>input]:text-base sm:[&>input]:text-sm [&>input]:border-slate-200 [&>input]:focus:border-blue-600 [&>input]:focus:ring-2 [&>input]:focus:ring-blue-600/20 [&>input]:shadow-2xs"
                       placeholder="Minimal 6 karakter"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
                 </div>
 
                 <Button
                   type="submit"
-                  className="h-12 w-full text-base font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-blue-600/25 mt-2"
-                  disabled={pending}
+                  className="h-12 w-full text-base font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-blue-600/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none mt-2"
+                  disabled={pending || !isFormValid}
                 >
                   {pending ? (
                     <>
