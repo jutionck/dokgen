@@ -17,6 +17,7 @@ import {
   Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { balancedCardSpan, cn } from "@/lib/utils";
 
 interface LandingPageProps {
   isLoggedIn: boolean;
@@ -632,13 +633,16 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
             <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-3xl">5 Jenis Dokumen Standar Bisnis</h2>
           </div>
 
-          <div className="mt-8 sm:mt-10 grid gap-3.5 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {docTypes.map((item) => {
+          <div className="mt-8 grid grid-cols-1 gap-3.5 sm:mt-10 sm:grid-cols-6 sm:gap-5">
+            {docTypes.map((item, index) => {
               const IconComp = item.icon;
               return (
                 <div
                   key={item.id}
-                  className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5 hover:border-blue-500/40 hover:shadow-sm transition-all"
+                  className={cn(
+                    "rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-blue-500/40 hover:shadow-sm sm:p-5",
+                    balancedCardSpan(index, docTypes.length)
+                  )}
                 >
                   <div className="flex items-center justify-between mb-2.5 sm:mb-3">
                     <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700">

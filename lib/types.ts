@@ -27,6 +27,7 @@ export interface Company {
   website?: string | null;
   npwp?: string | null;
   logo_url?: string | null;
+  signature_url?: string | null;
   bank_name?: string | null;
   bank_account_number?: string | null;
   bank_account_holder?: string | null;

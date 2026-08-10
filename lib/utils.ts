@@ -5,6 +5,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Membagi sisa kartu agar baris terakhir selalu memenuhi lebar grid.
+ * Grid induk harus menggunakan enam kolom mulai breakpoint `sm`.
+ */
+export function balancedCardSpan(index: number, itemCount: number) {
+  const isLast = index === itemCount - 1;
+  const desktopRemainder = itemCount % 3;
+
+  return cn(
+    "sm:col-span-3 lg:col-span-2",
+    itemCount % 2 === 1 && isLast && "sm:col-span-6",
+    desktopRemainder === 1 && isLast && "lg:col-span-6",
+    desktopRemainder === 2 && index >= itemCount - 2 && "lg:col-span-3"
+  );
+}
+
 export function formatIDR(value: number, currency = "IDR") {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",

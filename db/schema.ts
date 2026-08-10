@@ -97,6 +97,7 @@ export const companies = mysqlTable("companies", {
   website: text("website"),
   npwp: text("npwp"),
   logo_url: text("logo_url"),
+  signature_url: text("signature_url"),
   bank_name: text("bank_name"),
   bank_account_number: text("bank_account_number"),
   bank_account_holder: text("bank_account_holder"),

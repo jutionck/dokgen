@@ -187,7 +187,7 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* ===== Dokumen Terbaru (2 kolom) ===== */}
-        <Card className="lg:col-span-2 border-slate-200/80 shadow-xs rounded-2xl overflow-hidden flex flex-col justify-between">
+        <Card className="lg:col-span-2 border-slate-200/80 shadow-xs rounded-2xl overflow-hidden flex flex-col">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-5 px-5 sm:px-6 border-b border-slate-100">
             <div>
               <CardTitle className="text-base font-bold text-slate-900">Dokumen Terbaru</CardTitle>
@@ -200,7 +200,9 @@ export default async function DashboardPage() {
               Lihat semua <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardHeader>
-          <CardContent className="p-0 flex-1 flex flex-col justify-center">
+          <CardContent
+            className={cn("flex flex-1 flex-col p-0", recent.length === 0 ? "justify-center" : "justify-start")}
+          >
             {recent.length === 0 ? (
               <div className="py-12 px-6 text-center flex flex-col items-center justify-center">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-3 border border-blue-100 shadow-2xs">

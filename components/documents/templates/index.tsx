@@ -5,6 +5,7 @@ import { QuotationTemplate } from "./quotation";
 import { InvoiceTemplate } from "./invoice";
 import { BastTemplate } from "./bast";
 import { KontrakTemplate } from "./kontrak";
+import { DocFooter } from "./blocks";
 
 export function DocPage({ children }: { children: React.ReactNode }) {
   return (
@@ -15,18 +16,32 @@ export function DocPage({ children }: { children: React.ReactNode }) {
 }
 
 export function TemplateSwitch({ data }: { data: TemplateData }) {
+  let template: React.ReactNode;
+
   switch (data.doc.type as DocType) {
     case "penawaran":
-      return <PenawaranTemplate data={data} />;
+      template = <PenawaranTemplate data={data} />;
+      break;
     case "quotation":
-      return <QuotationTemplate data={data} />;
+      template = <QuotationTemplate data={data} />;
+      break;
     case "invoice":
-      return <InvoiceTemplate data={data} />;
+      template = <InvoiceTemplate data={data} />;
+      break;
     case "bast":
-      return <BastTemplate data={data} />;
+      template = <BastTemplate data={data} />;
+      break;
     case "kontrak":
-      return <KontrakTemplate data={data} />;
+      template = <KontrakTemplate data={data} />;
+      break;
     default:
       return null;
   }
+
+  return (
+    <>
+      {template}
+      <DocFooter data={data} />
+    </>
+  );
 }
