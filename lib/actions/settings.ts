@@ -27,6 +27,12 @@ export interface CompanyInput {
 
 const COMPANY_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
+function getBlobToken() {
+  // Vercel memakai nama kedua saat Blob store dibuat dengan prefix
+  // `BLOB_READ_WRITE_TOKEN` melalui menu Advanced Options.
+  return process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN ?? process.env.BLOB_READ_WRITE_TOKEN;
+}
+
 function isManagedBlobUrl(value?: string | null) {
   if (!value) return false;
   try {
@@ -37,9 +43,10 @@ function isManagedBlobUrl(value?: string | null) {
 }
 
 async function deleteManagedBlob(value?: string | null) {
-  if (!isManagedBlobUrl(value) || !process.env.BLOB_READ_WRITE_TOKEN) return;
+  const token = getBlobToken();
+  if (!isManagedBlobUrl(value) || !token) return;
   try {
-    await del(value!);
+    await del(value!, { token });
   } catch (error) {
     console.warn("[company-image] Gagal menghapus Blob lama:", error);
   }
@@ -67,9 +74,11 @@ async function uploadCompanyImage(
     return { error: `Format ${options.label} harus ${formats}` };
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  const blobToken = getBlobToken();
+  if (!blobToken) {
     return {
-      error: "Penyimpanan gambar belum dikonfigurasi. Tambahkan BLOB_READ_WRITE_TOKEN di environment aplikasi.",
+      error:
+        "Penyimpanan gambar belum dikonfigurasi. Hubungkan Vercel Blob dan tambahkan read-write token di environment aplikasi.",
     };
   }
 
@@ -84,11 +93,18 @@ async function uploadCompanyImage(
     const result = await put(
       `${options.folder}/${companyId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`,
       file,
-      { access: "public", addRandomSuffix: false }
+      { access: "public", addRandomSuffix: true, token: blobToken }
     );
     imageUrl = result.url;
   } catch (error) {
-    return { error: `Gagal mengunggah ${options.label}: ${error instanceof Error ? error.message : "unknown"}` };
+    const message = error instanceof Error ? error.message : "unknown";
+    if (message.includes("This store does not exist")) {
+      return {
+        error:
+          "Blob store tidak ditemukan. Perbarui read-write token dari Blob store yang masih aktif, lalu deploy ulang aplikasi.",
+      };
+    }
+    return { error: `Gagal mengunggah ${options.label}: ${message}` };
   }
 
   try {

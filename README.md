@@ -56,6 +56,8 @@ npm run dev           # http://localhost:3000
 
 - Local: `npx vercel link` lalu `npx vercel env pull` — atau buat token di
   [vercel.com/docs/storage/vercel-blob](https://vercel.com/docs/storage/vercel-blob) dan isi `BLOB_READ_WRITE_TOKEN`
+- Jika Blob store dibuat dengan prefix `BLOB_READ_WRITE_TOKEN`, Vercel dapat membuat
+  `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN`; aplikasi mendukung kedua nama tersebut.
 
 ## Deploy ke Vercel
 
