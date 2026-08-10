@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { put } from "@vercel/blob";
+import { del, put } from "@vercel/blob";
 import { db } from "@/lib/db";
 import { companies } from "@/db/schema";
 import { requireCompanyId } from "@/lib/documents/auth";
@@ -23,6 +23,104 @@ export interface CompanyInput {
   signer_name?: string;
   signer_position?: string;
   signer_nip?: string;
+}
+
+const COMPANY_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+function isManagedBlobUrl(value?: string | null) {
+  if (!value) return false;
+  try {
+    return new URL(value).hostname.endsWith(".blob.vercel-storage.com");
+  } catch {
+    return false;
+  }
+}
+
+async function deleteManagedBlob(value?: string | null) {
+  if (!isManagedBlobUrl(value) || !process.env.BLOB_READ_WRITE_TOKEN) return;
+  try {
+    await del(value!);
+  } catch (error) {
+    console.warn("[company-image] Gagal menghapus Blob lama:", error);
+  }
+}
+
+async function uploadCompanyImage(
+  formData: FormData,
+  options: {
+    formKey: "logo" | "signature";
+    folder: "logos" | "signatures";
+    column: "logo_url" | "signature_url";
+    label: "logo" | "tanda tangan";
+    allowedTypes?: string[];
+  }
+) {
+  const companyId = await requireCompanyId();
+  if (!companyId) return { error: "Akun tidak terhubung ke perusahaan" };
+
+  const file = formData.get(options.formKey) as File | null;
+  if (!file || file.size === 0) return { error: `Pilih file ${options.label} terlebih dahulu` };
+  if (file.size > 2 * 1024 * 1024) return { error: `Ukuran ${options.label} maksimal 2MB` };
+  const allowedTypes = options.allowedTypes ?? COMPANY_IMAGE_TYPES;
+  if (!allowedTypes.includes(file.type)) {
+    const formats = allowedTypes.includes("image/webp") ? "PNG, JPG, atau WebP" : "PNG atau JPG";
+    return { error: `Format ${options.label} harus ${formats}` };
+  }
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return {
+      error: "Penyimpanan gambar belum dikonfigurasi. Tambahkan BLOB_READ_WRITE_TOKEN di environment aplikasi.",
+    };
+  }
+
+  const [currentCompany] = await db
+    .select({ imageUrl: companies[options.column] })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1);
+
+  let imageUrl: string;
+  try {
+    const result = await put(
+      `${options.folder}/${companyId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`,
+      file,
+      { access: "public", addRandomSuffix: false }
+    );
+    imageUrl = result.url;
+  } catch (error) {
+    return { error: `Gagal mengunggah ${options.label}: ${error instanceof Error ? error.message : "unknown"}` };
+  }
+
+  try {
+    const updateData: Partial<typeof companies.$inferInsert> = { [options.column]: imageUrl };
+    await db.update(companies).set(updateData).where(eq(companies.id, companyId));
+    await deleteManagedBlob(currentCompany?.imageUrl);
+    revalidatePath("/settings");
+    revalidatePath("/documents");
+    revalidatePath("/dashboard");
+    return { success: true, url: imageUrl };
+  } catch (error) {
+    await deleteManagedBlob(imageUrl);
+    return { error: `Gagal menyimpan ${options.label}: ${error instanceof Error ? error.message : "unknown"}` };
+  }
+}
+
+async function removeCompanyImage(column: "logo_url" | "signature_url") {
+  const companyId = await requireCompanyId();
+  if (!companyId) return { error: "Akun tidak terhubung ke perusahaan" };
+
+  const [currentCompany] = await db
+    .select({ imageUrl: companies[column] })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1);
+  const updateData: Partial<typeof companies.$inferInsert> = { [column]: null };
+  await db.update(companies).set(updateData).where(eq(companies.id, companyId));
+  await deleteManagedBlob(currentCompany?.imageUrl);
+  revalidatePath("/settings");
+  revalidatePath("/documents");
+  revalidatePath("/dashboard");
+  return { success: true };
 }
 
 export async function updateCompanyAction(input: CompanyInput) {
@@ -68,64 +166,28 @@ export async function updateCompanyAction(input: CompanyInput) {
 }
 
 export async function uploadLogoAction(formData: FormData) {
-  const companyId = await requireCompanyId();
-  if (!companyId) return { error: "Akun tidak terhubung ke perusahaan" };
-
-  const file = formData.get("logo") as File | null;
-  if (!file || file.size === 0) return { error: "Pilih file logo terlebih dahulu" };
-  if (file.size > 2 * 1024 * 1024) return { error: "Ukuran logo maksimal 2MB" };
-  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-    return { error: "Format logo harus PNG, JPG, atau WebP" };
-  }
-
-  let logoUrl = "";
-
-  // 1. Coba upload ke Vercel Blob jika token tersedia
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    try {
-      const { url } = await put(
-        `logos/${companyId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`,
-        file,
-        {
-          access: "public",
-          addRandomSuffix: false,
-        }
-      );
-      logoUrl = url;
-    } catch (e) {
-      console.warn("Vercel Blob upload failed, fallback to Data URL:", e);
-    }
-  }
-
-  // 2. Mitigasi Fallback: Jika Vercel Blob tidak tersedia atau gagal, gunakan Data URL (Base64)
-  if (!logoUrl) {
-    try {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const mimeType = file.type || "image/png";
-      logoUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
-    } catch (e) {
-      return { error: `Gagal memproses file logo: ${e instanceof Error ? e.message : "unknown"}` };
-    }
-  }
-
-  try {
-    await db.update(companies).set({ logo_url: logoUrl }).where(eq(companies.id, companyId));
-    revalidatePath("/settings");
-    revalidatePath("/documents");
-    revalidatePath("/dashboard");
-    return { success: true, url: logoUrl };
-  } catch (e) {
-    return { error: `Gagal menyimpan logo: ${e instanceof Error ? e.message : "unknown"}` };
-  }
+  return uploadCompanyImage(formData, {
+    formKey: "logo",
+    folder: "logos",
+    column: "logo_url",
+    label: "logo",
+  });
 }
 
 export async function removeLogoAction() {
-  const companyId = await requireCompanyId();
-  if (!companyId) return { error: "Akun tidak terhubung ke perusahaan" };
+  return removeCompanyImage("logo_url");
+}
 
-  await db.update(companies).set({ logo_url: null }).where(eq(companies.id, companyId));
-  revalidatePath("/settings");
-  revalidatePath("/documents");
-  return { success: true };
+export async function uploadSignatureAction(formData: FormData) {
+  return uploadCompanyImage(formData, {
+    formKey: "signature",
+    folder: "signatures",
+    column: "signature_url",
+    label: "tanda tangan",
+    allowedTypes: ["image/png", "image/jpeg"],
+  });
+}
+
+export async function removeSignatureAction() {
+  return removeCompanyImage("signature_url");
 }

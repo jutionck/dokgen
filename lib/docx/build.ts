@@ -2,6 +2,7 @@ import {
   AlignmentType,
   BorderStyle,
   Document,
+  Footer,
   Packer,
   Paragraph,
   ShadingType,
@@ -25,6 +26,7 @@ import {
 } from "@/components/documents/templates/shared";
 import { parseScopeOfWork, parseBankAccounts } from "@/components/documents/templates/blocks";
 import { parseLogoDataUri, fitSize } from "@/lib/documents/logo";
+import { DOCUMENT_GENERATED_NOTICE } from "@/lib/documents/branding";
 
 const FONT = "Helvetica";
 const DEFAULT_PAGE = { width: 11906, height: 16838 }; // A4 (twips)
@@ -64,6 +66,21 @@ function title(text: string): Paragraph {
 
 function h3(text: string): Paragraph {
   return p([run(text.toUpperCase(), { bold: true, size: 19 })], { spacing: { before: 200, after: 100 } });
+}
+
+function generatedFooter(): Footer {
+  return new Footer({
+    children: [
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        border: {
+          top: { color: "CBD5E1", style: BorderStyle.SINGLE, size: 4, space: 4 },
+        },
+        children: [run(DOCUMENT_GENERATED_NOTICE, { color: "94A3B8", size: 15 })],
+        spacing: { before: 80, after: 0 },
+      }),
+    ],
+  });
 }
 
 function cell(
@@ -165,23 +182,49 @@ function signatureBlock(data: TemplateData, left: string[], right?: string[]): P
   const { company, doc } = data;
   const place = company.city || "";
   const dateLine = [place, doc.issue_date ? fmtDate(doc.issue_date) : ""].filter(Boolean).join(", ");
+  const signature = parseLogoDataUri(data.signatureDataUri);
+  const signatureSize = signature ? fitSize(signature.width, signature.height, 120, 48) : null;
 
-  const col = (lines: string[], align: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.RIGHT) => [
+  const col = (
+    lines: string[],
+    align: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.RIGHT,
+    includeSignature = false
+  ) => [
     p([run(lines[0], { bold: true })], { alignment: align, spacing: { after: 20 } }),
     ...(dateLine
-      ? [p([run(dateLine, { size: 17, color: "64748b" })], { alignment: align, spacing: { after: 240 } })]
+      ? [
+          p([run(dateLine, { size: 17, color: "64748b" })], {
+            alignment: align,
+            spacing: { after: includeSignature && signature ? 40 : 240 },
+          }),
+        ]
+      : []),
+    ...(includeSignature && signature && signatureSize
+      ? [
+          new Paragraph({
+            alignment: align,
+            children: [
+              new ImageRun({
+                type: signature.type,
+                data: signature.data,
+                transformation: signatureSize,
+              }),
+            ],
+            spacing: { after: 20 },
+          }),
+        ]
       : []),
     p([run(lines[1] || "", { bold: true, underline: {} })], { alignment: align, spacing: { after: 20 } }),
     p([run(lines[2] || "", { size: 17, color: "475569" })], { alignment: align, spacing: { after: 0 } }),
   ];
 
   if (!right) {
-    return [new Paragraph({ spacing: { before: 240 }, children: [] }), ...col(left, AlignmentType.RIGHT)];
+    return [new Paragraph({ spacing: { before: 240 }, children: [] }), ...col(left, AlignmentType.RIGHT, true)];
   }
 
   return [
     new Paragraph({ spacing: { before: 240 }, children: [] }),
-    ...col(left, AlignmentType.LEFT),
+    ...col(left, AlignmentType.LEFT, true),
     new Paragraph({ spacing: { before: 160 }, children: [] }),
     ...col(right, AlignmentType.RIGHT),
   ];
@@ -367,6 +410,7 @@ export function buildPenawaran(data: TemplateData, paper: { width: number; heigh
     sections: [
       {
         properties: { page: { size: paper } },
+        footers: { default: generatedFooter() },
         children: [
           ...header(data),
           p([run(`Lampiran : -`)], { spacing: { after: 40 } }),
@@ -421,6 +465,7 @@ export function buildQuotation(data: TemplateData, paper: { width: number; heigh
     sections: [
       {
         properties: { page: { size: paper } },
+        footers: { default: generatedFooter() },
         children: [
           ...header(data),
           ...clientBlock(data),
@@ -459,6 +504,7 @@ export function buildInvoice(data: TemplateData, paper: { width: number; height:
     sections: [
       {
         properties: { page: { size: paper } },
+        footers: { default: generatedFooter() },
         children: [
           ...header(data),
           ...clientBlock(data),
@@ -495,6 +541,7 @@ export function buildBast(data: TemplateData, paper: { width: number; height: nu
     sections: [
       {
         properties: { page: { size: paper } },
+        footers: { default: generatedFooter() },
         children: [
           ...header(data),
           p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], {
@@ -560,6 +607,7 @@ export function buildKontrak(data: TemplateData, paper: { width: number; height:
     sections: [
       {
         properties: { page: { size: paper } },
+        footers: { default: generatedFooter() },
         children: [
           ...header(data),
           p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], {

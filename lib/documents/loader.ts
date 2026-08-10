@@ -8,6 +8,21 @@ import type { Client, DocRecord } from "@/lib/types";
 import { requireCompanyId } from "@/lib/dal/auth";
 import { idSchema } from "@/lib/validators/actions";
 
+async function embedImage(imageUrl?: string | null): Promise<string | null> {
+  if (!imageUrl) return null;
+  if (imageUrl.startsWith("data:image/")) return imageUrl;
+
+  try {
+    const response = await fetch(imageUrl, { signal: AbortSignal.timeout(8000) });
+    if (!response.ok) return null;
+    const mime = response.headers.get("content-type") || "image/png";
+    const buffer = Buffer.from(await response.arrayBuffer());
+    return `data:${mime};base64,${buffer.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 export async function loadTemplateData(id: string): Promise<TemplateData | null> {
   if (!idSchema.safeParse(id).success) return null;
   const companyId = await requireCompanyId();
@@ -41,20 +56,11 @@ export async function loadTemplateData(id: string): Promise<TemplateData | null>
 
   const relItems = items.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
-  // Logo diambil server-side & di-embed sebagai data URI agar muncul di PDF/DOCX
-  let logoDataUri: string | null = null;
-  if (company.logo_url) {
-    try {
-      const res = await fetch(company.logo_url, { signal: AbortSignal.timeout(8000) });
-      if (res.ok) {
-        const mime = res.headers.get("content-type") || "image/png";
-        const buf = Buffer.from(await res.arrayBuffer());
-        logoDataUri = `data:${mime};base64,${buf.toString("base64")}`;
-      }
-    } catch {
-      logoDataUri = null;
-    }
-  }
+  // Aset diambil paralel dan di-embed agar konsisten di PDF, email, dan DOCX.
+  const [logoDataUri, signatureDataUri] = await Promise.all([
+    embedImage(company.logo_url),
+    embedImage(company.signature_url),
+  ]);
 
   return {
     company,
@@ -63,5 +69,6 @@ export async function loadTemplateData(id: string): Promise<TemplateData | null>
     items: relItems,
     totals: computeTotals(doc as unknown as DocRecord, relItems),
     logoDataUri,
+    signatureDataUri,
   };
 }

@@ -1,4 +1,5 @@
 import type { TemplateData } from "./shared";
+import { DOCUMENT_GENERATED_NOTICE } from "@/lib/documents/branding";
 import { fmt, fmtDate, fmtNum, terbilang } from "./shared";
 
 function logo(company: TemplateData["company"]) {
@@ -6,6 +7,18 @@ function logo(company: TemplateData["company"]) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={company.logo_url} alt="logo" className="mb-2 h-16 w-auto max-w-[200px] object-contain" />
+  );
+}
+
+export function CompanySignature({ company }: { company: TemplateData["company"] }) {
+  if (!company.signature_url) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={company.signature_url}
+      alt={`Tanda tangan ${company.signer_name || company.name}`}
+      className="mx-auto h-16 w-36 object-contain"
+    />
   );
 }
 
@@ -383,7 +396,8 @@ export function SignatureBlock({
         <div className="w-64 text-center">
           <p className="whitespace-pre-line font-semibold text-slate-800">{leftLabel(company.name)}</p>
           {dateLine && <p className="mt-1 text-xs text-slate-500">{dateLine}</p>}
-          <div className="mt-16 flex flex-col items-center">
+          <div className={company.signature_url ? "mt-2 flex flex-col items-center" : "mt-16 flex flex-col items-center"}>
+            <CompanySignature company={company} />
             <p className="font-semibold underline text-slate-900">
               {signerName || company.signer_name || company.name}
             </p>
@@ -400,7 +414,8 @@ export function SignatureBlock({
       <div className="text-center">
         <p className="whitespace-pre-line font-semibold text-slate-800">{leftLabel(company.name)}</p>
         {dateLine && <p className="mt-1 text-xs text-slate-500">{dateLine}</p>}
-        <div className="mt-16 flex flex-col items-center">
+        <div className={company.signature_url ? "mt-2 flex flex-col items-center" : "mt-16 flex flex-col items-center"}>
+          <CompanySignature company={company} />
           <p className="font-semibold underline text-slate-900">{signerName || company.signer_name || company.name}</p>
           <p className="text-xs text-slate-600">{signerPosition || company.signer_position}</p>
           {company.signer_nip && <p className="text-xs text-slate-500">NIP. {company.signer_nip}</p>}
@@ -421,10 +436,12 @@ export function SignatureBlock({
 /** Footer kecil. */
 export function DocFooter({ data }: { data: TemplateData }) {
   const { company } = data;
+  const companyContact = [company.name, company.phone, company.email, company.website].filter(Boolean).join(" · ");
+
   return (
-    <footer className="mt-6 border-t border-slate-200 pt-2 text-center text-[11px] text-slate-400">
-      {company.name} · {company.phone ? `${company.phone} · ` : ""}
-      {company.email} · {company.website || ""}
+    <footer className="mt-6 space-y-0.5 border-t border-slate-200 pt-2 text-center text-[10px] leading-relaxed text-slate-400">
+      {companyContact && <p>{companyContact}</p>}
+      <p>{DOCUMENT_GENERATED_NOTICE}</p>
     </footer>
   );
 }

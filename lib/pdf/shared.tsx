@@ -3,10 +3,11 @@ import type { PageSize } from "@react-pdf/types";
 import type { TemplateData } from "@/components/documents/templates/shared";
 import { fmt, fmtDate, fmtNum, terbilang } from "@/components/documents/templates/shared";
 import { parseScopeOfWork, parseBankAccounts } from "@/components/documents/templates/blocks";
+import { DOCUMENT_GENERATED_NOTICE } from "@/lib/documents/branding";
 
 export const pdfStyles = StyleSheet.create({
   page: {
-    padding: "42 46",
+    padding: "42 46 56",
     fontSize: 10,
     fontFamily: "Helvetica",
     color: "#111827",
@@ -67,9 +68,10 @@ export const pdfStyles = StyleSheet.create({
   signature: { flexDirection: "row", marginTop: 36, marginBottom: 8 },
   sigCol: { flex: 1, alignItems: "center" },
   sigLabel: { fontSize: 9, marginBottom: 2 },
-  sigPlace: { fontSize: 8, color: "#64748b", marginBottom: 24 },
+  sigPlace: { fontSize: 8, color: "#64748b", marginBottom: 4 },
   sigName: { fontSize: 9, fontFamily: "Helvetica-Bold", textDecoration: "underline", marginBottom: 2 },
   sigTitle: { fontSize: 8.5, color: "#475569" },
+  signatureImage: { width: 100, height: 46, objectFit: "contain", marginBottom: 2 },
   infoBox: {
     borderWidth: 1,
     borderColor: "#e2e8f0",
@@ -81,7 +83,29 @@ export const pdfStyles = StyleSheet.create({
   },
   row: { flexDirection: "row" },
   col: { flex: 1 },
+  generatedFooter: {
+    position: "absolute",
+    right: 46,
+    bottom: 20,
+    left: 46,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTopWidth: 0.6,
+    borderTopColor: "#cbd5e1",
+    paddingTop: 5,
+    color: "#94a3b8",
+    fontSize: 7,
+  },
 });
+
+function PdfGeneratedFooter() {
+  return (
+    <View style={pdfStyles.generatedFooter} fixed>
+      <Text>{DOCUMENT_GENERATED_NOTICE}</Text>
+      <Text render={({ pageNumber, totalPages }) => `Halaman ${pageNumber} / ${totalPages}`} />
+    </View>
+  );
+}
 
 export function PdfHeader({ data }: { data: TemplateData }) {
   const { company, doc } = data;
@@ -274,7 +298,11 @@ export function PdfSignature({
         <View style={{ width: "45%", alignItems: "center" }}>
           <Text style={pdfStyles.sigLabel}>{leftLabel}</Text>
           {dateStr ? <Text style={pdfStyles.sigPlace}>{dateStr}</Text> : null}
-          <View style={{ marginTop: 24 }}>
+          <View style={{ marginTop: data.signatureDataUri ? 4 : 24, alignItems: "center" }}>
+            {data.signatureDataUri ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={data.signatureDataUri} style={pdfStyles.signatureImage} />
+            ) : null}
             <Text style={pdfStyles.sigName}>{leftName || company.signer_name || company.name}</Text>
             <Text style={pdfStyles.sigTitle}>{leftTitle || company.signer_position}</Text>
           </View>
@@ -288,7 +316,11 @@ export function PdfSignature({
       <View style={pdfStyles.sigCol}>
         <Text style={pdfStyles.sigLabel}>{leftLabel}</Text>
         {dateStr ? <Text style={pdfStyles.sigPlace}>{dateStr}</Text> : null}
-        <View style={{ marginTop: 24 }}>
+        <View style={{ marginTop: data.signatureDataUri ? 4 : 24, alignItems: "center" }}>
+          {data.signatureDataUri ? (
+            // eslint-disable-next-line jsx-a11y/alt-text
+            <Image src={data.signatureDataUri} style={pdfStyles.signatureImage} />
+          ) : null}
           <Text style={pdfStyles.sigName}>{leftName || company.signer_name || company.name}</Text>
           <Text style={pdfStyles.sigTitle}>{leftTitle || company.signer_position}</Text>
         </View>
@@ -424,6 +456,7 @@ export function PdfDocumentShell({
       <Page size={paperSize} style={pdfStyles.page}>
         <PdfHeader data={data} />
         {children}
+        <PdfGeneratedFooter />
       </Page>
     </Document>
   );

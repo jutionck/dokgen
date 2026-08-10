@@ -17,6 +17,7 @@ import { DocumentForm } from "@/components/documents/document-form";
 import { DOC_TEMPLATES, DOC_TYPE_META } from "@/lib/documents/templates";
 import { DOC_TYPES } from "@/lib/types";
 import type { Client, DocType, Company } from "@/lib/types";
+import { balancedCardSpan, cn } from "@/lib/utils";
 
 const TYPE_ICONS = {
   receipt: Receipt,
@@ -25,6 +26,8 @@ const TYPE_ICONS = {
   "file-check": FileCheck2,
   scale: Scale,
 };
+
+const DOCUMENT_TYPE_KEYS = Object.keys(DOC_TYPES) as DocType[];
 
 export function NewDocumentWizard({ clients, company }: { clients: Client[]; company?: Company }) {
   const router = useRouter();
@@ -57,8 +60,8 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
           <h1 className="text-2xl font-bold">Buat Dokumen Baru</h1>
           <p className="mt-1 text-sm text-muted-foreground">Pilih jenis dokumen yang ingin Anda buat.</p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {(Object.keys(DOC_TYPES) as DocType[]).map((t) => {
+        <div className="grid gap-4 sm:grid-cols-6">
+          {DOCUMENT_TYPE_KEYS.map((t, index) => {
             const meta = DOC_TYPE_META[t];
             const Icon = TYPE_ICONS[meta.icon];
             return (
@@ -66,7 +69,10 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
                 key={t}
                 type="button"
                 onClick={() => go({ type: t, seed: undefined })}
-                className="group rounded-xl border bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+                className={cn(
+                  "group rounded-xl border bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md",
+                  balancedCardSpan(index, DOCUMENT_TYPE_KEYS.length)
+                )}
               >
                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-blue-50 text-blue-700 transition-colors group-hover:bg-blue-600 group-hover:text-white">
                   <Icon className="h-5 w-5" />
@@ -102,13 +108,16 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {templates.map((tpl) => (
+        <div className="grid gap-4 sm:grid-cols-6">
+          {templates.map((tpl, index) => (
             <button
               key={tpl.id}
               type="button"
               onClick={() => go({ type, seed: tpl.id })}
-              className="group rounded-xl border bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+              className={cn(
+                "group rounded-xl border bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md",
+                balancedCardSpan(index, templates.length + 1)
+              )}
             >
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-amber-50 text-amber-600 transition-colors group-hover:bg-amber-500 group-hover:text-white">
                 <Sparkles className="h-5 w-5" />
@@ -121,7 +130,10 @@ export function NewDocumentWizard({ clients, company }: { clients: Client[]; com
           <button
             type="button"
             onClick={() => go({ type, seed: undefined, blank: "1" })}
-            className="group rounded-xl border border-dashed bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+            className={cn(
+              "group rounded-xl border border-dashed bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md",
+              balancedCardSpan(templates.length, templates.length + 1)
+            )}
           >
             {" "}
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition-colors group-hover:bg-slate-200">

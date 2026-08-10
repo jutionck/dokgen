@@ -16,6 +16,8 @@ export interface TemplateData {
   totals: Totals;
   /** Logo perusahaan sebagai data URI (diambil server-side untuk PDF/DOCX) */
   logoDataUri?: string | null;
+  /** Tanda tangan perusahaan sebagai data URI (diambil server-side untuk PDF/DOCX) */
+  signatureDataUri?: string | null;
 }
 
 export function computeTotals(doc: DocRecord, items: DocumentItem[]): Totals {

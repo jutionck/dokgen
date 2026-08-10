@@ -1,6 +1,6 @@
 import type { TemplateData } from "./shared";
 import { fmt, fmtDate, fmtNum, terbilang } from "./shared";
-import { DocHeader, ItemsTable } from "./blocks";
+import { CompanySignature, DocHeader, ItemsTable } from "./blocks";
 
 function Pasal({ no, title, children }: { no: string; title: string; children: React.ReactNode }) {
   return (
@@ -162,7 +162,8 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
           <p className="mt-2 text-xs text-slate-500">
             {company.city || "-"}, {fmtDate(doc.issue_date)}
           </p>
-          <div className="mt-16">
+          <div className={company.signature_url ? "mt-2" : "mt-16"}>
+            <CompanySignature company={company} />
             <p className="font-semibold underline">{company.signer_name || company.name}</p>
             <p className="text-xs text-slate-600">{company.signer_position}</p>
           </div>
