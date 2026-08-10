@@ -52,6 +52,7 @@ import { DOC_STATUS, DOC_TYPES } from "@/lib/types";
 import type { DocStatus, DocType } from "@/lib/types";
 import { updateDocumentStatusAction, deleteDocumentAction, duplicateDocumentAction } from "@/lib/actions/documents";
 import { TerminDialog } from "@/components/documents/termin-dialog";
+import { PAPER_SIZES, DEFAULT_PAPER } from "@/lib/documents/paper";
 
 interface Props {
   docId: string;
@@ -165,14 +166,40 @@ export function DocumentDetailActions({
     <>
       {/* Desktop & Tablet Toolbar (sm+) */}
       <div className="hidden sm:flex flex-nowrap items-center gap-1.5 md:gap-2 shrink-0">
-        {/* Utama: Download PDF */}
-        <Button asChild size="sm" className="gap-1.5 shadow-xs">
-          <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-            <Download className="h-4 w-4" />
-            <span className="hidden xl:inline">Download PDF</span>
-            <span className="xl:hidden">PDF</span>
-          </a>
-        </Button>
+        {/* Utama: Download PDF (pilih ukuran kertas) */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" className="gap-1.5 shadow-xs">
+              <Download className="h-4 w-4" />
+              <span className="hidden xl:inline">Download PDF</span>
+              <span className="xl:hidden">PDF</span>
+              <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-60">
+            <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Pilih ukuran kertas</div>
+            {Object.values(PAPER_SIZES).map((paper) => (
+              <DropdownMenuItem key={paper.id} asChild>
+                <a
+                  href={`${pdfUrl}?size=${paper.id}`}
+                  download
+                  className="flex items-center justify-between gap-2 cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileType2 className="h-4 w-4 text-blue-600" /> {paper.label}
+                  </span>
+                  {paper.id === DEFAULT_PAPER && <span className="text-[10px] text-muted-foreground">Default</span>}
+                </a>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <a href={docxUrl} download className="flex items-center gap-2 cursor-pointer">
+                <FileType2 className="h-4 w-4 text-slate-500" /> Export Word (.docx)
+              </a>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Edit Dokumen */}
         <Button asChild variant="outline" size="sm" className="gap-1.5">
@@ -258,12 +285,38 @@ export function DocumentDetailActions({
       {/* Floating Bottom Toolbar untuk Mobile (< sm) */}
       <div className="no-print fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-30 border-t border-slate-200 bg-white/95 px-3 py-2.5 shadow-lg backdrop-blur sm:hidden">
         <div className="mx-auto flex max-w-md items-center gap-2">
-          {/* Download PDF */}
-          <Button asChild size="sm" className="flex-1 gap-1.5 text-xs font-semibold shadow-xs">
-            <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-              <Download className="h-4 w-4" /> PDF
-            </a>
-          </Button>
+          {/* Download PDF (pilih ukuran kertas) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" className="flex-1 gap-1.5 text-xs font-semibold shadow-xs">
+                <Download className="h-4 w-4" /> PDF
+                <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-60">
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Pilih ukuran kertas</div>
+              {Object.values(PAPER_SIZES).map((paper) => (
+                <DropdownMenuItem key={paper.id} asChild>
+                  <a
+                    href={`${pdfUrl}?size=${paper.id}`}
+                    download
+                    className="flex items-center justify-between gap-2 cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <FileType2 className="h-4 w-4 text-blue-600" /> {paper.label}
+                    </span>
+                    {paper.id === DEFAULT_PAPER && <span className="text-[10px] text-muted-foreground">Default</span>}
+                  </a>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <a href={docxUrl} download className="flex items-center gap-2 cursor-pointer">
+                  <FileType2 className="h-4 w-4 text-slate-500" /> Export Word (.docx)
+                </a>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Edit */}
           <Button asChild variant="outline" size="sm" className="px-2.5" title="Edit Dokumen">

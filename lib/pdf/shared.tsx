@@ -1,4 +1,5 @@
-import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
+import type { PageSize } from "@react-pdf/types";
 import type { TemplateData } from "@/components/documents/templates/shared";
 import { fmt, fmtDate, fmtNum, terbilang } from "@/components/documents/templates/shared";
 import { parseScopeOfWork, parseBankAccounts } from "@/components/documents/templates/blocks";
@@ -87,6 +88,13 @@ export function PdfHeader({ data }: { data: TemplateData }) {
   return (
     <View style={pdfStyles.header}>
       <View style={pdfStyles.headerLeft}>
+        {data.logoDataUri ? (
+          // eslint-disable-next-line jsx-a11y/alt-text
+          <Image
+            src={data.logoDataUri}
+            style={{ width: 150, height: 56, objectFit: "contain", marginBottom: 4 }}
+          />
+        ) : null}
         <Text style={pdfStyles.companyName}>{company.name}</Text>
         {company.tagline ? <Text style={pdfStyles.companyLine}>{company.tagline}</Text> : null}
         {company.address ? <Text style={pdfStyles.companyLine}>{company.address}</Text> : null}
@@ -121,8 +129,8 @@ export function PdfClient({ data }: { data: TemplateData }) {
 export function PdfItemsTable({ data, showQty = true }: { data: TemplateData; showQty?: boolean }) {
   const { items, doc } = data;
   return (
-    <View style={pdfStyles.table}>
-      <View style={[pdfStyles.row, { backgroundColor: "#1f2937" }]}>
+    <View style={pdfStyles.table} minPresenceAhead={48}>
+      <View style={[pdfStyles.row, { backgroundColor: "#1f2937" }]} wrap={false}>
         <Text style={[pdfStyles.th, { width: "4%" }]}>No</Text>
         <Text style={[pdfStyles.th, showQty ? { width: "46%" } : { width: "58%" }]}>Uraian / Deskripsi</Text>
         {showQty ? (
@@ -142,7 +150,7 @@ export function PdfItemsTable({ data, showQty = true }: { data: TemplateData; sh
         </View>
       ) : null}
       {items.map((item, i) => (
-        <View key={i} style={pdfStyles.row}>
+        <View key={i} style={pdfStyles.row} wrap={false}>
           <Text style={[pdfStyles.td, { width: "4%" }]}>{i + 1}</Text>
           <Text style={[pdfStyles.td, showQty ? { width: "46%" } : { width: "58%" }]}>{item.description}</Text>
           {showQty ? (
@@ -164,7 +172,7 @@ export function PdfItemsTable({ data, showQty = true }: { data: TemplateData; sh
 export function PdfTotals({ data }: { data: TemplateData }) {
   const { doc, totals } = data;
   return (
-    <View style={pdfStyles.totalsBox}>
+    <View style={pdfStyles.totalsBox} wrap={false}>
       <View style={pdfStyles.totalsRow}>
         <Text style={pdfStyles.gray}>Subtotal</Text>
         <Text>{fmt(totals.subtotal, doc.currency)}</Text>
@@ -262,7 +270,7 @@ export function PdfSignature({
 
   if (!rightLabel) {
     return (
-      <View style={[pdfStyles.signature, { justifyContent: "flex-end" }]}>
+      <View style={[pdfStyles.signature, { justifyContent: "flex-end" }]} wrap={false}>
         <View style={{ width: "45%", alignItems: "center" }}>
           <Text style={pdfStyles.sigLabel}>{leftLabel}</Text>
           {dateStr ? <Text style={pdfStyles.sigPlace}>{dateStr}</Text> : null}
@@ -276,7 +284,7 @@ export function PdfSignature({
   }
 
   return (
-    <View style={pdfStyles.signature}>
+    <View style={pdfStyles.signature} wrap={false}>
       <View style={pdfStyles.sigCol}>
         <Text style={pdfStyles.sigLabel}>{leftLabel}</Text>
         {dateStr ? <Text style={pdfStyles.sigPlace}>{dateStr}</Text> : null}
@@ -345,7 +353,9 @@ export function PdfScopeTable({ scopeOfWork }: { scopeOfWork?: string | null }) 
 
   return (
     <View style={{ marginTop: 6, marginBottom: 8 }}>
-      <Text style={pdfStyles.sectionTitle}>Lingkup Pekerjaan</Text>
+      <Text style={pdfStyles.sectionTitle} minPresenceAhead={72}>
+        Lingkup Pekerjaan
+      </Text>
       <View style={{ borderWidth: 1, borderColor: "#cbd5e1", borderRadius: 2, overflow: "hidden" }}>
         <View style={{ flexDirection: "row", backgroundColor: "#1e293b", paddingVertical: 4, paddingHorizontal: 6 }}>
           <Text style={[pdfStyles.bold, { color: "#ffffff", width: 24, textAlign: "center" }]}>No.</Text>
@@ -355,6 +365,7 @@ export function PdfScopeTable({ scopeOfWork }: { scopeOfWork?: string | null }) 
         {items.map((item) => (
           <View
             key={item.no}
+            wrap={false}
             style={{
               flexDirection: "row",
               borderTopWidth: 1,
@@ -399,10 +410,18 @@ export function PdfNotesBlock({ notes, title = "Catatan" }: { notes?: string | n
   );
 }
 
-export function PdfDocumentShell({ data, children }: { data: TemplateData; children?: React.ReactNode }) {
+export function PdfDocumentShell({
+  data,
+  children,
+  paperSize = "A4",
+}: {
+  data: TemplateData;
+  children?: React.ReactNode;
+  paperSize?: PageSize;
+}) {
   return (
     <Document title={`${data.doc.title} - ${data.doc.number}`} author={data.company.name} creator="Dokgen">
-      <Page size="A4" style={pdfStyles.page}>
+      <Page size={paperSize} style={pdfStyles.page}>
         <PdfHeader data={data} />
         {children}
       </Page>

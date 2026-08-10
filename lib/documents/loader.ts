@@ -42,11 +42,27 @@ export async function loadTemplateData(id: string): Promise<TemplateData | null>
 
   const relItems = items.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
+  // Logo diambil server-side & di-embed sebagai data URI agar muncul di PDF/DOCX
+  let logoDataUri: string | null = null;
+  if (company.logo_url) {
+    try {
+      const res = await fetch(company.logo_url, { signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const mime = res.headers.get("content-type") || "image/png";
+        const buf = Buffer.from(await res.arrayBuffer());
+        logoDataUri = `data:${mime};base64,${buf.toString("base64")}`;
+      }
+    } catch {
+      logoDataUri = null;
+    }
+  }
+
   return {
     company,
     client,
     doc: doc as unknown as DocRecord,
     items: relItems,
     totals: computeTotals(doc as unknown as DocRecord, relItems),
+    logoDataUri,
   };
 }

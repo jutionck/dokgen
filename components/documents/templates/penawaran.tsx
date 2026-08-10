@@ -1,5 +1,5 @@
 import type { TemplateData } from "./shared";
-import { fmtDate } from "./shared";
+import { fmtDateAfterDays } from "./shared";
 import {
   DocHeader,
   ClientBlock,
@@ -48,7 +48,7 @@ export function PenawaranTemplate({ data }: { data: TemplateData }) {
         <div className="flex justify-between">
           <span className="font-semibold text-slate-600">Masa Berlaku Penawaran</span>
           <span className="font-medium">
-            {validityDays} hari (s.d. {fmtDate(doc.issue_date)} + {validityDays} hari)
+            {validityDays} hari (s.d. {fmtDateAfterDays(doc.issue_date, validityDays)})
           </span>
         </div>
       </div>

@@ -2,10 +2,15 @@ export function sanitizeFilename(s: string) {
   return s.replace(/[\/\\:*?"<>|]+/g, "-").trim();
 }
 
-export function pdfFilename(data: { title: string; number: string }) {
-  return `${sanitizeFilename(data.title)}-${sanitizeFilename(data.number)}.pdf`;
+function baseName(data: { title: string; number: string }, sizeLabel?: string) {
+  const size = sizeLabel ? `-${sizeLabel.toUpperCase()}` : "";
+  return `${sanitizeFilename(data.title)}-${sanitizeFilename(data.number)}${size}`;
 }
 
-export function docxFilename(data: { title: string; number: string }) {
-  return `${sanitizeFilename(data.title)}-${sanitizeFilename(data.number)}.docx`;
+export function pdfFilename(data: { title: string; number: string }, sizeLabel?: string) {
+  return `${baseName(data, sizeLabel)}.pdf`;
+}
+
+export function docxFilename(data: { title: string; number: string }, sizeLabel?: string) {
+  return `${baseName(data, sizeLabel)}.docx`;
 }
