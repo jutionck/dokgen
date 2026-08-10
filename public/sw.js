@@ -1,5 +1,5 @@
-const CACHE_NAME = "dokgen-v1";
-const PRECACHE = ["/", "/icon.svg", "/icons/icon-192.png", "/icons/icon-512.png"];
+const CACHE_NAME = "dokgen-static-v2";
+const PRECACHE = ["/icon.svg", "/icons/icon-192.png", "/icons/icon-512.png"];
 const STATIC_RE = /\/_next\/static\//;
 
 self.addEventListener("install", (event) => {
@@ -26,33 +26,26 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-  // jangan cache API / auth
-  if (url.pathname.startsWith("/api/")) return;
+  // Halaman, API, Server Components, dan data sesi harus selalu ditangani
+  // langsung oleh browser/Next.js agar tidak pernah tersimpan di Cache Storage.
+  const isStaticAsset =
+    STATIC_RE.test(url.pathname) ||
+    url.pathname === "/icon.svg" ||
+    url.pathname.startsWith("/icons/");
+  if (!isStaticAsset) return;
 
-  // aset statis: cache-first (offline OK)
-  if (STATIC_RE.test(url.pathname) || url.pathname.startsWith("/icons/")) {
-    event.respondWith(
-      caches.match(request).then(
-        (cached) =>
-          cached ||
-          fetch(request).then((response) => {
+  // Hanya aset statis publik/immutable yang menggunakan cache-first.
+  event.respondWith(
+    caches.match(request).then(
+      (cached) =>
+        cached ||
+        fetch(request).then((response) => {
+          if (response.ok) {
             const copy = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-            return response;
-          })
-      )
-    );
-    return;
-  }
-
-  // navigasi/halaman: network-first dengan fallback cache (PWA nyala saat offline)
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        return response;
-      })
-      .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))
+          }
+          return response;
+        })
+    )
   );
 });

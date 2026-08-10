@@ -4,10 +4,16 @@ import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { docSequences, documentItems, documents } from "@/db/schema";
+import { clients, docSequences, documentItems, documents } from "@/db/schema";
 import { DOC_TYPES } from "@/lib/types";
 import type { DocStatus, DocType, DocumentItem, DocExtra } from "@/lib/types";
 import { requireCompanyId } from "@/lib/documents/auth";
+import {
+  documentInputSchema,
+  documentStatusSchema,
+  idSchema,
+  terminInputSchema,
+} from "@/lib/validators/actions";
 
 export type DocActionResult =
   { success: true; id: string; number?: string; error?: never } | { success?: never; error: string; id?: never };
@@ -45,6 +51,18 @@ function sanitizeItems(rawItems: unknown[]): Omit<DocumentItem, "id" | "document
     .filter((i) => i.description);
 }
 
+async function isCompanyClient(clientId: string | undefined, companyId: string): Promise<boolean> {
+  if (!clientId) return true;
+
+  const [client] = await db
+    .select({ id: clients.id })
+    .from(clients)
+    .where(and(eq(clients.id, clientId), eq(clients.company_id, companyId)))
+    .limit(1);
+
+  return Boolean(client);
+}
+
 async function nextDocNumber(company_id: string, type: DocType, issue_date: string): Promise<string> {
   const period = issue_date.slice(0, 7);
 
@@ -78,28 +96,34 @@ async function nextDocNumber(company_id: string, type: DocType, issue_date: stri
 export async function createDocumentAction(input: DocumentInput): Promise<DocActionResult> {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
+  const parsed = documentInputSchema.safeParse(input);
+  if (!parsed.success) return { error: "Data dokumen tidak valid" };
+  const validInput = parsed.data as DocumentInput;
+  if (!(await isCompanyClient(validInput.client_id, company_id))) {
+    return { error: "Klien tidak ditemukan di perusahaan aktif" };
+  }
 
-  const issue_date = input.issue_date || new Date().toISOString().slice(0, 10);
-  const number = await nextDocNumber(company_id, input.type, issue_date);
-  const items = sanitizeItems(input.items);
+  const issue_date = validInput.issue_date;
+  const number = await nextDocNumber(company_id, validInput.type, issue_date);
+  const items = sanitizeItems(validInput.items);
   const docId = randomUUID();
 
   await db.insert(documents).values({
     id: docId,
     company_id,
-    type: input.type,
+    type: validInput.type,
     number,
-    title: input.title || DOC_TYPES[input.type].defaultTitle,
-    client_id: input.client_id || null,
-    status: input.status,
+    title: validInput.title || DOC_TYPES[validInput.type].defaultTitle,
+    client_id: validInput.client_id || null,
+    status: validInput.status,
     issue_date,
-    due_date: input.due_date || null,
-    currency: input.currency || "IDR",
-    tax_rate: input.tax_rate || 0,
-    discount: input.discount || 0,
-    notes: input.notes || null,
-    terms: input.terms || null,
-    extra: input.extra || {},
+    due_date: validInput.due_date || null,
+    currency: validInput.currency || "IDR",
+    tax_rate: validInput.tax_rate || 0,
+    discount: validInput.discount || 0,
+    notes: validInput.notes || null,
+    terms: validInput.terms || null,
+    extra: validInput.extra || {},
   });
 
   if (items.length > 0) {
@@ -123,39 +147,54 @@ export async function createDocumentAction(input: DocumentInput): Promise<DocAct
 export async function updateDocumentAction(id: string, input: DocumentInput): Promise<DocActionResult> {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
-  const items = sanitizeItems(input.items);
-
-  await db
-    .update(documents)
-    .set({
-      title: input.title,
-      client_id: input.client_id || null,
-      status: input.status,
-      issue_date: input.issue_date,
-      due_date: input.due_date || null,
-      currency: input.currency || "IDR",
-      tax_rate: input.tax_rate || 0,
-      discount: input.discount || 0,
-      notes: input.notes || null,
-      terms: input.terms || null,
-      extra: input.extra || {},
-    })
-    .where(eq(documents.id, id));
-
-  await db.delete(documentItems).where(eq(documentItems.document_id, id));
-
-  if (items.length > 0) {
-    await db.insert(documentItems).values(
-      items.map((item, idx) => ({
-        document_id: id,
-        description: item.description,
-        qty: item.qty,
-        unit: item.unit,
-        unit_price: item.unit_price,
-        sort_order: idx,
-      }))
-    );
+  if (!idSchema.safeParse(id).success) return { error: "Dokumen tidak ditemukan" };
+  const parsed = documentInputSchema.safeParse(input);
+  if (!parsed.success) return { error: "Data dokumen tidak valid" };
+  const validInput = parsed.data as DocumentInput;
+  const [ownedDocument] = await db
+    .select({ id: documents.id })
+    .from(documents)
+    .where(and(eq(documents.id, id), eq(documents.company_id, company_id)))
+    .limit(1);
+  if (!ownedDocument) return { error: "Dokumen tidak ditemukan" };
+  if (!(await isCompanyClient(validInput.client_id, company_id))) {
+    return { error: "Klien tidak ditemukan di perusahaan aktif" };
   }
+  const items = sanitizeItems(validInput.items);
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(documents)
+      .set({
+        title: validInput.title,
+        client_id: validInput.client_id || null,
+        status: validInput.status,
+        issue_date: validInput.issue_date,
+        due_date: validInput.due_date || null,
+        currency: validInput.currency || "IDR",
+        tax_rate: validInput.tax_rate || 0,
+        discount: validInput.discount || 0,
+        notes: validInput.notes || null,
+        terms: validInput.terms || null,
+        extra: validInput.extra || {},
+      })
+      .where(and(eq(documents.id, id), eq(documents.company_id, company_id)));
+
+    await tx.delete(documentItems).where(eq(documentItems.document_id, id));
+
+    if (items.length > 0) {
+      await tx.insert(documentItems).values(
+        items.map((item, idx) => ({
+          document_id: id,
+          description: item.description,
+          qty: item.qty,
+          unit: item.unit,
+          unit_price: item.unit_price,
+          sort_order: idx,
+        }))
+      );
+    }
+  });
 
   revalidatePath(`/documents/${id}`);
   revalidatePath("/documents");
@@ -166,8 +205,14 @@ export async function updateDocumentAction(id: string, input: DocumentInput): Pr
 export async function updateDocumentStatusAction(id: string, status: DocStatus) {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
+  if (!idSchema.safeParse(id).success || !documentStatusSchema.safeParse(status).success) {
+    return { error: "Status dokumen tidak valid" };
+  }
 
-  await db.update(documents).set({ status }).where(eq(documents.id, id));
+  await db
+    .update(documents)
+    .set({ status })
+    .where(and(eq(documents.id, id), eq(documents.company_id, company_id)));
   revalidatePath(`/documents/${id}`);
   revalidatePath("/documents");
   revalidatePath("/dashboard");
@@ -177,8 +222,9 @@ export async function updateDocumentStatusAction(id: string, status: DocStatus) 
 export async function deleteDocumentAction(id: string) {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
+  if (!idSchema.safeParse(id).success) return { error: "Dokumen tidak ditemukan" };
 
-  await db.delete(documents).where(eq(documents.id, id));
+  await db.delete(documents).where(and(eq(documents.id, id), eq(documents.company_id, company_id)));
   revalidatePath("/documents");
   revalidatePath("/dashboard");
   return { success: true };
@@ -187,8 +233,13 @@ export async function deleteDocumentAction(id: string) {
 export async function duplicateDocumentAction(id: string): Promise<DocActionResult> {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
+  if (!idSchema.safeParse(id).success) return { error: "Dokumen tidak ditemukan" };
 
-  const [doc] = await db.select().from(documents).where(eq(documents.id, id)).limit(1);
+  const [doc] = await db
+    .select()
+    .from(documents)
+    .where(and(eq(documents.id, id), eq(documents.company_id, company_id)))
+    .limit(1);
   if (!doc) return { error: "Dokumen tidak ditemukan" };
 
   const items = await db
@@ -245,9 +296,10 @@ export interface TerminInput {
 export async function createNextTerminAction(sourceId: string, input: TerminInput): Promise<DocActionResult> {
   const company_id = await requireCompanyId();
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
-  if (!Number.isFinite(input.nominal) || input.nominal <= 0) {
-    return { error: "Nominal termin wajib lebih dari 0" };
-  }
+  if (!idSchema.safeParse(sourceId).success) return { error: "Dokumen sumber tidak valid" };
+  const parsed = terminInputSchema.safeParse(input);
+  if (!parsed.success) return { error: "Data termin tidak valid" };
+  const validInput = parsed.data;
 
   const [src] = await db
     .select()
@@ -260,10 +312,10 @@ export async function createNextTerminAction(sourceId: string, input: TerminInpu
 
   const issue_date = new Date().toISOString().slice(0, 10);
   const due_date =
-    input.due_date || new Date(new Date(issue_date).getTime() + 30 * 86400000).toISOString().slice(0, 10);
+    validInput.due_date || new Date(new Date(issue_date).getTime() + 30 * 86400000).toISOString().slice(0, 10);
   const number = await nextDocNumber(company_id, "invoice", issue_date);
 
-  const title = input.title?.trim() || "Invoice Termin";
+  const title = validInput.title || "Invoice Termin";
   const docId = randomUUID();
 
   await db.insert(documents).values({
@@ -279,7 +331,7 @@ export async function createNextTerminAction(sourceId: string, input: TerminInpu
     currency: src.currency,
     tax_rate: 0,
     discount: 0,
-    notes: input.notes?.trim() || null,
+    notes: validInput.notes || null,
     terms: "",
     extra: {
       payment_terms: src.extra?.payment_terms || "",
@@ -291,7 +343,7 @@ export async function createNextTerminAction(sourceId: string, input: TerminInpu
     description: `${title} — ${src.title} (${src.number})`,
     qty: 1,
     unit: "ls",
-    unit_price: input.nominal,
+    unit_price: validInput.nominal,
     sort_order: 0,
   });
 

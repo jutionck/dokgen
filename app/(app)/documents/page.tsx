@@ -11,7 +11,14 @@ import {
   Receipt,
   RotateCcw,
 } from "lucide-react";
-import { getCompany, listClients, listDocumentItems, listDocumentsPage, PAGE_SIZE } from "@/lib/data";
+import {
+  getCompany,
+  groupDocumentItemAmounts,
+  listClients,
+  listDocumentItemAmounts,
+  listDocumentsPage,
+  PAGE_SIZE,
+} from "@/lib/data";
 import { DOC_TYPES, DOC_STATUS } from "@/lib/types";
 import type { DocRecord, DocType } from "@/lib/types";
 import { formatIDR, formatDateShort, cn } from "@/lib/utils";
@@ -86,11 +93,8 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
 
   const clientMap = new Map(allClients.map((c) => [c.id, c.name]));
 
-  const itemResults = await Promise.all(docs.map((doc) => listDocumentItems(doc.id)));
-  const itemsByDoc = new Map<string, { qty: number; unit_price: number }[]>();
-  docs.forEach((doc, idx) => {
-    itemsByDoc.set(doc.id, itemResults[idx]);
-  });
+  const itemRows = await listDocumentItemAmounts(docs.map((doc) => doc.id));
+  const itemsByDoc = groupDocumentItemAmounts(itemRows);
 
   const buildHref = (p: number) => {
     const params = new URLSearchParams();
