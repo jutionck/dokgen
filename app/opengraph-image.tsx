@@ -66,7 +66,6 @@ export default async function Image() {
             color: "#60a5fa",
             fontSize: "16px",
             fontWeight: 600,
-            width: "fit-content",
           }}
         >
           dokgen.mipdevp.com

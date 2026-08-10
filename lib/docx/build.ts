@@ -10,14 +10,24 @@ import {
   TableRow,
   TextRun,
   WidthType,
+  ImageRun,
   type IParagraphOptions,
   type IRunOptions,
 } from "docx";
 import type { TemplateData } from "@/components/documents/templates/shared";
-import { fmt, fmtDate, fmtDateLong, fmtNum, terbilang } from "@/components/documents/templates/shared";
+import {
+  fmt,
+  fmtDate,
+  fmtDateAfterDays,
+  fmtDateLong,
+  fmtNum,
+  terbilang,
+} from "@/components/documents/templates/shared";
 import { parseScopeOfWork, parseBankAccounts } from "@/components/documents/templates/blocks";
+import { parseLogoDataUri, fitSize } from "@/lib/documents/logo";
 
 const FONT = "Helvetica";
+const DEFAULT_PAGE = { width: 11906, height: 16838 }; // A4 (twips)
 
 function run(text: string, opts: IRunOptions = {}): TextRun {
   return new TextRun({ text, font: FONT, size: 20, ...opts });
@@ -192,7 +202,23 @@ function formattedListDocx(title: string, text?: string | null): Paragraph[] {
 
 function header(data: TemplateData): Paragraph[] {
   const { company, doc } = data;
+  const logo = parseLogoDataUri(data.logoDataUri);
+  const logoParagraph = logo
+    ? new Paragraph({
+        alignment: AlignmentType.LEFT,
+        spacing: { after: 80 },
+        children: [
+          new ImageRun({
+            type: logo.type,
+            data: logo.data,
+            transformation: fitSize(logo.width, logo.height, 160, 60),
+          }),
+        ],
+      })
+    : null;
+
   return [
+    ...(logoParagraph ? [logoParagraph] : []),
     new Paragraph({
       alignment: AlignmentType.LEFT,
       children: [run(company.name, { bold: true, size: 30 })],
@@ -330,7 +356,7 @@ function buildBankBlockDocx(company: TemplateData["company"], selectedBanks?: st
 
 // ---------------- TYPE BUILDERS ----------------
 
-export function buildPenawaran(data: TemplateData) {
+export function buildPenawaran(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE) {
   const { company, doc, client } = data;
   const extra = doc.extra;
   const validityDays = Number(extra.validity_days) || 14;
@@ -340,6 +366,7 @@ export function buildPenawaran(data: TemplateData) {
     styles: { default: { document: { run: { font: FONT, size: 20 } } } },
     sections: [
       {
+        properties: { page: { size: paper } },
         children: [
           ...header(data),
           p([run(`Lampiran : -`)], { spacing: { after: 40 } }),
@@ -360,7 +387,7 @@ export function buildPenawaran(data: TemplateData) {
           ...totalsBlock(data),
           p([
             run(
-              `Masa berlaku penawaran: ${validityDays} hari (s.d. ${fmtDate(doc.issue_date)} + ${validityDays} hari)`,
+              `Masa berlaku penawaran: ${validityDays} hari (s.d. ${fmtDateAfterDays(doc.issue_date, validityDays)})`,
               { color: "64748b" }
             ),
           ]),
@@ -383,7 +410,7 @@ export function buildPenawaran(data: TemplateData) {
   });
 }
 
-export function buildQuotation(data: TemplateData) {
+export function buildQuotation(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE) {
   const { company, doc } = data;
   const extra = doc.extra;
   const validityDays = Number(extra.validity_days) || 14;
@@ -393,6 +420,7 @@ export function buildQuotation(data: TemplateData) {
     styles: { default: { document: { run: { font: FONT, size: 20 } } } },
     sections: [
       {
+        properties: { page: { size: paper } },
         children: [
           ...header(data),
           ...clientBlock(data),
@@ -403,7 +431,7 @@ export function buildQuotation(data: TemplateData) {
           ...totalsBlock(data),
           p([
             run(
-              `Masa berlaku penawaran: ${validityDays} hari, berakhir ${fmtDate(doc.issue_date)} + ${validityDays} hari.`,
+              `Masa berlaku penawaran: ${validityDays} hari, berakhir ${fmtDateAfterDays(doc.issue_date, validityDays)}.`,
               { color: "64748b" }
             ),
           ]),
@@ -421,7 +449,7 @@ export function buildQuotation(data: TemplateData) {
   });
 }
 
-export function buildInvoice(data: TemplateData) {
+export function buildInvoice(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE) {
   const { company, doc } = data;
   const extra = doc.extra;
   return new Document({
@@ -430,6 +458,7 @@ export function buildInvoice(data: TemplateData) {
     styles: { default: { document: { run: { font: FONT, size: 20 } } } },
     sections: [
       {
+        properties: { page: { size: paper } },
         children: [
           ...header(data),
           ...clientBlock(data),
@@ -456,7 +485,7 @@ export function buildInvoice(data: TemplateData) {
   });
 }
 
-export function buildBast(data: TemplateData) {
+export function buildBast(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE) {
   const { company, doc, client } = data;
   const extra = doc.extra;
   return new Document({
@@ -465,6 +494,7 @@ export function buildBast(data: TemplateData) {
     styles: { default: { document: { run: { font: FONT, size: 20 } } } },
     sections: [
       {
+        properties: { page: { size: paper } },
         children: [
           ...header(data),
           p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], {
@@ -519,7 +549,7 @@ export function buildBast(data: TemplateData) {
   });
 }
 
-export function buildKontrak(data: TemplateData) {
+export function buildKontrak(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE) {
   const { company, doc, client, totals } = data;
   const extra = doc.extra;
   const city = extra.location || company.city || "-";
@@ -529,6 +559,7 @@ export function buildKontrak(data: TemplateData) {
     styles: { default: { document: { run: { font: FONT, size: 20 } } } },
     sections: [
       {
+        properties: { page: { size: paper } },
         children: [
           ...header(data),
           p([run(`Nomor: ${doc.number}`, { italics: true, bold: true })], {
@@ -629,26 +660,26 @@ export function buildKontrak(data: TemplateData) {
   });
 }
 
-export async function buildDocx(data: TemplateData): Promise<Buffer> {
+export async function buildDocx(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE): Promise<Buffer> {
   let doc: Document;
   switch (data.doc.type) {
     case "penawaran":
-      doc = buildPenawaran(data);
+      doc = buildPenawaran(data, paper);
       break;
     case "quotation":
-      doc = buildQuotation(data);
+      doc = buildQuotation(data, paper);
       break;
     case "invoice":
-      doc = buildInvoice(data);
+      doc = buildInvoice(data, paper);
       break;
     case "bast":
-      doc = buildBast(data);
+      doc = buildBast(data, paper);
       break;
     case "kontrak":
-      doc = buildKontrak(data);
+      doc = buildKontrak(data, paper);
       break;
     default:
-      doc = buildInvoice(data);
+      doc = buildInvoice(data, paper);
   }
   return Packer.toBuffer(doc);
 }

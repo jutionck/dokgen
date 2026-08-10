@@ -203,7 +203,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                       {uploading ? "Mengunggah..." : "Upload Logo"}
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/png,image/jpeg,image/webp"
                         className="hidden"
                         onChange={(e) => handleUpload(e.target.files?.[0])}
                       />

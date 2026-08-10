@@ -43,9 +43,9 @@ function LoginForm() {
 
     setPending(true);
     const res = await authClient.signIn.email({ email: emailVal, password });
-    setPending(false);
 
     if (res.error) {
+      setPending(false);
       const msg = res.error.message?.toLowerCase() || "";
       if (
         res.error.status === 403 ||
@@ -59,8 +59,7 @@ function LoginForm() {
       }
       return;
     }
-    router.push("/dashboard");
-    router.refresh();
+    router.replace("/dashboard");
   };
 
   const isValid = email.trim().length > 0 && /^\S+@\S+\.\S+$/.test(email.trim()) && password.length > 0;

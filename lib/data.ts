@@ -1,30 +1,9 @@
-import { cache } from "react";
-import { and, asc, count, desc, eq, like, or } from "drizzle-orm";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import "server-only";
+
+import { and, asc, count, desc, eq, inArray, like, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { clients, companies, companyMembers, documentItems, documents, emailLogs, user } from "@/db/schema";
-import type { Company } from "@/lib/types";
-
-export const getSessionUser = cache(async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
-  return session?.user ?? null;
-});
-
-export const getCompany = cache(async (): Promise<{ company: Company; isOwner: boolean } | null> => {
-  const userSession = await getSessionUser();
-  if (!userSession) return null;
-
-  const rows = await db
-    .select({ company: companies, role: companyMembers.role })
-    .from(companyMembers)
-    .innerJoin(companies, eq(companyMembers.company_id, companies.id))
-    .where(eq(companyMembers.user_id, userSession.id))
-    .limit(1);
-
-  if (rows.length === 0) return null;
-  return { company: rows[0].company, isOwner: rows[0].role === "owner" };
-});
+export { getCompany, getSessionUser } from "@/lib/dal/auth";
 
 export async function listClients(companyId: string) {
   return db.select().from(clients).where(eq(clients.company_id, companyId)).orderBy(desc(clients.created_at));
@@ -115,6 +94,40 @@ export async function listDocumentItems(docId: string) {
     .from(documentItems)
     .where(eq(documentItems.document_id, docId))
     .orderBy(asc(documentItems.sort_order));
+}
+
+export interface DocumentItemAmount {
+  document_id: string;
+  qty: number;
+  unit_price: number;
+}
+
+/**
+ * Ambil nilai item untuk banyak dokumen dalam satu round-trip database.
+ * Digunakan halaman list/dashboard untuk menghindari pola N+1 query.
+ */
+export async function listDocumentItemAmounts(documentIds: string[]): Promise<DocumentItemAmount[]> {
+  const uniqueIds = [...new Set(documentIds)].filter(Boolean);
+  if (uniqueIds.length === 0) return [];
+
+  return db
+    .select({
+      document_id: documentItems.document_id,
+      qty: documentItems.qty,
+      unit_price: documentItems.unit_price,
+    })
+    .from(documentItems)
+    .where(inArray(documentItems.document_id, uniqueIds));
+}
+
+export function groupDocumentItemAmounts(rows: DocumentItemAmount[]) {
+  const grouped = new Map<string, DocumentItemAmount[]>();
+  for (const row of rows) {
+    const items = grouped.get(row.document_id);
+    if (items) items.push(row);
+    else grouped.set(row.document_id, [row]);
+  }
+  return grouped;
 }
 
 export async function listEmailLogs(docId: string) {

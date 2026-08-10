@@ -16,7 +16,13 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { getCompany, listClients, listDocuments, listDocumentItems } from "@/lib/data";
+import {
+  getCompany,
+  groupDocumentItemAmounts,
+  listClients,
+  listDocumentItemAmounts,
+  listDocuments,
+} from "@/lib/data";
 import { DOC_TYPES, DOC_STATUS } from "@/lib/types";
 import type { DocRecord, DocType } from "@/lib/types";
 import { formatIDR, formatDate, formatDateShort, cn } from "@/lib/utils";
@@ -85,20 +91,14 @@ export default async function DashboardPage() {
 
   const [allDocs, clients] = await Promise.all([listDocuments(company.id), listClients(company.id)]);
 
-  let outstanding = 0;
-
   const unpaidInvoices = allDocs.filter((d) => d.type === "invoice" && !["paid", "cancelled"].includes(d.status));
-
-  for (const doc of unpaidInvoices) {
-    const items = await listDocumentItems(doc.id);
-    outstanding += computeTotals(doc, items).total;
-  }
-
   const recent = allDocs.slice(0, 6);
-  const itemsByDoc = new Map<string, { qty: number; unit_price: number }[]>();
-  for (const doc of recent) {
-    itemsByDoc.set(doc.id, await listDocumentItems(doc.id));
-  }
+  const itemRows = await listDocumentItemAmounts([...unpaidInvoices, ...recent].map((doc) => doc.id));
+  const itemsByDoc = groupDocumentItemAmounts(itemRows);
+  const outstanding = unpaidInvoices.reduce(
+    (sum, doc) => sum + computeTotals(doc, itemsByDoc.get(doc.id) || []).total,
+    0
+  );
 
   const clientMap = new Map(clients.map((c) => [c.id, c.name]));
   const monthKey = new Date().toISOString().slice(0, 7);

@@ -14,6 +14,8 @@ export interface TemplateData {
   doc: DocRecord;
   items: DocumentItem[];
   totals: Totals;
+  /** Logo perusahaan sebagai data URI (diambil server-side untuk PDF/DOCX) */
+  logoDataUri?: string | null;
 }
 
 export function computeTotals(doc: DocRecord, items: DocumentItem[]): Totals {
@@ -32,9 +34,21 @@ export function fmt(n: number, currency = "IDR") {
   }).format(n || 0);
 }
 
-export function fmtDate(d?: string | null) {
+export function fmtDate(d?: string | Date | null) {
   if (!d) return "";
   return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d));
+}
+
+export function fmtDateAfterDays(d: string | null | undefined, days: number) {
+  if (!d) return "";
+
+  // Date-only values must stay in the user's calendar day instead of shifting
+  // when the server and browser run in different time zones.
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(d) ? new Date(`${d}T00:00:00`) : new Date(d);
+  if (Number.isNaN(date.getTime())) return "";
+
+  date.setDate(date.getDate() + days);
+  return fmtDate(date);
 }
 
 export function fmtDateLong(d?: string | null) {

@@ -1,5 +1,5 @@
 import type { TemplateData } from "./shared";
-import { fmtDate } from "./shared";
+import { fmtDate, fmtDateAfterDays } from "./shared";
 import {
   DocHeader,
   ClientBlock,
@@ -49,7 +49,7 @@ export function QuotationTemplate({ data }: { data: TemplateData }) {
       <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50/80 p-3.5 text-xs text-slate-700">
         <p>
           <span className="font-semibold text-slate-600">Masa berlaku penawaran:</span> {validityDays} hari, berakhir{" "}
-          {fmtDate(doc.issue_date)} + {validityDays} hari.
+          {fmtDateAfterDays(doc.issue_date, validityDays)}.
         </p>
       </div>
 

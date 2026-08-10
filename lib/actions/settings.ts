@@ -6,6 +6,7 @@ import { put } from "@vercel/blob";
 import { db } from "@/lib/db";
 import { companies } from "@/db/schema";
 import { requireCompanyId } from "@/lib/documents/auth";
+import { companyInputSchema } from "@/lib/validators/actions";
 
 export interface CompanyInput {
   name: string;
@@ -27,7 +28,9 @@ export interface CompanyInput {
 export async function updateCompanyAction(input: CompanyInput) {
   const companyId = await requireCompanyId();
   if (!companyId) return { error: "Akun tidak terhubung ke perusahaan" };
-  if (!input.name?.trim()) return { error: "Nama perusahaan wajib diisi" };
+  const parsed = companyInputSchema.safeParse(input);
+  if (!parsed.success) return { error: "Data perusahaan tidak valid" };
+  const validInput = parsed.data;
 
   // Hanya update field yang benar-benar dikirim — supaya menyimpan satu tab
   // tidak menghapus data tab lainnya (bank, penandatangan, profil).
@@ -50,8 +53,8 @@ export async function updateCompanyAction(input: CompanyInput) {
 
   const setData: Record<string, string | null> = {};
   for (const field of fields) {
-    if (input[field] !== undefined) {
-      const value = input[field];
+    if (validInput[field] !== undefined) {
+      const value = validInput[field];
       setData[field] = field === "name" ? value.trim() : value?.trim() ? value.trim() : null;
     }
   }
@@ -71,6 +74,9 @@ export async function uploadLogoAction(formData: FormData) {
   const file = formData.get("logo") as File | null;
   if (!file || file.size === 0) return { error: "Pilih file logo terlebih dahulu" };
   if (file.size > 2 * 1024 * 1024) return { error: "Ukuran logo maksimal 2MB" };
+  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+    return { error: "Format logo harus PNG, JPG, atau WebP" };
+  }
 
   let logoUrl = "";
 
