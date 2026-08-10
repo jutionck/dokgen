@@ -211,7 +211,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
                   {company.logo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={company.logo_url} alt="Logo Perusahaan" className="h-full w-full object-contain p-1" />
+                    <img src="/api/company-assets/logo" alt="Logo Perusahaan" className="h-full w-full object-contain p-1" />
                   ) : (
                     <Building2 className="h-9 w-9 text-slate-300" />
                   )}
@@ -450,7 +450,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                   {company.signature_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={company.signature_url}
+                      src="/api/company-assets/signature"
                       alt={`Tanda tangan digital ${company.signer_name || company.name}`}
                       className="h-full w-full object-contain"
                     />

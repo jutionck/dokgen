@@ -62,7 +62,8 @@ npm run dev           # http://localhost:3000
 ## Deploy ke Vercel
 
 1. Push repo ke GitHub → import di [vercel.com](https://vercel.com)
-2. Di dashboard Vercel → **Storage** → **Blob** → _Create_ (token otomatis masuk ke env)
+2. Di dashboard Vercel → **Storage** → **Blob** → _Create_ dengan akses **Private**
+   (token otomatis masuk ke env)
 3. Isi environment variables: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
    (URL production, contoh `https://dokgen.vercel.app`), `BETTER_AUTH_TRUSTED_ORIGINS`,
    `RESEND_API_KEY`, `RESEND_FROM`
