@@ -1,5 +1,6 @@
 import "server-only";
 
+import { get } from "@vercel/blob";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { clients, companies, documentItems, documents } from "@/db/schema";
@@ -7,12 +8,22 @@ import { computeTotals, type TemplateData } from "@/components/documents/templat
 import type { Client, DocRecord } from "@/lib/types";
 import { requireCompanyId } from "@/lib/dal/auth";
 import { idSchema } from "@/lib/validators/actions";
+import { getBlobReadWriteToken, isPrivateVercelBlobUrl } from "@/lib/blob";
 
 async function embedImage(imageUrl?: string | null): Promise<string | null> {
   if (!imageUrl) return null;
   if (imageUrl.startsWith("data:image/")) return imageUrl;
 
   try {
+    if (isPrivateVercelBlobUrl(imageUrl)) {
+      const token = getBlobReadWriteToken();
+      if (!token) return null;
+      const result = await get(imageUrl, { access: "private", token });
+      if (!result || result.statusCode !== 200) return null;
+      const buffer = Buffer.from(await new Response(result.stream).arrayBuffer());
+      return `data:${result.blob.contentType};base64,${buffer.toString("base64")}`;
+    }
+
     const response = await fetch(imageUrl, { signal: AbortSignal.timeout(8000) });
     if (!response.ok) return null;
     const mime = response.headers.get("content-type") || "image/png";
@@ -63,7 +74,11 @@ export async function loadTemplateData(id: string): Promise<TemplateData | null>
   ]);
 
   return {
-    company,
+    company: {
+      ...company,
+      logo_url: logoDataUri,
+      signature_url: signatureDataUri,
+    },
     client,
     doc: doc as unknown as DocRecord,
     items: relItems,

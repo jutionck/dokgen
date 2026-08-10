@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { del, put } from "@vercel/blob";
 import { db } from "@/lib/db";
 import { companies } from "@/db/schema";
+import { getBlobReadWriteToken, isVercelBlobUrl } from "@/lib/blob";
 import { requireCompanyId } from "@/lib/documents/auth";
 import { companyInputSchema } from "@/lib/validators/actions";
 
@@ -27,24 +28,9 @@ export interface CompanyInput {
 
 const COMPANY_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
-function getBlobToken() {
-  // Vercel memakai nama kedua saat Blob store dibuat dengan prefix
-  // `BLOB_READ_WRITE_TOKEN` melalui menu Advanced Options.
-  return process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN ?? process.env.BLOB_READ_WRITE_TOKEN;
-}
-
-function isManagedBlobUrl(value?: string | null) {
-  if (!value) return false;
-  try {
-    return new URL(value).hostname.endsWith(".blob.vercel-storage.com");
-  } catch {
-    return false;
-  }
-}
-
 async function deleteManagedBlob(value?: string | null) {
-  const token = getBlobToken();
-  if (!isManagedBlobUrl(value) || !token) return;
+  const token = getBlobReadWriteToken();
+  if (!isVercelBlobUrl(value) || !token) return;
   try {
     await del(value!, { token });
   } catch (error) {
@@ -74,7 +60,7 @@ async function uploadCompanyImage(
     return { error: `Format ${options.label} harus ${formats}` };
   }
 
-  const blobToken = getBlobToken();
+  const blobToken = getBlobReadWriteToken();
   if (!blobToken) {
     return {
       error:
@@ -93,7 +79,7 @@ async function uploadCompanyImage(
     const result = await put(
       `${options.folder}/${companyId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`,
       file,
-      { access: "public", addRandomSuffix: true, token: blobToken }
+      { access: "private", addRandomSuffix: true, token: blobToken }
     );
     imageUrl = result.url;
   } catch (error) {
