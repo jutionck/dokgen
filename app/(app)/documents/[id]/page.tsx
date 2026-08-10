@@ -40,7 +40,13 @@ export default async function DocumentDetailPage(props: PageProps<"/documents/[i
   const relItems = items.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
   const templateData: TemplateData = {
-    company,
+    company: {
+      ...company,
+      // Private Blob tidak dapat dipakai langsung sebagai src di browser.
+      // Route ini memverifikasi sesi dan tenant sebelum meneruskan aset.
+      logo_url: company.logo_url ? "/api/company-assets/logo" : null,
+      signature_url: company.signature_url ? "/api/company-assets/signature" : null,
+    },
     client,
     doc: doc as unknown as DocRecord,
     items: relItems,
