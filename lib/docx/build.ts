@@ -402,6 +402,7 @@ function buildBankBlockDocx(company: TemplateData["company"], selectedBanks?: st
 export function buildPenawaran(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE) {
   const { company, doc, client } = data;
   const extra = doc.extra;
+  const intro = extra.intro?.trim();
   const validityDays = Number(extra.validity_days) || 14;
   return new Document({
     creator: company.name,
@@ -417,14 +418,17 @@ export function buildPenawaran(data: TemplateData, paper: { width: number; heigh
           p([run(`Hal : ${extra.project_title || doc.title}`, { bold: true })], { spacing: { after: 200 } }),
           ...clientBlock(data),
           p([run("Dengan hormat,")]),
-          p([
-            run(`Bersama ini kami sampaikan penawaran jasa `),
-            ...ml(extra.project_title || "sesuai kebutuhan Anda"),
-            run(
-              ` kepada ${client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:`
-            ),
-          ]),
-          ...(extra.intro ? [p([...ml(extra.intro)])] : []),
+          ...(intro
+            ? [p([...ml(intro)])]
+            : [
+                p([
+                  run(`Bersama ini kami sampaikan penawaran jasa `),
+                  ...ml(extra.project_title || "sesuai kebutuhan Anda"),
+                  run(
+                    ` kepada ${client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:`
+                  ),
+                ]),
+              ]),
           ...(extra.scope_of_work ? buildScopeTableDocx(extra.scope_of_work) : []),
           h3("Rincian Biaya Penawaran"),
           itemsTable(data),
@@ -708,7 +712,10 @@ export function buildKontrak(data: TemplateData, paper: { width: number; height:
   });
 }
 
-export async function buildDocx(data: TemplateData, paper: { width: number; height: number } = DEFAULT_PAGE): Promise<Buffer> {
+export async function buildDocx(
+  data: TemplateData,
+  paper: { width: number; height: number } = DEFAULT_PAGE
+): Promise<Buffer> {
   let doc: Document;
   switch (data.doc.type) {
     case "penawaran":

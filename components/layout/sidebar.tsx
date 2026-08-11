@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { FileText, LayoutDashboard, LogOut, PlusCircle, Settings, Users, ChevronDown } from "lucide-react";
+import { FileText, LayoutDashboard, Loader2, LogOut, PlusCircle, Settings, Users, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogoutButton } from "@/components/auth/logout-button";
@@ -100,6 +101,21 @@ function NavContent({ companyName, isOwner }: { companyName: string; isOwner: bo
 
 export function Sidebar({ companyName, isOwner }: { companyName: string; isOwner: boolean }) {
   const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await authClient.signOut();
+      await logoutAction();
+    } catch {
+      router.push("/login");
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   return (
     <>
@@ -140,23 +156,15 @@ export function Sidebar({ companyName, isOwner }: { companyName: string; isOwner
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={loggingOut}
               className="text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer"
-              onSelect={async (e) => {
+              onSelect={(e) => {
                 e.preventDefault();
-                try {
-                  await authClient.signOut();
-                } catch {
-                  // fallback
-                }
-                try {
-                  await logoutAction();
-                } catch {
-                  router.push("/login");
-                  router.refresh();
-                }
+                void handleLogout();
               }}
             >
-              <LogOut className="h-4 w-4 mr-2" /> Keluar
+              {loggingOut ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
+              {loggingOut ? "Keluar..." : "Keluar"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

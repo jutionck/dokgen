@@ -77,7 +77,6 @@ export function TerminDialog({
     toast.success(`Invoice termin dibuat: ${res.number}`);
     setOpen(false);
     router.push(`/documents/${res.id}`);
-    router.refresh();
   };
 
   return (

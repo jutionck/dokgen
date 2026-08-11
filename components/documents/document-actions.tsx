@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Download, FileType2, Mail, MoreHorizontal, Pencil, Copy, Trash2, Eye } from "lucide-react";
+import { Download, FileType2, Mail, MoreHorizontal, Pencil, Copy, Trash2, Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,33 +25,44 @@ import { useState } from "react";
 import { deleteDocumentAction, duplicateDocumentAction } from "@/lib/actions/documents";
 
 export function DocumentActions({ docId }: { docId: string }) {
-  const router = useRouter();
   const [confirm, setConfirm] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<"duplicate" | "delete" | null>(null);
 
   const handleDuplicate = async () => {
-    const res = await duplicateDocumentAction(docId);
-    if (res.error) return toast.error(res.error);
-    toast.success("Dokumen diduplikasi");
-    router.refresh();
+    if (busy) return;
+    setBusy("duplicate");
+    try {
+      const res = await duplicateDocumentAction(docId);
+      if (res.error) return toast.error(res.error);
+      toast.success("Dokumen diduplikasi");
+    } catch {
+      toast.error("Gagal menduplikasi dokumen");
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleDelete = async () => {
-    setBusy(true);
-    const res = await deleteDocumentAction(docId);
-    setBusy(false);
-    if (res.error) return toast.error(res.error);
-    toast.success("Dokumen dihapus");
-    setConfirm(false);
-    router.refresh();
+    if (busy) return;
+    setBusy("delete");
+    try {
+      const res = await deleteDocumentAction(docId);
+      if (res.error) return toast.error(res.error);
+      toast.success("Dokumen dihapus");
+      setConfirm(false);
+    } catch {
+      toast.error("Gagal menghapus dokumen");
+    } finally {
+      setBusy(null);
+    }
   };
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-4 w-4" />
+          <Button variant="ghost" size="icon" disabled={busy !== null}>
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4" />}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
@@ -86,8 +96,9 @@ export function DocumentActions({ docId }: { docId: string }) {
               <Pencil /> Edit
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleDuplicate}>
-            <Copy /> Duplikat
+          <DropdownMenuItem onSelect={handleDuplicate} disabled={busy !== null}>
+            {busy === "duplicate" ? <Loader2 className="animate-spin" /> : <Copy />}
+            {busy === "duplicate" ? "Menduplikasi..." : "Duplikat"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setConfirm(true)} className="text-red-600 focus:text-red-700">
@@ -103,9 +114,10 @@ export function DocumentActions({ docId }: { docId: string }) {
             <AlertDialogDescription>Dokumen ini akan dihapus permanen.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700" disabled={busy}>
-              Hapus
+            <AlertDialogCancel disabled={busy !== null}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700" disabled={busy !== null}>
+              {busy === "delete" ? <Loader2 className="animate-spin" /> : <Trash2 />}
+              {busy === "delete" ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
