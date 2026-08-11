@@ -1,109 +1,190 @@
 # Dokgen — Generator Dokumen Bisnis
 
-Aplikasi web untuk membuat dokumen bisnis **dalam satu pintu**: **Surat Penawaran, Quotation, Invoice, BAST, dan Kontrak/SPK**.
+Dokgen adalah aplikasi web berbasis Next.js untuk membuat dan mengelola dokumen bisnis Indonesia dalam satu tempat: **Surat Penawaran, Quotation, Invoice, Berita Acara Serah Terima (BAST), dan Kontrak/SPK**.
 
-- Download langsung dalam format **PDF** (server-side, kualitas cetak)
-- **Export DOCX** untuk diedit di Word / Google Docs
-- **Kirim via email** dengan PDF ter-lampir otomatis (Resend)
-- **History dokumen** tersimpan, bisa diduplikasi, status (draft / terkirim / lunas / selesai / batal)
-- **Login tim** — anggota bergabung dengan kode perusahaan
-- Logo, data bank, dan penandatangan dikonfigurasi sekali di Pengaturan
+## Fitur Utama
 
-## Tech Stack (semua gratis)
+- Preview dokumen responsif dengan layout konsisten terhadap hasil ekspor.
+- Download PDF server-side dengan pilihan kertas A4, Letter, dan Legal.
+- Export DOCX untuk diedit kembali di Microsoft Word atau Google Docs.
+- Filename PDF, DOCX, dan lampiran email menyertakan nama klien.
+- Pengiriman email dengan PDF terlampir melalui Resend.
+- Logo dan tanda tangan digital disimpan di private Vercel Blob.
+- Multi-rekening bank dan pemilihan rekening per dokumen.
+- Nomor dokumen otomatis berdasarkan jenis dan periode.
+- Status, riwayat email, duplikasi, edit, dan penghapusan dokumen.
+- Akses berbasis perusahaan/tenant dan keanggotaan tim.
+- Footer identitas Dokgen pada PDF, DOCX, hasil cetak, dan lampiran email.
 
-| Komponen       | Pilihan                                                    | Alasan                            |
-| -------------- | ---------------------------------------------------------- | --------------------------------- |
-| Framework      | Next.js 16 (App Router)                                    | Serverless di Vercel              |
-| Database       | [Neon Postgres](https://neon.tech) (free tier)             | Postgres serverless, 500MB gratis |
-| ORM            | Drizzle ORM                                                | Type-safe, migrasi otomatis       |
-| Auth           | [Better Auth](https://better-auth.com) (open source)       | Email/password, tanpa biaya       |
-| Email          | [Resend](https://resend.com) (free tier)                   | 3.000 email/bulan gratis          |
-| Storage (logo) | [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | Gratis 1GB                        |
-| PDF            | @react-pdf/renderer                                        | Render server-side                |
-| DOCX           | docx                                                       | Export Word asli                  |
+## Teknologi
+
+| Komponen       | Teknologi                                   |
+| -------------- | ------------------------------------------- |
+| Framework      | Next.js 16 App Router, React 19, TypeScript |
+| UI             | Tailwind CSS, Radix UI, Lucide              |
+| Database       | MySQL 8+                                    |
+| ORM            | Drizzle ORM                                 |
+| Authentication | Better Auth                                 |
+| Object storage | Private Vercel Blob                         |
+| Email          | Resend                                      |
+| PDF            | `@react-pdf/renderer`                       |
+| DOCX           | `docx`                                      |
+
+## Persyaratan
+
+- Node.js 20 atau lebih baru.
+- npm.
+- MySQL 8 atau layanan MySQL yang kompatibel.
+- Vercel Blob store berakses **Private** untuk upload logo dan tanda tangan.
+- Akun Resend jika fitur kirim email digunakan.
 
 ## Setup Lokal
 
-### 1. Environment variables
+### 1. Instal dependency
+
+```bash
+npm install
+```
+
+### 2. Siapkan environment
 
 ```bash
 cp .env.example .env.local
 ```
 
-Isi `DATABASE_URL` (dari dashboard Neon), lalu:
+Environment utama:
+
+| Nama                          | Keterangan                                                |
+| ----------------------------- | --------------------------------------------------------- |
+| `DATABASE_URL`                | Connection string MySQL.                                  |
+| `BETTER_AUTH_SECRET`          | Secret acak minimal 32 karakter.                          |
+| `BETTER_AUTH_URL`             | Origin aplikasi, misalnya `http://localhost:3000`.        |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Daftar origin tepercaya dipisahkan koma.                  |
+| `RESEND_API_KEY`              | API key Resend.                                           |
+| `RESEND_FROM`                 | Identitas pengirim, misalnya `Dokgen <kirim@domain.com>`. |
+| `BLOB_READ_WRITE_TOKEN`       | Read-write token Vercel Blob.                             |
+
+Buat secret autentikasi:
 
 ```bash
-openssl rand -base64 32   # untuk BETTER_AUTH_SECRET
+openssl rand -base64 32
 ```
 
-### 2. Install & migrasi database
+Jika Vercel Blob dibuat dengan prefix `BLOB_READ_WRITE_TOKEN`, Vercel dapat menghasilkan `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN`. Dokgen mendukung nama standar dan nama hasil prefix tersebut.
+
+Untuk menarik environment dari project Vercel yang sudah terhubung:
 
 ```bash
-npm install
-npm run db:migrate    # apply migrasi ke Neon (jalankan sekali)
-npm run dev           # http://localhost:3000
+npx vercel link
+npx vercel env pull .env.local
 ```
 
-### 3. Setup email (Resend)
+### 3. Siapkan database lokal baru
 
-1. Daftar di [resend.com](https://resend.com) → buat API Key → isi `RESEND_API_KEY`
-2. Verifikasi domain (atau pakai domain `resend.dev` saat uji coba) → isi `RESEND_FROM`:
-   ```
-   RESEND_FROM="Nama Perusahaan <kirim@domain-anda.com>"
-   ```
+Untuk database development baru, sinkronkan schema MySQL saat ini:
 
-### 4. Setup logo (Vercel Blob)
+```bash
+npx drizzle-kit push
+```
 
-- Local: `npx vercel link` lalu `npx vercel env pull` — atau buat token di
-  [vercel.com/docs/storage/vercel-blob](https://vercel.com/docs/storage/vercel-blob) dan isi `BLOB_READ_WRITE_TOKEN`
-- Jika Blob store dibuat dengan prefix `BLOB_READ_WRITE_TOKEN`, Vercel dapat membuat
-  `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN`; aplikasi mendukung kedua nama tersebut.
+> Folder `db/migrations` menyimpan baseline historis yang sebagian berasal dari implementasi PostgreSQL lama. Jangan menjalankan seluruh migration tersebut pada database production MySQL tanpa meninjau SQL dan status schema target terlebih dahulu.
+
+### 4. Jalankan aplikasi
+
+```bash
+npm run dev
+```
+
+Buka [http://localhost:3000](http://localhost:3000).
+
+## Setup Private Vercel Blob
+
+1. Buka project di Vercel.
+2. Pilih **Storage → Create Database → Blob**.
+3. Buat store dengan akses **Private**.
+4. Hubungkan store ke environment Production, Preview, dan Development.
+5. Redeploy aplikasi setelah environment ditambahkan.
+
+Private Blob tidak diekspos langsung ke browser. Preview logo dan tanda tangan dilayani melalui `/api/company-assets/[kind]`, yang memverifikasi sesi dan perusahaan pengguna. PDF, DOCX, dan lampiran email mengambil aset langsung secara server-side.
+
+## Setup Resend
+
+1. Buat API key di Resend dan isi `RESEND_API_KEY`.
+2. Verifikasi domain pengirim.
+3. Isi `RESEND_FROM`, misalnya:
+
+```env
+RESEND_FROM="Dokgen <kirim@domain-anda.com>"
+```
 
 ## Deploy ke Vercel
 
-1. Push repo ke GitHub → import di [vercel.com](https://vercel.com)
-2. Di dashboard Vercel → **Storage** → **Blob** → _Create_ dengan akses **Private**
-   (token otomatis masuk ke env)
-3. Isi environment variables: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
-   (URL production, contoh `https://dokgen.vercel.app`), `BETTER_AUTH_TRUSTED_ORIGINS`,
-   `RESEND_API_KEY`, `RESEND_FROM`
-4. Jalankan migrasi sekali: terminal → `npx vercel env pull` lalu `npm run db:migrate`
-   (atau jalankan `drizzle-kit migrate` dari local dengan `DATABASE_URL` production)
+1. Push repository ke GitHub dan import project ke Vercel.
+2. Isi seluruh environment untuk Production dan Preview.
+3. Pastikan schema database MySQL target sudah sesuai dengan `db/schema.ts`.
+4. Buat dan hubungkan private Vercel Blob store.
+5. Deploy aplikasi.
 
-> Neon free tier menidurkan database setelah idle beberapa menit — request pertama
-> setelah idle butuh ~1 detik lebih lama. Normal.
+Environment production minimum:
+
+```env
+DATABASE_URL="mysql://user:password@host:3306/database"
+BETTER_AUTH_SECRET="secret-acak-minimal-32-karakter"
+BETTER_AUTH_URL="https://dokgen.example.com"
+BETTER_AUTH_TRUSTED_ORIGINS="https://dokgen.example.com"
+BLOB_READ_WRITE_TOKEN="vercel_blob_rw_..."
+RESEND_API_KEY="re_..."
+RESEND_FROM="Dokgen <kirim@example.com>"
+```
+
+Jangan commit file `.env` atau membagikan nilai secret/token.
 
 ## Alur Penggunaan
 
-1. **Registrasi** → buat perusahaan baru (jadi pemilik) atau gabung tim pakai kode
-2. **Pengaturan** → isi profil, logo, rekening bank, penandatangan, kode tim
-3. **Klien** → tambahkan data pelanggan
-4. **Buat Dokumen** → pilih jenis (Surat Penawaran / Quotation / Invoice / BAST / Kontrak),
-   isi rincian & item, simpan — nomor dokumen otomatis (mis. `001/INV/08/2026`)
-5. **Di halaman dokumen** → lihat preview, **Download PDF**, **Export DOCX**,
-   **Kirim Email** (PDF otomatis terlampir), duplikat, edit, ubah status
+1. Registrasi dan buat perusahaan, atau bergabung memakai kode tim.
+2. Lengkapi profil, rekening bank, penandatangan, logo, dan tanda tangan digital.
+3. Tambahkan data klien.
+4. Pilih jenis dokumen, isi rincian dan item, lalu simpan.
+5. Preview dokumen, download PDF/DOCX, kirim email, atau bagikan melalui WhatsApp.
 
-## Struktur Penting
+Contoh filename hasil download:
 
+```text
+Surat Penawaran-Warta Selatan-001-SP-08-2026-A4.pdf
 ```
+
+## Struktur Project
+
+```text
 app/
-  (app)/dashboard          → ringkasan & statistik
-  (app)/documents          → daftar dokumen (history) + filter
-  (app)/documents/new      → form dokumen (5 jenis)
-  (app)/documents/[id]     → detail + aksi (PDF/DOCX/email)
-  (app)/clients            → manajemen klien
-  (app)/settings           → profil perusahaan, bank, penandatangan, tim
-  api/documents/[id]/pdf   → generate PDF (GET)
-  api/documents/[id]/docx  → export DOCX (GET)
-  api/documents/[id]/email → kirim via Resend (POST)
-components/documents/templates → template HTML (preview & cetak)
-lib/pdf/                  → rendering PDF per jenis dokumen
-lib/docx/                 → builder DOCX per jenis dokumen
-db/schema.ts              → skema Drizzle (migrasi: npm run db:generate)
+  (app)/dashboard                 dashboard dan statistik
+  (app)/documents                 daftar dan filter dokumen
+  (app)/documents/[id]            detail, preview, dan aksi dokumen
+  (app)/documents/new             wizard pembuatan dokumen
+  (app)/clients                   manajemen klien
+  (app)/settings                  profil, bank, penandatangan, dan tim
+  api/company-assets/[kind]       proxy aset private per tenant
+  api/documents/[id]/pdf          generator PDF
+  api/documents/[id]/docx         generator DOCX
+  api/documents/[id]/email        pengiriman email dan lampiran PDF
+components/documents/templates    template preview HTML
+lib/pdf                           renderer PDF
+lib/docx                          builder DOCX
+lib/documents                     loader, filename, paper, dan branding
+db/schema.ts                      schema MySQL Drizzle
 ```
 
-## Catatan
+## Validasi Sebelum Release
 
-- Nomor dokumen: `001/INV/MM/YYYY` — urut otomatis per jenis per bulan (aman untuk tim kecil)
-- Keamanan data: semua query dokumen selalu difilter `company_id` milik pengguna login
-- Invoice "Tagihan Berjalan" di dashboard dihitung dari invoice berstatus selain lunas/batal
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build -- --webpack
+```
+
+## Keamanan
+
+- Query bisnis difilter berdasarkan `company_id` pengguna aktif.
+- Aset Blob private hanya dilayani setelah verifikasi sesi dan tenant.
+- Server Action memvalidasi tipe serta ukuran file upload.
+- PDF, DOCX, dan endpoint aset menggunakan cache private/no-store sesuai kebutuhan.
