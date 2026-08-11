@@ -16,6 +16,7 @@ import {
   List,
   TableProperties,
   Landmark,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -226,6 +227,7 @@ export function DocumentForm({
   }, [extra.scope_of_work]);
 
   const [scopeRows, setScopeRows] = useState(initialScopeRows);
+  const [submitting, setSubmitting] = useState(false);
 
   const syncScopeToExtra = (updatedRows: { key: string; description: string; note: string }[]) => {
     const serialized = updatedRows
@@ -290,6 +292,8 @@ export function DocumentForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+
     const payload = {
       type,
       title,
@@ -311,14 +315,20 @@ export function DocumentForm({
       })),
     };
 
-    const res = isEdit ? await updateDocumentAction(doc!.id, payload) : await createDocumentAction(payload);
-    if (!res.success) {
-      toast.error(res.error);
-      return;
+    setSubmitting(true);
+    try {
+      const res = isEdit ? await updateDocumentAction(doc!.id, payload) : await createDocumentAction(payload);
+      if (!res.success) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(isEdit ? "Dokumen diperbarui" : `Dokumen dibuat: ${res.number}`);
+      router.push(`/documents/${isEdit ? doc!.id : res.id}`);
+    } catch {
+      toast.error(isEdit ? "Gagal menyimpan perubahan" : "Gagal membuat dokumen");
+    } finally {
+      setSubmitting(false);
     }
-    toast.success(isEdit ? "Dokumen diperbarui" : `Dokumen dibuat: ${res.number}`);
-    router.push(`/documents/${isEdit ? doc!.id : res.id}`);
-    router.refresh();
   };
 
   const changeType = (t: DocType) => {
@@ -328,7 +338,7 @@ export function DocumentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 pb-24 sm:pb-0">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-24 sm:pb-0" aria-busy={submitting}>
       {/* Top Bar Header */}
       <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
@@ -363,6 +373,7 @@ export function DocumentForm({
             <Select
               value={status}
               onValueChange={(v) => setStatus(v as DocStatus)}
+              disabled={submitting}
               className="w-36 font-medium"
               options={(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => ({
                 value: s,
@@ -370,8 +381,9 @@ export function DocumentForm({
               }))}
             />
           </div>
-          <Button type="submit" className="gap-2 shadow-sm transition-all hover:shadow">
-            <Save className="h-4 w-4" /> {isEdit ? "Simpan Perubahan" : "Simpan Dokumen"}
+          <Button type="submit" className="gap-2 shadow-sm transition-all hover:shadow" disabled={submitting}>
+            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {submitting ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Simpan Dokumen"}
           </Button>
         </div>
       </div>
@@ -550,13 +562,18 @@ export function DocumentForm({
                 <Textarea
                   value={extra.intro || ""}
                   onChange={setExtraField("intro")}
-                  placeholder="Kalimat pembuka khusus sebelum daftar item..."
+                  placeholder="Contoh: Merujuk pada kebutuhan Bapak/Ibu, bersama ini kami menyampaikan penawaran berikut..."
                   rows={2}
                 />
+                {isPenawaran && (
+                  <p className="text-[11px] text-slate-500">
+                    Jika diisi, paragraf ini menggantikan kalimat pembuka standar setelah “Dengan hormat,”.
+                  </p>
+                )}
               </div>
             )}
 
-            {(isPenawaran || isKontrak || isBast) && (
+            {(isKontrak || isBast) && (
               <div className="space-y-1.5 sm:col-span-2">
                 <Label className="text-xs font-semibold text-slate-700">Uraian / Deskripsi Pekerjaan</Label>
                 <Textarea
@@ -1032,20 +1049,23 @@ export function DocumentForm({
             size="icon"
             onClick={() => (isEdit && doc?.id ? router.push(`/documents/${doc.id}`) : router.push("/documents"))}
             title="Kembali"
+            disabled={submitting}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <Select
             value={status}
             onValueChange={(v) => setStatus(v as DocStatus)}
+            disabled={submitting}
             className="w-28"
             options={(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => ({
               value: s,
               label: DOC_STATUS[s].label,
             }))}
           />
-          <Button type="submit" className="flex-1 gap-1.5">
-            <Save className="h-4 w-4" /> {isEdit ? "Simpan" : "Buat Dokumen"}
+          <Button type="submit" className="flex-1 gap-1.5" disabled={submitting}>
+            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {submitting ? "Menyimpan..." : isEdit ? "Simpan" : "Buat Dokumen"}
           </Button>
         </div>
       </div>

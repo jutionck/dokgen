@@ -27,6 +27,7 @@ function PartyBox({ party, title }: { party: string; title: string }) {
 export function PenawaranPdf({ data, paperSize }: { data: TemplateData; paperSize?: PageSize }) {
   const { company, doc, client } = data;
   const extra = doc.extra;
+  const intro = extra.intro?.trim();
   const validityDays = Number(extra.validity_days) || 14;
   return (
     <PdfDocumentShell data={data} paperSize={paperSize}>
@@ -34,10 +35,11 @@ export function PenawaranPdf({ data, paperSize }: { data: TemplateData; paperSiz
       <PdfClient data={data} />
       <Text style={pdfStyles.text}>Dengan hormat,</Text>
       <Text style={pdfStyles.text}>
-        Bersama ini kami sampaikan penawaran jasa {extra.project_title || "sesuai kebutuhan Anda"} kepada{" "}
-        {client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:
+        {intro ||
+          `Bersama ini kami sampaikan penawaran jasa ${extra.project_title || "sesuai kebutuhan Anda"} kepada ${
+            client?.company || client?.name || "calon klien"
+          }. Adapun rincian penawaran kami adalah sebagai berikut:`}
       </Text>
-      {extra.intro ? <Text style={pdfStyles.text}>{extra.intro}</Text> : null}
       {extra.scope_of_work ? <PdfScopeTable scopeOfWork={extra.scope_of_work} /> : null}
       <Text style={pdfStyles.sectionTitle} minPresenceAhead={72}>
         Rincian Biaya Penawaran

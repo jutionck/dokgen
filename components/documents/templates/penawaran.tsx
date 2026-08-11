@@ -14,6 +14,7 @@ import {
 export function PenawaranTemplate({ data }: { data: TemplateData }) {
   const { company, doc, client } = data;
   const extra = doc.extra;
+  const intro = extra.intro?.trim();
   const validityDays = Number(extra.validity_days) || 14;
 
   return (
@@ -29,11 +30,14 @@ export function PenawaranTemplate({ data }: { data: TemplateData }) {
 
       <div className="space-y-3 text-sm leading-relaxed">
         <p>Dengan hormat,</p>
-        <p>
-          Bersama ini kami sampaikan penawaran jasa {extra.project_title || "sesuai kebutuhan Anda"} kepada{" "}
-          {client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:
-        </p>
-        {extra.intro && <p>{extra.intro}</p>}
+        {intro ? (
+          <p className="whitespace-pre-line">{intro}</p>
+        ) : (
+          <p>
+            Bersama ini kami sampaikan penawaran jasa {extra.project_title || "sesuai kebutuhan Anda"} kepada{" "}
+            {client?.company || client?.name || "calon klien"}. Adapun rincian penawaran kami adalah sebagai berikut:
+          </p>
+        )}
       </div>
 
       {extra.scope_of_work && <ScopeTable scopeOfWork={extra.scope_of_work} />}

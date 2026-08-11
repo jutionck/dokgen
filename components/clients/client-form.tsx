@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,7 +48,6 @@ const initial = {
 };
 
 export function ClientForm({ mode, client, trigger, onSaved }: ClientFormProps) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [form, setForm] = useState(
@@ -66,38 +64,48 @@ export function ClientForm({ mode, client, trigger, onSaved }: ClientFormProps) 
         }
       : initial
   );
-  const [saving, setSaving] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"save" | "delete" | null>(null);
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    const res = mode === "create" ? await createClientAction(form) : await updateClientAction(client!.id, form);
-    setSaving(false);
-    if (res.error) {
-      toast.error(res.error);
-      return;
+    if (pendingAction) return;
+    setPendingAction("save");
+    try {
+      const res = mode === "create" ? await createClientAction(form) : await updateClientAction(client!.id, form);
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(mode === "create" ? "Klien ditambahkan" : "Klien diperbarui");
+      setOpen(false);
+      onSaved?.();
+    } catch {
+      toast.error("Gagal menyimpan data klien");
+    } finally {
+      setPendingAction(null);
     }
-    toast.success(mode === "create" ? "Klien ditambahkan" : "Klien diperbarui");
-    setOpen(false);
-    router.refresh();
-    onSaved?.();
   };
 
   const handleDelete = async () => {
-    setSaving(true);
-    const res = await deleteClientAction(client!.id);
-    setSaving(false);
-    if (res.error) {
-      toast.error(res.error);
-      return;
+    if (pendingAction) return;
+    setPendingAction("delete");
+    try {
+      const res = await deleteClientAction(client!.id);
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("Klien dihapus");
+      setConfirm(false);
+      setOpen(false);
+    } catch {
+      toast.error("Gagal menghapus klien");
+    } finally {
+      setPendingAction(null);
     }
-    toast.success("Klien dihapus");
-    setConfirm(false);
-    setOpen(false);
-    router.refresh();
   };
 
   return (
@@ -155,14 +163,15 @@ export function ClientForm({ mode, client, trigger, onSaved }: ClientFormProps) 
                   type="button"
                   variant="destructive"
                   onClick={() => setConfirm(true)}
-                  disabled={saving}
+                  disabled={pendingAction !== null}
                   className="mr-auto"
                 >
                   <Trash2 className="h-4 w-4" /> Hapus
                 </Button>
               )}
-              <Button type="submit" disabled={saving}>
-                {saving ? "Menyimpan..." : "Simpan"}
+              <Button type="submit" disabled={pendingAction !== null}>
+                {pendingAction === "save" && <Loader2 className="h-4 w-4 animate-spin" />}
+                {pendingAction === "save" ? "Menyimpan..." : "Simpan"}
               </Button>
             </DialogFooter>
           </form>
@@ -178,9 +187,18 @@ export function ClientForm({ mode, client, trigger, onSaved }: ClientFormProps) 
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700" disabled={saving}>
-              Hapus
+            <AlertDialogCancel disabled={pendingAction !== null}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={pendingAction !== null}
+            >
+              {pendingAction === "delete" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              {pendingAction === "delete" ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

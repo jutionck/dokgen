@@ -101,32 +101,48 @@ export function DocumentDetailActions({
   const docxUrl = `/api/documents/${docId}/docx`;
 
   const handleStatus = async (value: DocStatus) => {
+    if (busy) return;
     setBusy("status");
-    const res = await updateDocumentStatusAction(docId, value);
-    setBusy(null);
-    if (res.error) return toast.error(res.error);
-    toast.success("Status diperbarui");
-    router.refresh();
+    try {
+      const res = await updateDocumentStatusAction(docId, value);
+      if (res.error) return toast.error(res.error);
+      toast.success("Status diperbarui");
+    } catch {
+      toast.error("Gagal memperbarui status");
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleDuplicate = async () => {
+    if (busy) return;
     setBusy("duplicate");
-    const res = await duplicateDocumentAction(docId);
-    setBusy(null);
-    if (res.error) return toast.error(res.error);
-    toast.success("Dokumen diduplikasi sebagai draft baru");
-    router.push(`/documents/${res.id}`);
-    router.refresh();
+    try {
+      const res = await duplicateDocumentAction(docId);
+      if (res.error) return toast.error(res.error);
+      toast.success("Dokumen diduplikasi sebagai draft baru");
+      router.push(`/documents/${res.id}`);
+    } catch {
+      toast.error("Gagal menduplikasi dokumen");
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleDelete = async () => {
+    if (busy) return;
     setBusy("delete");
-    const res = await deleteDocumentAction(docId);
-    setBusy(null);
-    if (res.error) return toast.error(res.error);
-    toast.success("Dokumen dihapus");
-    setDeleteOpen(false);
-    router.push("/documents");
+    try {
+      const res = await deleteDocumentAction(docId);
+      if (res.error) return toast.error(res.error);
+      toast.success("Dokumen dihapus");
+      setDeleteOpen(false);
+      router.push("/documents");
+    } catch {
+      toast.error("Gagal menghapus dokumen");
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleSendEmail = async () => {
@@ -217,15 +233,21 @@ export function DocumentDetailActions({
         </Button>
 
         {/* Dropdown Status */}
-        <Select
-          value={status}
-          onValueChange={(v) => handleStatus(v as DocStatus)}
-          className="w-28 md:w-32 lg:w-36 font-medium text-xs sm:text-sm"
-          options={(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => ({
-            value: s,
-            label: DOC_STATUS[s].label,
-          }))}
-        />
+        <div className="flex items-center gap-1.5">
+          <Select
+            value={status}
+            onValueChange={(v) => handleStatus(v as DocStatus)}
+            disabled={busy !== null}
+            className="w-28 md:w-32 lg:w-36 font-medium text-xs sm:text-sm"
+            options={(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => ({
+              value: s,
+              label: DOC_STATUS[s].label,
+            }))}
+          />
+          {busy === "status" && (
+            <Loader2 aria-label="Menyimpan status" className="h-4 w-4 animate-spin text-blue-600" />
+          )}
+        </div>
 
         {/* Dropdown Menu Aksi Lainnya */}
         <DropdownMenu>
@@ -264,10 +286,15 @@ export function DocumentDetailActions({
 
             <DropdownMenuItem
               onClick={handleDuplicate}
-              disabled={busy === "duplicate"}
+              disabled={busy !== null}
               className="flex items-center gap-2 cursor-pointer"
             >
-              <Copy className="h-4 w-4 text-purple-600" /> Duplikat Dokumen
+              {busy === "duplicate" ? (
+                <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
+              ) : (
+                <Copy className="h-4 w-4 text-purple-600" />
+              )}
+              {busy === "duplicate" ? "Menduplikasi..." : "Duplikat Dokumen"}
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />
@@ -331,15 +358,21 @@ export function DocumentDetailActions({
           </Button>
 
           {/* Select Status */}
-          <Select
-            value={status}
-            onValueChange={(v) => handleStatus(v as DocStatus)}
-            className="w-28 text-xs font-medium"
-            options={(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => ({
-              value: s,
-              label: DOC_STATUS[s].label,
-            }))}
-          />
+          <div className="flex items-center gap-1">
+            <Select
+              value={status}
+              onValueChange={(v) => handleStatus(v as DocStatus)}
+              disabled={busy !== null}
+              className="w-28 text-xs font-medium"
+              options={(Object.keys(DOC_STATUS) as DocStatus[]).map((s) => ({
+                value: s,
+                label: DOC_STATUS[s].label,
+              }))}
+            />
+            {busy === "status" && (
+              <Loader2 aria-label="Menyimpan status" className="h-4 w-4 animate-spin text-blue-600" />
+            )}
+          </div>
 
           {/* Menu Lainnya */}
           <DropdownMenu>
@@ -379,10 +412,15 @@ export function DocumentDetailActions({
 
               <DropdownMenuItem
                 onClick={handleDuplicate}
-                disabled={busy === "duplicate"}
+                disabled={busy !== null}
                 className="flex items-center gap-2 cursor-pointer"
               >
-                <Copy className="h-4 w-4 text-purple-600" /> Duplikat Dokumen
+                {busy === "duplicate" ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
+                ) : (
+                  <Copy className="h-4 w-4 text-purple-600" />
+                )}
+                {busy === "duplicate" ? "Menduplikasi..." : "Duplikat Dokumen"}
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
@@ -486,13 +524,14 @@ export function DocumentDetailActions({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel disabled={busy === "delete"}>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-red-600 hover:bg-red-700"
               disabled={busy === "delete"}
             >
-              {busy === "delete" ? <Loader2 className="animate-spin" /> : <Trash2 />} Hapus
+              {busy === "delete" ? <Loader2 className="animate-spin" /> : <Trash2 />}
+              {busy === "delete" ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

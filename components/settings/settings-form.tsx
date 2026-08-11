@@ -1,9 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Building2, Landmark, PenLine, Copy, Check, Trash2, Upload, Users, Plus, ShieldCheck } from "lucide-react";
+import {
+  Building2,
+  Landmark,
+  PenLine,
+  Copy,
+  Check,
+  Trash2,
+  Upload,
+  Users,
+  Plus,
+  ShieldCheck,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +48,6 @@ const settingsTabClass =
   "h-11 min-w-max shrink-0 gap-2 rounded-xl px-4 text-xs font-semibold text-slate-600 transition-all hover:bg-white/70 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 sm:text-sm md:w-full md:min-w-0 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=active]:shadow-blue-600/20";
 
 export function SettingsForm({ company, members, isOwner }: Props) {
-  const router = useRouter();
   const [saving, setSaving] = useState<null | "profil" | "bank" | "signer">(null);
   const [copied, setCopied] = useState(false);
 
@@ -103,6 +113,7 @@ export function SettingsForm({ company, members, isOwner }: Props) {
 
   const [uploading, setUploading] = useState(false);
   const [uploadingSignature, setUploadingSignature] = useState(false);
+  const [assetAction, setAssetAction] = useState<"remove-logo" | "remove-signature" | null>(null);
 
   const setComp = (k: keyof typeof companyForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setCompanyForm((f) => ({ ...f, [k]: e.target.value }));
@@ -110,50 +121,77 @@ export function SettingsForm({ company, members, isOwner }: Props) {
     setSignerForm((f) => ({ ...f, [k]: e.target.value }));
 
   const save = async (which: "profil" | "bank" | "signer", payload: Record<string, string>) => {
+    if (saving) return;
     setSaving(which);
-    const res = await updateCompanyAction({ ...payload, name: companyForm.name } as never);
-    setSaving(null);
-    if (res.error) return toast.error(res.error);
-    toast.success("Pengaturan berhasil disimpan");
-    router.refresh();
+    try {
+      const res = await updateCompanyAction({ ...payload, name: companyForm.name } as never);
+      if (res.error) return toast.error(res.error);
+      toast.success("Pengaturan berhasil disimpan");
+    } catch {
+      toast.error("Gagal menyimpan pengaturan");
+    } finally {
+      setSaving(null);
+    }
   };
 
   const handleUpload = async (file?: File | null) => {
-    if (!file) return;
+    if (!file || uploading || assetAction) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append("logo", file);
-    const res = await uploadLogoAction(fd);
-    setUploading(false);
-    if (res.error) return toast.error(res.error);
-    toast.success("Logo perusahaan diperbarui");
-    router.refresh();
+    try {
+      const fd = new FormData();
+      fd.append("logo", file);
+      const res = await uploadLogoAction(fd);
+      if (res.error) return toast.error(res.error);
+      toast.success("Logo perusahaan diperbarui");
+    } catch {
+      toast.error("Gagal mengunggah logo");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleRemoveLogo = async () => {
-    const res = await removeLogoAction();
-    if (res.error) return toast.error(res.error);
-    toast.success("Logo dihapus");
-    router.refresh();
+    if (uploading || assetAction) return;
+    setAssetAction("remove-logo");
+    try {
+      const res = await removeLogoAction();
+      if (res.error) return toast.error(res.error);
+      toast.success("Logo dihapus");
+    } catch {
+      toast.error("Gagal menghapus logo");
+    } finally {
+      setAssetAction(null);
+    }
   };
 
   const handleSignatureUpload = async (file?: File | null) => {
-    if (!file) return;
+    if (!file || uploadingSignature || assetAction) return;
     setUploadingSignature(true);
-    const formData = new FormData();
-    formData.append("signature", file);
-    const result = await uploadSignatureAction(formData);
-    setUploadingSignature(false);
-    if (result.error) return toast.error(result.error);
-    toast.success("Tanda tangan digital berhasil diperbarui");
-    router.refresh();
+    try {
+      const formData = new FormData();
+      formData.append("signature", file);
+      const result = await uploadSignatureAction(formData);
+      if (result.error) return toast.error(result.error);
+      toast.success("Tanda tangan digital berhasil diperbarui");
+    } catch {
+      toast.error("Gagal mengunggah tanda tangan digital");
+    } finally {
+      setUploadingSignature(false);
+    }
   };
 
   const handleRemoveSignature = async () => {
-    const result = await removeSignatureAction();
-    if (result.error) return toast.error(result.error);
-    toast.success("Tanda tangan digital dihapus");
-    router.refresh();
+    if (uploadingSignature || assetAction) return;
+    setAssetAction("remove-signature");
+    try {
+      const result = await removeSignatureAction();
+      if (result.error) return toast.error(result.error);
+      toast.success("Tanda tangan digital dihapus");
+    } catch {
+      toast.error("Gagal menghapus tanda tangan digital");
+    } finally {
+      setAssetAction(null);
+    }
   };
 
   const copyCode = async () => {
@@ -211,20 +249,32 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
                   {company.logo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src="/api/company-assets/logo" alt="Logo Perusahaan" className="h-full w-full object-contain p-1" />
+                    <img
+                      src="/api/company-assets/logo"
+                      alt="Logo Perusahaan"
+                      className="h-full w-full object-contain p-1"
+                    />
                   ) : (
                     <Building2 className="h-9 w-9 text-slate-300" />
                   )}
                 </div>
                 <div className="space-y-2 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <label className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs font-semibold cursor-pointer shadow-xs transition-all active:scale-95">
-                      <Upload className="h-3.5 w-3.5" />
+                    <label
+                      aria-disabled={uploading || assetAction !== null}
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-blue-700 active:scale-95 aria-disabled:pointer-events-none aria-disabled:opacity-60"
+                    >
+                      {uploading ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Upload className="h-3.5 w-3.5" />
+                      )}
                       {uploading ? "Mengunggah..." : "Upload Logo"}
                       <input
                         type="file"
                         accept="image/png,image/jpeg,image/webp"
                         className="hidden"
+                        disabled={uploading || assetAction !== null}
                         onChange={(e) => handleUpload(e.target.files?.[0])}
                       />
                     </label>
@@ -232,9 +282,15 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                       <button
                         type="button"
                         onClick={handleRemoveLogo}
+                        disabled={uploading || assetAction !== null}
                         className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
                       >
-                        <Trash2 className="h-3.5 w-3.5" /> Hapus Logo
+                        {assetAction === "remove-logo" ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                        {assetAction === "remove-logo" ? "Menghapus..." : "Hapus Logo"}
                       </button>
                     )}
                   </div>
@@ -324,8 +380,9 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 <Button
                   className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-xs"
                   onClick={() => save("profil", companyForm)}
-                  disabled={saving === "profil"}
+                  disabled={saving !== null}
                 >
+                  {saving === "profil" && <Loader2 className="animate-spin" />}
                   {saving === "profil" ? "Menyimpan Profil..." : "Simpan Profil Perusahaan"}
                 </Button>
               </div>
@@ -426,8 +483,9 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 <Button
                   className="w-full sm:w-auto rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-xs"
                   onClick={saveBankAccounts}
-                  disabled={saving === "bank"}
+                  disabled={saving !== null}
                 >
+                  {saving === "bank" && <Loader2 className="animate-spin" />}
                   {saving === "bank" ? "Menyimpan Bank..." : "Simpan Informasi Bank"}
                 </Button>
               </div>
@@ -472,16 +530,24 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <label
-                      aria-disabled={uploadingSignature}
+                      aria-disabled={uploadingSignature || assetAction !== null}
                       className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-blue-700 active:scale-95 aria-disabled:pointer-events-none aria-disabled:opacity-60"
                     >
-                      <Upload className="h-3.5 w-3.5" />
-                      {uploadingSignature ? "Mengunggah..." : company.signature_url ? "Ganti Tanda Tangan" : "Upload Tanda Tangan"}
+                      {uploadingSignature ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Upload className="h-3.5 w-3.5" />
+                      )}
+                      {uploadingSignature
+                        ? "Mengunggah..."
+                        : company.signature_url
+                          ? "Ganti Tanda Tangan"
+                          : "Upload Tanda Tangan"}
                       <input
                         type="file"
                         accept="image/png,image/jpeg"
                         className="hidden"
-                        disabled={uploadingSignature}
+                        disabled={uploadingSignature || assetAction !== null}
                         onChange={(event) => handleSignatureUpload(event.target.files?.[0])}
                       />
                     </label>
@@ -491,9 +557,15 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                         variant="outline"
                         size="sm"
                         onClick={handleRemoveSignature}
+                        disabled={uploadingSignature || assetAction !== null}
                         className="rounded-xl border-slate-200 text-xs font-medium text-red-600 hover:bg-red-50 hover:text-red-700"
                       >
-                        <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Hapus
+                        {assetAction === "remove-signature" ? (
+                          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                        )}
+                        {assetAction === "remove-signature" ? "Menghapus..." : "Hapus"}
                       </Button>
                     )}
                   </div>
@@ -537,8 +609,9 @@ export function SettingsForm({ company, members, isOwner }: Props) {
                 <Button
                   className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-xs"
                   onClick={() => save("signer", signerForm)}
-                  disabled={saving === "signer"}
+                  disabled={saving !== null}
                 >
+                  {saving === "signer" && <Loader2 className="animate-spin" />}
                   {saving === "signer" ? "Menyimpan Penandatangan..." : "Simpan Penandatangan"}
                 </Button>
               </div>
