@@ -37,14 +37,14 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: process.env.RESEND_FROM,
           to: [user.email],
-          subject: "Verifikasi Alamat Email Anda - Dokgen",
+          subject: "Verifikasi Alamat Email Anda - Docgen",
           html: `
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verifikasi Email - Dokgen</title>
+  <title>Verifikasi Email - Docgen</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; }
     .wrapper { width: 100%; padding: 32px 16px; background-color: #f8fafc; box-sizing: border-box; }
@@ -63,19 +63,19 @@ export const auth = betterAuth({
     <div class="container">
       <div class="header">
         <img
-          src="https://dokgen.mipdevp.com/icons/icon-192.png"
+          src="https://docgen.mipdevp.com/icons/icon-192.png"
           width="56"
           height="56"
-          alt="Dokgen Logo"
+          alt="Docgen Logo"
           style="display: block; margin: 0 auto 12px auto; border-radius: 14px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); border: 2px solid rgba(255, 255, 255, 0.2);"
         />
-        <h1 class="brand-title">Dokgen</h1>
+        <h1 class="brand-title">Docgen</h1>
         <p class="brand-sub">Verifikasi Alamat Email Anda</p>
       </div>
       <div class="content">
         <div class="message-body">
-          Halo <strong>${user.name || "Pengguna Dokgen"}</strong>,<br/><br/>
-          Terima kasih telah mendaftar di Dokgen. Sebelum dapat menggunakan akun Anda, mohon konfirmasi alamat email ini dengan menekan tombol di bawah:
+          Halo <strong>${user.name || "Pengguna Docgen"}</strong>,<br/><br/>
+          Terima kasih telah mendaftar di Docgen. Sebelum dapat menggunakan akun Anda, mohon konfirmasi alamat email ini dengan menekan tombol di bawah:
         </div>
         <a href="${verifyUrl}" class="btn" target="_blank">Verifikasi Email Saya</a>
         <div class="message-body" style="font-size: 12px; color: #94a3b8; margin-top: 16px;">
@@ -84,7 +84,7 @@ export const auth = betterAuth({
         </div>
       </div>
       <div class="footer">
-        <p style="margin: 0;">© ${new Date().getFullYear()} Dokgen — Generator Dokumen Bisnis.</p>
+        <p style="margin: 0;">© ${new Date().getFullYear()} Docgen — Generator Dokumen Bisnis.</p>
       </div>
     </div>
   </div>

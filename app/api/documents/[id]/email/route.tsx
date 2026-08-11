@@ -27,7 +27,7 @@ export async function POST(request: Request, props: RouteContext<"/api/documents
   }
   if (!process.env.RESEND_FROM) {
     return Response.json(
-      { error: "RESEND_FROM (email pengirim) belum dikonfigurasi. Contoh: Dokgen <noreply@domain.com>" },
+      { error: "RESEND_FROM (email pengirim) belum dikonfigurasi. Contoh: Docgen <noreply@domain.com>" },
       { status: 500 }
     );
   }

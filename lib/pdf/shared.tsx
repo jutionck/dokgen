@@ -114,10 +114,7 @@ export function PdfHeader({ data }: { data: TemplateData }) {
       <View style={pdfStyles.headerLeft}>
         {data.logoDataUri ? (
           // eslint-disable-next-line jsx-a11y/alt-text
-          <Image
-            src={data.logoDataUri}
-            style={{ width: 150, height: 56, objectFit: "contain", marginBottom: 4 }}
-          />
+          <Image src={data.logoDataUri} style={{ width: 150, height: 56, objectFit: "contain", marginBottom: 4 }} />
         ) : null}
         <Text style={pdfStyles.companyName}>{company.name}</Text>
         {company.tagline ? <Text style={pdfStyles.companyLine}>{company.tagline}</Text> : null}
@@ -452,7 +449,7 @@ export function PdfDocumentShell({
   paperSize?: PageSize;
 }) {
   return (
-    <Document title={`${data.doc.title} - ${data.doc.number}`} author={data.company.name} creator="Dokgen">
+    <Document title={`${data.doc.title} - ${data.doc.number}`} author={data.company.name} creator="Docgen">
       <Page size={paperSize} style={pdfStyles.page}>
         <PdfHeader data={data} />
         {children}

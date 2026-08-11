@@ -22,7 +22,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
           }}
         >
           <div style={{ maxWidth: 480 }}>
-            <h1 style={{ fontSize: 28, marginBottom: 12 }}>Dokgen mengalami kendala</h1>
+            <h1 style={{ fontSize: 28, marginBottom: 12 }}>Docgen mengalami kendala</h1>
             <p style={{ color: "#475569", lineHeight: 1.6 }}>
               Aplikasi tidak dapat dimuat saat ini. Silakan coba kembali.
             </p>

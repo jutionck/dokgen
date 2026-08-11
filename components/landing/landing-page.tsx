@@ -88,12 +88,12 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
       a: "Tentu. Anda dapat mendaftarkan beberapa rekening bank di menu Pengaturan Bank dan memilih rekening mana saja yang ingin ditampilkan per dokumen.",
     },
     {
-      q: "Apakah dokumen Dokgen sesuai dengan standar bisnis di Indonesia?",
+      q: "Apakah dokumen Docgen sesuai dengan standar bisnis di Indonesia?",
       a: "Ya. Seluruh template dokumen telah disesuaikan dengan struktur dan format standar korespondensi bisnis di Indonesia.",
     },
     {
       q: "Apakah saya bisa mengirim dokumen langsung ke email atau WhatsApp klien?",
-      a: "Bisa. Dokgen menyediakan fitur kirim email otomatis berlampiran PDF serta tautan berbagi via WhatsApp.",
+      a: "Bisa. Docgen menyediakan fitur kirim email otomatis berlampiran PDF serta tautan berbagi via WhatsApp.",
     },
   ];
 
@@ -106,11 +106,11 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/icon.svg"
-              alt="Dokgen"
+              alt="Docgen"
               className="h-7 w-7 rounded-md shadow-2xs group-hover:scale-105 transition-transform"
             />
             <span className="text-lg font-bold tracking-tight text-slate-900">
-              Dokgen<span className="text-blue-600">.</span>
+              Docgen<span className="text-blue-600">.</span>
             </span>
           </Link>
 
@@ -162,7 +162,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
         <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
           <div className="inline-flex max-w-[95%] items-center justify-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-semibold text-blue-700 sm:text-xs mb-4 sm:mb-6 leading-tight">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.svg" alt="Dokgen" className="h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-xs shadow-2xs shrink-0" />
+            <img src="/icon.svg" alt="Docgen" className="h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-xs shadow-2xs shrink-0" />
             <span className="truncate sm:whitespace-normal">Generator Dokumen Bisnis & Invoice Standar Indonesia</span>
           </div>
 
@@ -274,7 +274,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
                 <div className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-slate-300" />
                 <div className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-slate-300" />
                 <span className="text-[11px] sm:text-xs font-semibold text-slate-500 ml-1">
-                  Pratinjau {docTypes.find((d) => d.id === activePreviewTab)?.title} Dokgen
+                  Pratinjau {docTypes.find((d) => d.id === activePreviewTab)?.title} Docgen
                 </span>
               </div>
               <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">PDF & DOCX Siap Ekspor</span>
@@ -575,7 +575,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto">
             <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Keunggulan Utama</span>
-            <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-3xl">Fitur Utama Generator Dokumen Dokgen</h2>
+            <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-3xl">Fitur Utama Generator Dokumen Docgen</h2>
             <p className="mt-1.5 text-slate-600 text-xs sm:text-sm">
               Semua yang Anda butuhkan untuk mengelola korespondensi bisnis secara efisien.
             </p>
@@ -665,7 +665,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
       <section id="cara-kerja" className="border-t border-slate-200 bg-white py-10 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
           <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Langkah Mudah</span>
-          <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-3xl">Cara Kerja Dokgen</h2>
+          <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-3xl">Cara Kerja Docgen</h2>
 
           <div className="mt-8 sm:mt-10 grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-5 sm:p-6 text-center shadow-2xs">
@@ -763,8 +763,8 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
         <div className="mx-auto max-w-6xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.svg" alt="Dokgen" className="h-5 w-5 rounded-md shadow-2xs" />
-            <span className="font-bold text-slate-900">Dokgen.</span>
+            <img src="/icon.svg" alt="Docgen" className="h-5 w-5 rounded-md shadow-2xs" />
+            <span className="font-bold text-slate-900">Docgen.</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-slate-600 font-medium text-xs">
@@ -786,7 +786,7 @@ export function LandingPage({ isLoggedIn, hasCompany, stats }: LandingPageProps)
           </div>
 
           <p className="text-slate-400">
-            © {new Date().getFullYear()} Dokgen. Seluruh hak cipta dilindungi undang-undang.
+            © {new Date().getFullYear()} Docgen. Seluruh hak cipta dilindungi undang-undang.
           </p>
         </div>
       </footer>

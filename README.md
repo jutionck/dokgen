@@ -1,6 +1,6 @@
-# Dokgen — Generator Dokumen Bisnis
+# Docgen — Generator Dokumen Bisnis
 
-Dokgen adalah aplikasi web berbasis Next.js untuk membuat dan mengelola dokumen bisnis Indonesia dalam satu tempat: **Surat Penawaran, Quotation, Invoice, Berita Acara Serah Terima (BAST), dan Kontrak/SPK**.
+Docgen adalah aplikasi web berbasis Next.js untuk membuat dan mengelola dokumen bisnis Indonesia dalam satu tempat: **Surat Penawaran, Quotation, Invoice, Berita Acara Serah Terima (BAST), dan Kontrak/SPK**.
 
 ## Fitur Utama
 
@@ -14,7 +14,7 @@ Dokgen adalah aplikasi web berbasis Next.js untuk membuat dan mengelola dokumen 
 - Nomor dokumen otomatis berdasarkan jenis dan periode.
 - Status, riwayat email, duplikasi, edit, dan penghapusan dokumen.
 - Akses berbasis perusahaan/tenant dan keanggotaan tim.
-- Footer identitas Dokgen pada PDF, DOCX, hasil cetak, dan lampiran email.
+- Footer identitas Docgen pada PDF, DOCX, hasil cetak, dan lampiran email.
 
 ## Teknologi
 
@@ -61,7 +61,7 @@ Environment utama:
 | `BETTER_AUTH_URL`             | Origin aplikasi, misalnya `http://localhost:3000`.        |
 | `BETTER_AUTH_TRUSTED_ORIGINS` | Daftar origin tepercaya dipisahkan koma.                  |
 | `RESEND_API_KEY`              | API key Resend.                                           |
-| `RESEND_FROM`                 | Identitas pengirim, misalnya `Dokgen <kirim@domain.com>`. |
+| `RESEND_FROM`                 | Identitas pengirim, misalnya `Docgen <kirim@domain.com>`. |
 | `BLOB_READ_WRITE_TOKEN`       | Read-write token Vercel Blob.                             |
 
 Buat secret autentikasi:
@@ -70,7 +70,7 @@ Buat secret autentikasi:
 openssl rand -base64 32
 ```
 
-Jika Vercel Blob dibuat dengan prefix `BLOB_READ_WRITE_TOKEN`, Vercel dapat menghasilkan `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN`. Dokgen mendukung nama standar dan nama hasil prefix tersebut.
+Jika Vercel Blob dibuat dengan prefix `BLOB_READ_WRITE_TOKEN`, Vercel dapat menghasilkan `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN`. Docgen mendukung nama standar dan nama hasil prefix tersebut.
 
 Untuk menarik environment dari project Vercel yang sudah terhubung:
 
@@ -114,7 +114,7 @@ Private Blob tidak diekspos langsung ke browser. Preview logo dan tanda tangan d
 3. Isi `RESEND_FROM`, misalnya:
 
 ```env
-RESEND_FROM="Dokgen <kirim@domain-anda.com>"
+RESEND_FROM="Docgen <kirim@domain-anda.com>"
 ```
 
 ## Deploy ke Vercel
@@ -130,11 +130,11 @@ Environment production minimum:
 ```env
 DATABASE_URL="mysql://user:password@host:3306/database"
 BETTER_AUTH_SECRET="secret-acak-minimal-32-karakter"
-BETTER_AUTH_URL="https://dokgen.example.com"
-BETTER_AUTH_TRUSTED_ORIGINS="https://dokgen.example.com"
+BETTER_AUTH_URL="https://docgen.example.com"
+BETTER_AUTH_TRUSTED_ORIGINS="https://docgen.example.com"
 BLOB_READ_WRITE_TOKEN="vercel_blob_rw_..."
 RESEND_API_KEY="re_..."
-RESEND_FROM="Dokgen <kirim@example.com>"
+RESEND_FROM="Docgen <kirim@example.com>"
 ```
 
 Jangan commit file `.env` atau membagikan nilai secret/token.

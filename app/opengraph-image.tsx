@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "nodejs";
 
-export const alt = "Dokgen — Generator Dokumen Bisnis & Invoice Standar Indonesia";
+export const alt = "Docgen — Generator Dokumen Bisnis & Invoice Standar Indonesia";
 export const size = {
   width: 1200,
   height: 630,
@@ -47,7 +47,7 @@ export default async function Image() {
           D
         </div>
         <div style={{ display: "flex", fontSize: "32px", fontWeight: 800, letterSpacing: "-0.025em" }}>
-          <span>Dokgen</span>
+          <span>Docgen</span>
           <span style={{ color: "#3b82f6" }}>.</span>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default async function Image() {
             fontWeight: 600,
           }}
         >
-          dokgen.mipdevp.com
+          docgen.mipdevp.com
         </div>
 
         <div
