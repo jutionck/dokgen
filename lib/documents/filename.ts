@@ -1,16 +1,26 @@
 export function sanitizeFilename(s: string) {
-  return s.replace(/[\/\\:*?"<>|]+/g, "-").trim();
+  return s
+    .replace(/[\u0000-\u001f\u007f]+/g, "")
+    .replace(/[\/\\:*?"<>|]+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function baseName(data: { title: string; number: string }, sizeLabel?: string) {
-  const size = sizeLabel ? `-${sizeLabel.toUpperCase()}` : "";
-  return `${sanitizeFilename(data.title)}-${sanitizeFilename(data.number)}${size}`;
+interface FilenameOptions {
+  clientName?: string | null;
+  sizeLabel?: string;
 }
 
-export function pdfFilename(data: { title: string; number: string }, sizeLabel?: string) {
-  return `${baseName(data, sizeLabel)}.pdf`;
+function baseName(data: { title: string; number: string }, options: FilenameOptions = {}) {
+  const client = options.clientName ? `-${sanitizeFilename(options.clientName)}` : "";
+  const size = options.sizeLabel ? `-${sanitizeFilename(options.sizeLabel).toUpperCase()}` : "";
+  return `${sanitizeFilename(data.title)}${client}-${sanitizeFilename(data.number)}${size}`;
 }
 
-export function docxFilename(data: { title: string; number: string }, sizeLabel?: string) {
-  return `${baseName(data, sizeLabel)}.docx`;
+export function pdfFilename(data: { title: string; number: string }, options?: FilenameOptions) {
+  return `${baseName(data, options)}.pdf`;
+}
+
+export function docxFilename(data: { title: string; number: string }, options?: FilenameOptions) {
+  return `${baseName(data, options)}.docx`;
 }

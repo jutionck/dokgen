@@ -65,7 +65,7 @@ export async function POST(request: Request, props: RouteContext<"/api/documents
       html,
       attachments: [
         {
-          filename: pdfFilename(data.doc),
+          filename: pdfFilename(data.doc, { clientName: data.client?.company || data.client?.name }),
           content: Buffer.from(pdfBuffer),
         },
       ],

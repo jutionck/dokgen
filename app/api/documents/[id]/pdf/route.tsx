@@ -17,13 +17,17 @@ export async function GET(request: Request, props: RouteContext<"/api/documents/
   const query = new URL(request.url).searchParams;
   const paper = resolvePaper(query.get("size"));
   const disposition = query.get("disposition") === "inline" ? "inline" : "attachment";
+  const clientName = data.client?.company || data.client?.name;
 
   try {
     const buffer = await renderToBuffer(<PdfRenderer data={data} paperSize={paper.pdf} />);
     return new Response(new Uint8Array(buffer), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `${disposition}; filename="${pdfFilename(data.doc, paper.id)}"`,
+        "Content-Disposition": `${disposition}; filename="${pdfFilename(data.doc, {
+          clientName,
+          sizeLabel: paper.id,
+        })}"`,
         "Cache-Control": "private, no-store, max-age=0",
         "X-Document-Paper-Size": paper.id,
         "X-Document-Paper-Width": String(paper.points.width),
