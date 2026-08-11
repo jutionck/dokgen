@@ -56,10 +56,11 @@ export const metadata: Metadata = {
       "Platform otomatisasi pembuatan Invoice, Surat Penawaran, Quotation, BAST, dan Kontrak Kerja profesional standar bisnis Indonesia. Ekspor PDF & Word presisi.",
     images: [
       {
-        url: `${baseUrl}/opengraph-image`,
-        width: 1200,
-        height: 630,
+        url: `${baseUrl}/docgen-og-image.webp`,
+        width: 1731,
+        height: 909,
         alt: "Docgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
+        type: "image/webp",
       },
     ],
   },
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
     title: "Docgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
     description:
       "Platform otomatisasi pembuatan Invoice, Surat Penawaran, Quotation, BAST, dan Kontrak Kerja profesional.",
-    images: [`${baseUrl}/opengraph-image`],
+    images: [`${baseUrl}/docgen-og-image.webp`],
   },
   robots: {
     index: true,
