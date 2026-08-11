@@ -72,7 +72,7 @@ function LoginForm() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/icon.svg"
-            alt="Dokgen"
+            alt="Docgen"
             className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-2xl shadow-lg shadow-blue-900/25"
           />
         </div>
@@ -80,7 +80,7 @@ function LoginForm() {
           Selamat Datang
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm text-slate-500 max-w-xs">
-          Masuk ke akun Dokgen untuk mengelola faktur & dokumen bisnis Anda.
+          Masuk ke akun Docgen untuk mengelola faktur & dokumen bisnis Anda.
         </CardDescription>
       </CardHeader>
       <CardContent className="px-0 sm:px-8 pb-4 sm:pb-9 pt-2 sm:pt-4">

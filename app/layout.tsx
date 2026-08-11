@@ -3,17 +3,17 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { PwaRegister } from "@/components/pwa/pwa-register";
 
-const baseUrl = "https://dokgen.mipdevp.com";
+const baseUrl = "https://docgen.mipdevp.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
-    template: "%s | Dokgen",
+    default: "Docgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
+    template: "%s | Docgen",
   },
   description:
     "Platform otomatisasi pembuatan Invoice, Surat Penawaran, Estimasi Biaya (Quotation), BAST, dan Kontrak Kerja profesional standar bisnis Indonesia. Ekspor PDF & Word (.docx) presisi.",
-  applicationName: "Dokgen",
+  applicationName: "Docgen",
   keywords: [
     "invoice generator indonesia",
     "buat invoice online",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     "BAST berita acara serah terima",
     "kontrak kerja perjanjian",
     "dokumen bisnis indonesia",
-    "dokgen",
+    "docgen",
     "mipdevp",
   ],
   authors: [{ name: "MIPDEVP Digital", url: baseUrl }],
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Dokgen",
+    title: "Docgen",
   },
   icons: {
     icon: "/icon.svg",
@@ -50,8 +50,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     url: baseUrl,
-    siteName: "Dokgen",
-    title: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
+    siteName: "Docgen",
+    title: "Docgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
     description:
       "Platform otomatisasi pembuatan Invoice, Surat Penawaran, Quotation, BAST, dan Kontrak Kerja profesional standar bisnis Indonesia. Ekspor PDF & Word presisi.",
     images: [
@@ -59,13 +59,13 @@ export const metadata: Metadata = {
         url: `${baseUrl}/opengraph-image`,
         width: 1200,
         height: 630,
-        alt: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
+        alt: "Docgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dokgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
+    title: "Docgen - Generator Dokumen Bisnis & Invoice Standar Indonesia",
     description:
       "Platform otomatisasi pembuatan Invoice, Surat Penawaran, Quotation, BAST, dan Kontrak Kerja profesional.",
     images: [`${baseUrl}/opengraph-image`],
@@ -93,7 +93,7 @@ export const viewport: Viewport = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "Dokgen",
+  name: "Docgen",
   url: baseUrl,
   description:
     "Generator Dokumen Bisnis & Invoice Standar Indonesia. Ekspor PDF & Word (.docx) presisi, multi-rekening bank, dan kirim via Email & WhatsApp.",

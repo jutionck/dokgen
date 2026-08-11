@@ -30,9 +30,9 @@ function Brand({ companyName, compact }: { companyName?: string; compact?: boole
   return (
     <div className="flex items-center gap-2.5">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/icon.svg" alt="Dokgen" className="h-9 w-9 rounded-lg shadow-sm" />
+      <img src="/icon.svg" alt="Docgen" className="h-9 w-9 rounded-lg shadow-sm" />
       <div className="min-w-0">
-        <p className="text-sm font-bold tracking-tight">Dokgen</p>
+        <p className="text-sm font-bold tracking-tight">Docgen</p>
         {companyName ? (
           <p className="truncate text-[11px] text-muted-foreground">{companyName}</p>
         ) : (

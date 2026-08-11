@@ -22,7 +22,7 @@ export default async function SettingsPage() {
               <LogOut className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900">Keluar dari Dokgen</p>
+              <p className="text-sm font-bold text-slate-900">Keluar dari Docgen</p>
               <p className="text-xs text-slate-500">Akhiri sesi aktif akun Anda di perangkat ini.</p>
             </div>
           </div>

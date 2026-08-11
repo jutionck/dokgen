@@ -150,10 +150,10 @@ export function renderDocumentEmailHtml({
     <div class="container">
       <div class="header">
         <img
-          src="https://dokgen.mipdevp.com/icons/icon-192.png"
+          src="https://docgen.mipdevp.com/icons/icon-192.png"
           width="48"
           height="48"
-          alt="Dokgen Logo"
+          alt="Docgen Logo"
           style="display: block; margin: 0 0 10px 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); border: 2px solid rgba(255, 255, 255, 0.2);"
         />
         <h1 class="brand-title">${company.name}</h1>
@@ -198,7 +198,7 @@ export function renderDocumentEmailHtml({
       </div>
 
       <div class="footer">
-        <p style="margin: 0 0 6px 0;">Email ini dikirim secara otomatis oleh <strong>${company.name}</strong> melalui <a href="https://dokgen.mipdevp.com">Dokgen</a>.</p>
+        <p style="margin: 0 0 6px 0;">Email ini dikirim secara otomatis oleh <strong>${company.name}</strong> melalui <a href="https://docgen.mipdevp.com">Docgen</a>.</p>
         <p style="margin: 0; font-size: 11px; color: #94a3b8;">© ${new Date().getFullYear()} ${company.name}. All rights reserved.</p>
       </div>
     </div>

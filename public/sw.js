@@ -1,4 +1,4 @@
-const CACHE_NAME = "dokgen-static-v2";
+const CACHE_NAME = "docgen-static-v3";
 const PRECACHE = ["/icon.svg", "/icons/icon-192.png", "/icons/icon-512.png"];
 const STATIC_RE = /\/_next\/static\//;
 

@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Dokgen — Generator Dokumen Bisnis",
-    short_name: "Dokgen",
+    name: "Docgen — Generator Dokumen Bisnis",
+    short_name: "Docgen",
     description: "Buat Surat Penawaran, Quotation, Invoice, BAST, dan Kontrak dalam satu pintu.",
     id: "/",
     start_url: "/dashboard",

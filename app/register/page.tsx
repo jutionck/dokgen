@@ -63,11 +63,11 @@ export default function RegisterPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/icon.svg"
-              alt="Dokgen"
+              alt="Docgen"
               className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-2xl shadow-lg shadow-blue-900/25"
             />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Mulai Pakai Dokgen</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Mulai Pakai Docgen</h1>
           <p className="mt-1 max-w-xs text-xs sm:text-sm text-slate-500">
             Buat akun perusahaan baru atau gabung ke tim dengan kode.
           </p>
