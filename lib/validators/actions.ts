@@ -1,19 +1,28 @@
 import { z } from "zod";
 
 const optionalText = (max: number) => z.string().trim().max(max).optional();
+const normalizeClientText = (value: string) =>
+  value
+    .normalize("NFC")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .trim();
+const clientText = (max: number) => z.string().transform(normalizeClientText).pipe(z.string().max(max));
+const optionalClientText = (max: number) => clientText(max).optional();
 const dateString = z.union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]);
 
 export const idSchema = z.string().uuid();
 
 export const clientInputSchema = z.object({
-  name: z.string().trim().min(1).max(500),
-  company: optionalText(500),
-  address: optionalText(5_000),
-  phone: optionalText(100),
-  email: z.union([z.literal(""), z.string().trim().email().max(320)]).optional(),
-  npwp: optionalText(100),
-  pic: optionalText(500),
-  notes: optionalText(10_000),
+  name: clientText(500).pipe(z.string().min(1)),
+  company: optionalClientText(500),
+  address: optionalClientText(5_000),
+  phone: optionalClientText(100),
+  email: clientText(320)
+    .pipe(z.union([z.literal(""), z.string().email()]))
+    .optional(),
+  npwp: optionalClientText(100),
+  pic: optionalClientText(500),
+  notes: optionalClientText(10_000),
 });
 
 export const companyInputSchema = z.object({

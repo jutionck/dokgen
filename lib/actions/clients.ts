@@ -25,17 +25,22 @@ export async function createClientAction(input: ClientInput) {
   if (!parsed.success) return { error: "Data klien tidak valid" };
   const validInput = parsed.data;
 
-  await db.insert(clients).values({
-    company_id,
-    name: validInput.name,
-    company: validInput.company || null,
-    address: validInput.address || null,
-    phone: validInput.phone || null,
-    email: validInput.email || null,
-    npwp: validInput.npwp || null,
-    pic: validInput.pic || null,
-    notes: validInput.notes || null,
-  });
+  try {
+    await db.insert(clients).values({
+      company_id,
+      name: validInput.name,
+      company: validInput.company || null,
+      address: validInput.address || null,
+      phone: validInput.phone || null,
+      email: validInput.email || null,
+      npwp: validInput.npwp || null,
+      pic: validInput.pic || null,
+      notes: validInput.notes || null,
+    });
+  } catch (error) {
+    console.error("[Clients] Gagal membuat klien", { company_id, error });
+    return { error: "Gagal menyimpan data klien. Silakan coba lagi." };
+  }
 
   revalidatePath("/clients");
   revalidatePath("/dashboard");
@@ -50,19 +55,24 @@ export async function updateClientAction(id: string, input: ClientInput) {
   if (!parsed.success) return { error: "Data klien tidak valid" };
   const validInput = parsed.data;
 
-  await db
-    .update(clients)
-    .set({
-      name: validInput.name,
-      company: validInput.company || null,
-      address: validInput.address || null,
-      phone: validInput.phone || null,
-      email: validInput.email || null,
-      npwp: validInput.npwp || null,
-      pic: validInput.pic || null,
-      notes: validInput.notes || null,
-    })
-    .where(and(eq(clients.id, id), eq(clients.company_id, company_id)));
+  try {
+    await db
+      .update(clients)
+      .set({
+        name: validInput.name,
+        company: validInput.company || null,
+        address: validInput.address || null,
+        phone: validInput.phone || null,
+        email: validInput.email || null,
+        npwp: validInput.npwp || null,
+        pic: validInput.pic || null,
+        notes: validInput.notes || null,
+      })
+      .where(and(eq(clients.id, id), eq(clients.company_id, company_id)));
+  } catch (error) {
+    console.error("[Clients] Gagal memperbarui klien", { company_id, client_id: id, error });
+    return { error: "Gagal memperbarui data klien. Silakan coba lagi." };
+  }
 
   revalidatePath("/clients");
   revalidatePath("/dashboard");
@@ -74,7 +84,12 @@ export async function deleteClientAction(id: string) {
   if (!company_id) return { error: "Akun tidak terhubung ke perusahaan" };
   if (!idSchema.safeParse(id).success) return { error: "Klien tidak ditemukan" };
 
-  await db.delete(clients).where(and(eq(clients.id, id), eq(clients.company_id, company_id)));
+  try {
+    await db.delete(clients).where(and(eq(clients.id, id), eq(clients.company_id, company_id)));
+  } catch (error) {
+    console.error("[Clients] Gagal menghapus klien", { company_id, client_id: id, error });
+    return { error: "Gagal menghapus data klien. Silakan coba lagi." };
+  }
 
   revalidatePath("/clients");
   revalidatePath("/dashboard");
