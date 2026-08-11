@@ -47,12 +47,7 @@ function LoginForm() {
     if (res.error) {
       setPending(false);
       const msg = res.error.message?.toLowerCase() || "";
-      if (
-        res.error.status === 403 ||
-        msg.includes("verify") ||
-        msg.includes("verifikasi") ||
-        res.error.code === "EMAIL_NOT_VERIFIED"
-      ) {
+      if (msg.includes("verify") || msg.includes("verifikasi") || res.error.code === "EMAIL_NOT_VERIFIED") {
         setError("Email Anda belum diverifikasi. Silakan cek inbox/spam email Anda.");
       } else {
         setError(res.error.message || "Email atau password salah");
@@ -123,6 +118,12 @@ function LoginForm() {
               <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-slate-600">
                 Password
               </Label>
+              <Link
+                href="/forgot-password"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                Lupa password?
+              </Link>
             </div>
             <PasswordInput
               id="password"
