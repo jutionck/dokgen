@@ -1,5 +1,6 @@
 export type DocType = "penawaran" | "quotation" | "invoice" | "bast" | "kontrak";
 export type DocStatus = "draft" | "sent" | "paid" | "done" | "cancelled";
+export type StampDutyMode = "auto" | "required" | "none";
 
 export const DOC_TYPES: Record<DocType, { label: string; code: string; defaultTitle: string }> = {
   penawaran: { label: "Surat Penawaran", code: "SP", defaultTitle: "Surat Penawaran" },
@@ -78,6 +79,7 @@ export interface DocExtra {
   clauses?: string | null;
   result_text?: string | null;
   selected_banks?: string[] | null;
+  stamp_duty_mode?: StampDutyMode | null;
 }
 
 export interface DocRecord {

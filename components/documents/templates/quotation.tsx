@@ -58,7 +58,7 @@ export function QuotationTemplate({ data }: { data: TemplateData }) {
 
       <BankBlock company={company} selectedBanks={extra.selected_banks} />
 
-      <SignatureBlock company={company} date={doc.issue_date} />
+      <SignatureBlock data={data} date={doc.issue_date} />
     </div>
   );
 }

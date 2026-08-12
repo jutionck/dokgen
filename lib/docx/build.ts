@@ -27,6 +27,7 @@ import {
 import { parseScopeOfWork, parseBankAccounts } from "@/components/documents/templates/blocks";
 import { parseLogoDataUri, fitSize } from "@/lib/documents/logo";
 import { DOCUMENT_GENERATED_NOTICE } from "@/lib/documents/branding";
+import { resolveStampDuty } from "@/lib/documents/stamp-duty";
 
 const FONT = "Helvetica";
 const DEFAULT_PAGE = { width: 11906, height: 16838 }; // A4 (twips)
@@ -184,6 +185,14 @@ function signatureBlock(data: TemplateData, left: string[], right?: string[]): P
   const dateLine = [place, doc.issue_date ? fmtDate(doc.issue_date) : ""].filter(Boolean).join(", ");
   const signature = parseLogoDataUri(data.signatureDataUri);
   const signatureSize = signature ? fitSize(signature.width, signature.height, 120, 48) : null;
+  const stampDuty = resolveStampDuty({
+    type: doc.type,
+    status: doc.status,
+    currency: doc.currency,
+    total: data.totals.total,
+    mode: doc.extra.stamp_duty_mode,
+  });
+  const stampBorder = { style: BorderStyle.DASHED, size: 6, color: "D97706", space: 4 };
 
   const col = (
     lines: string[],
@@ -195,7 +204,31 @@ function signatureBlock(data: TemplateData, left: string[], right?: string[]): P
       ? [
           p([run(dateLine, { size: 17, color: "64748b" })], {
             alignment: align,
-            spacing: { after: includeSignature && signature ? 40 : 240 },
+            spacing: { after: includeSignature && (signature || stampDuty.required) ? 40 : 240 },
+          }),
+        ]
+      : []),
+    ...(includeSignature && stampDuty.required
+      ? [
+          new Paragraph({
+            alignment: align,
+            indent: align === AlignmentType.RIGHT ? { left: 6100 } : { right: 6100 },
+            border: { top: stampBorder, bottom: stampBorder, left: stampBorder, right: stampBorder },
+            shading: { type: ShadingType.CLEAR, fill: "FFFBEB" },
+            children: [
+              run("RUANG e-METERAI Rp10.000", {
+                bold: true,
+                size: 15,
+                color: "92400E",
+              }),
+              run("Bubuhkan resmi pada dokumen final", {
+                break: 1,
+                size: 14,
+                color: "92400E",
+              }),
+            ],
+            keepNext: true,
+            spacing: { after: 40 },
           }),
         ]
       : []),

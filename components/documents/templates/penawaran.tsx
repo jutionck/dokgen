@@ -12,7 +12,7 @@ import {
 } from "./blocks";
 
 export function PenawaranTemplate({ data }: { data: TemplateData }) {
-  const { company, doc, client } = data;
+  const { doc, client } = data;
   const extra = doc.extra;
   const intro = extra.intro?.trim();
   const validityDays = Number(extra.validity_days) || 14;
@@ -68,7 +68,7 @@ export function PenawaranTemplate({ data }: { data: TemplateData }) {
         <p className="font-medium">Terima kasih atas kepercayaan dan kerjasamanya.</p>
       </div>
 
-      <SignatureBlock company={company} date={doc.issue_date} />
+      <SignatureBlock data={data} date={doc.issue_date} />
     </div>
   );
 }

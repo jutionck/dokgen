@@ -1,10 +1,18 @@
 import type { TemplateData } from "./shared";
 import { fmtDate, fmtDateLong } from "./shared";
-import { CompanySignature, DocHeader, ItemsTable, TotalsBlock } from "./blocks";
+import { CompanySignature, DocHeader, ItemsTable, StampDutyPlaceholder, TotalsBlock } from "./blocks";
+import { resolveStampDuty } from "@/lib/documents/stamp-duty";
 
 export function BastTemplate({ data }: { data: TemplateData }) {
-  const { company, doc, client } = data;
+  const { company, doc, client, totals } = data;
   const extra = doc.extra;
+  const stampDuty = resolveStampDuty({
+    type: doc.type,
+    status: doc.status,
+    currency: doc.currency,
+    total: totals.total,
+    mode: extra.stamp_duty_mode,
+  });
 
   return (
     <div className="space-y-5">
@@ -85,8 +93,11 @@ export function BastTemplate({ data }: { data: TemplateData }) {
           <p className="mt-2 text-xs text-slate-500">
             {company.city || "-"}, {fmtDate(doc.issue_date)}
           </p>
-          <div className={company.signature_url ? "mt-2" : "mt-16"}>
-            <CompanySignature company={company} />
+          <div className={company.signature_url || stampDuty.required ? "mt-2" : "mt-16"}>
+            <div className="flex items-end justify-center gap-2">
+              {stampDuty.required && <StampDutyPlaceholder />}
+              <CompanySignature company={company} />
+            </div>
             <p className="font-semibold underline">{company.signer_name || company.name}</p>
             <p className="text-xs text-slate-600">{company.signer_position}</p>
           </div>

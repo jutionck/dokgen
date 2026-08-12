@@ -29,6 +29,7 @@ interface DocExtra {
   clauses?: string | null;
   result_text?: string | null;
   selected_banks?: string[] | null;
+  stamp_duty_mode?: "auto" | "required" | "none" | null;
 }
 
 const ts = (name: string) => timestamp(name, { mode: "date" });

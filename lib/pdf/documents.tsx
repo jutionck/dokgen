@@ -320,22 +320,24 @@ export function KontrakPdf({ data, paperSize }: { data: TemplateData; paperSize?
           <Text style={pdfStyles.text}>{extra.clauses}</Text>
         </PasalPdf>
       ) : null}
-      <PasalPdf no={extra.clauses ? "Pasal 6" : "Pasal 5"} title="Penutup">
-        <Text style={pdfStyles.text}>
-          Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian atas kesepakatan PARA PIHAK. Perjanjian
-          ini dibuat dan ditandatangani dalam rangkap dua (2) dengan kekuatan hukum yang sama.
-        </Text>
-      </PasalPdf>
+      <View wrap={false}>
+        <PasalPdf no={extra.clauses ? "Pasal 6" : "Pasal 5"} title="Penutup">
+          <Text style={pdfStyles.text}>
+            Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian atas kesepakatan PARA PIHAK. Perjanjian
+            ini dibuat dan ditandatangani dalam rangkap dua (2) dengan kekuatan hukum yang sama.
+          </Text>
+        </PasalPdf>
 
-      <PdfSignature
-        data={data}
-        leftLabel="PIHAK PERTAMA,"
-        leftName={company.signer_name}
-        leftTitle={company.signer_position}
-        rightLabel="PIHAK KEDUA,"
-        rightName={client?.name ?? undefined}
-        rightTitle={client?.pic || undefined}
-      />
+        <PdfSignature
+          data={data}
+          leftLabel="PIHAK PERTAMA,"
+          leftName={company.signer_name}
+          leftTitle={company.signer_position}
+          rightLabel="PIHAK KEDUA,"
+          rightName={client?.name ?? undefined}
+          rightTitle={client?.pic || undefined}
+        />
+      </View>
     </PdfDocumentShell>
   );
 }
