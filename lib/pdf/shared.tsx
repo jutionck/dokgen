@@ -121,6 +121,7 @@ function PdfGeneratedFooter() {
 
 export function PdfHeader({ data }: { data: TemplateData }) {
   const { company, doc } = data;
+  const logoOnly = doc.extra.header_identity_mode === "logo_only" && Boolean(data.logoDataUri);
   return (
     <View style={pdfStyles.header}>
       <View style={pdfStyles.headerLeft}>
@@ -128,13 +129,17 @@ export function PdfHeader({ data }: { data: TemplateData }) {
           // eslint-disable-next-line jsx-a11y/alt-text
           <Image src={data.logoDataUri} style={{ width: 150, height: 56, objectFit: "contain", marginBottom: 4 }} />
         ) : null}
-        <Text style={pdfStyles.companyName}>{company.name}</Text>
-        {company.tagline ? <Text style={pdfStyles.companyLine}>{company.tagline}</Text> : null}
-        {company.address ? <Text style={pdfStyles.companyLine}>{company.address}</Text> : null}
-        <Text style={pdfStyles.companyLine}>
-          {[company.phone, company.email, company.website].filter(Boolean).join("  ·  ")}
-        </Text>
-        {company.npwp ? <Text style={pdfStyles.companyLine}>NPWP: {company.npwp}</Text> : null}
+        {!logoOnly ? (
+          <>
+            <Text style={pdfStyles.companyName}>{company.name}</Text>
+            {company.tagline ? <Text style={pdfStyles.companyLine}>{company.tagline}</Text> : null}
+            {company.address ? <Text style={pdfStyles.companyLine}>{company.address}</Text> : null}
+            <Text style={pdfStyles.companyLine}>
+              {[company.phone, company.email, company.website].filter(Boolean).join("  ·  ")}
+            </Text>
+            {company.npwp ? <Text style={pdfStyles.companyLine}>NPWP: {company.npwp}</Text> : null}
+          </>
+        ) : null}
       </View>
       <View style={pdfStyles.headerRight}>
         <Text style={pdfStyles.docTitle}>{doc.title}</Text>

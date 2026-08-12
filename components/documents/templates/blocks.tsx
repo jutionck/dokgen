@@ -57,17 +57,22 @@ export function SignatureMedia({
  */
 export function DocHeader({ data }: { data: TemplateData }) {
   const { company, doc } = data;
+  const logoOnly = doc.extra.header_identity_mode === "logo_only" && Boolean(company.logo_url);
   return (
     <header className="flex flex-col gap-4 border-b-2 border-slate-800 pb-4 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0">
         {logo(company)}
-        <h1 className="text-xl font-bold leading-tight">{company.name}</h1>
-        {company.tagline && <p className="text-xs italic text-slate-500">{company.tagline}</p>}
-        <div className="mt-1.5 space-y-0.5 text-xs text-slate-600">
-          {company.address && <p>{company.address}</p>}
-          <p>{[company.phone, company.email, company.website].filter(Boolean).join("  ·  ")}</p>
-          {company.npwp && <p className="text-slate-500">NPWP: {company.npwp}</p>}
-        </div>
+        {!logoOnly && (
+          <>
+            <h1 className="text-xl font-bold leading-tight">{company.name}</h1>
+            {company.tagline && <p className="text-xs italic text-slate-500">{company.tagline}</p>}
+            <div className="mt-1.5 space-y-0.5 text-xs text-slate-600">
+              {company.address && <p>{company.address}</p>}
+              <p>{[company.phone, company.email, company.website].filter(Boolean).join("  ·  ")}</p>
+              {company.npwp && <p className="text-slate-500">NPWP: {company.npwp}</p>}
+            </div>
+          </>
+        )}
       </div>
       <div className="shrink-0 text-left md:text-right">
         <p className="font-serif text-2xl font-bold uppercase tracking-tight text-slate-800">{doc.title}</p>
