@@ -82,7 +82,6 @@ export const pdfStyles = StyleSheet.create({
     backgroundColor: "#fffbeb",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 6,
     padding: 3,
   },
   infoBox: {
@@ -323,16 +322,19 @@ export function PdfSignature({
         style={[pdfStyles.signature, { justifyContent: "flex-end", marginTop: stampDuty.required ? 14 : 36 }]}
         wrap={false}
       >
-        <View style={{ width: "45%", alignItems: "center" }}>
+        <View style={{ width: "50%", alignItems: "center" }}>
           <Text style={pdfStyles.sigLabel}>{leftLabel}</Text>
           {dateStr ? <Text style={pdfStyles.sigPlace}>{dateStr}</Text> : null}
           <View style={{ marginTop: data.signatureDataUri || stampDuty.required ? 4 : 24, alignItems: "center" }}>
-            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-              {stampPlaceholder}
-              {data.signatureDataUri ? (
-                // eslint-disable-next-line jsx-a11y/alt-text
-                <Image src={data.signatureDataUri} style={pdfStyles.signatureImage} />
-              ) : null}
+            <View style={{ alignSelf: "stretch", height: 46, flexDirection: "row", alignItems: "flex-end" }}>
+              <View style={{ flex: 1, alignItems: "flex-end" }}>{stampPlaceholder}</View>
+              <View style={{ width: 100, alignItems: "center" }}>
+                {data.signatureDataUri ? (
+                  // eslint-disable-next-line jsx-a11y/alt-text
+                  <Image src={data.signatureDataUri} style={pdfStyles.signatureImage} />
+                ) : null}
+              </View>
+              <View style={{ flex: 1 }} />
             </View>
             <Text style={pdfStyles.sigName}>{leftName || company.signer_name || company.name}</Text>
             <Text style={pdfStyles.sigTitle}>{leftTitle || company.signer_position}</Text>
@@ -348,12 +350,15 @@ export function PdfSignature({
         <Text style={pdfStyles.sigLabel}>{leftLabel}</Text>
         {dateStr ? <Text style={pdfStyles.sigPlace}>{dateStr}</Text> : null}
         <View style={{ marginTop: data.signatureDataUri || stampDuty.required ? 4 : 24, alignItems: "center" }}>
-          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-            {stampPlaceholder}
-            {data.signatureDataUri ? (
-              // eslint-disable-next-line jsx-a11y/alt-text
-              <Image src={data.signatureDataUri} style={pdfStyles.signatureImage} />
-            ) : null}
+          <View style={{ alignSelf: "stretch", height: 46, flexDirection: "row", alignItems: "flex-end" }}>
+            <View style={{ flex: 1, alignItems: "flex-end" }}>{stampPlaceholder}</View>
+            <View style={{ width: 100, alignItems: "center" }}>
+              {data.signatureDataUri ? (
+                // eslint-disable-next-line jsx-a11y/alt-text
+                <Image src={data.signatureDataUri} style={pdfStyles.signatureImage} />
+              ) : null}
+            </View>
+            <View style={{ flex: 1 }} />
           </View>
           <Text style={pdfStyles.sigName}>{leftName || company.signer_name || company.name}</Text>
           <Text style={pdfStyles.sigTitle}>{leftTitle || company.signer_position}</Text>

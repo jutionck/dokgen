@@ -25,11 +25,29 @@ export function CompanySignature({ company }: { company: TemplateData["company"]
 
 export function StampDutyPlaceholder() {
   return (
-    <div className="flex h-16 w-24 shrink-0 flex-col items-center justify-center rounded border border-dashed border-amber-500 bg-amber-50 px-1 text-center text-[8px] font-semibold leading-tight text-amber-900">
+    <div className="flex h-16 w-20 shrink-0 flex-col items-center justify-center rounded border border-dashed border-amber-500 bg-amber-50 px-1 text-center text-[8px] font-semibold leading-tight text-amber-900">
       <span>RUANG</span>
       <span>e-METERAI</span>
       <span>Rp10.000</span>
       <span className="mt-0.5 font-normal">Bubuhkan resmi</span>
+    </div>
+  );
+}
+
+export function SignatureMedia({
+  company,
+  showStampDuty,
+}: {
+  company: TemplateData["company"];
+  showStampDuty: boolean;
+}) {
+  return (
+    <div className="grid h-16 w-full grid-cols-[1fr_9rem_1fr] items-end">
+      <div className="flex justify-end">{showStampDuty && <StampDutyPlaceholder />}</div>
+      <div className="flex justify-center">
+        <CompanySignature company={company} />
+      </div>
+      <div aria-hidden="true" />
     </div>
   );
 }
@@ -413,7 +431,7 @@ export function SignatureBlock({
   if (!rightLabel) {
     return (
       <div className="mt-8 flex justify-end text-sm">
-        <div className="w-64 text-center">
+        <div className="w-80 text-center">
           <p className="whitespace-pre-line font-semibold text-slate-800">{leftLabel(company.name)}</p>
           {dateLine && <p className="mt-1 text-xs text-slate-500">{dateLine}</p>}
           <div
@@ -423,10 +441,7 @@ export function SignatureBlock({
                 : "mt-16 flex flex-col items-center"
             }
           >
-            <div className="flex items-end justify-center gap-2">
-              {stampDuty.required && <StampDutyPlaceholder />}
-              <CompanySignature company={company} />
-            </div>
+            <SignatureMedia company={company} showStampDuty={stampDuty.required} />
             <p className="font-semibold underline text-slate-900">
               {signerName || company.signer_name || company.name}
             </p>
@@ -450,10 +465,7 @@ export function SignatureBlock({
               : "mt-16 flex flex-col items-center"
           }
         >
-          <div className="flex items-end justify-center gap-2">
-            {stampDuty.required && <StampDutyPlaceholder />}
-            <CompanySignature company={company} />
-          </div>
+          <SignatureMedia company={company} showStampDuty={stampDuty.required} />
           <p className="font-semibold underline text-slate-900">{signerName || company.signer_name || company.name}</p>
           <p className="text-xs text-slate-600">{signerPosition || company.signer_position}</p>
           {company.signer_nip && <p className="text-xs text-slate-500">NIP. {company.signer_nip}</p>}
