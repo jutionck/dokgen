@@ -1,6 +1,6 @@
 import type { TemplateData } from "./shared";
 import { fmt, fmtDate, fmtNum, terbilang } from "./shared";
-import { CompanySignature, DocHeader, ItemsTable, StampDutyPlaceholder } from "./blocks";
+import { DocHeader, ItemsTable, SignatureMedia } from "./blocks";
 import { resolveStampDuty } from "@/lib/documents/stamp-duty";
 
 function Pasal({ no, title, children }: { no: string; title: string; children: React.ReactNode }) {
@@ -171,10 +171,7 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
             {company.city || "-"}, {fmtDate(doc.issue_date)}
           </p>
           <div className={company.signature_url || stampDuty.required ? "mt-2" : "mt-16"}>
-            <div className="flex items-end justify-center gap-2">
-              {stampDuty.required && <StampDutyPlaceholder />}
-              <CompanySignature company={company} />
-            </div>
+            <SignatureMedia company={company} showStampDuty={stampDuty.required} />
             <p className="font-semibold underline">{company.signer_name || company.name}</p>
             <p className="text-xs text-slate-600">{company.signer_position}</p>
           </div>
