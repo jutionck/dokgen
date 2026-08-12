@@ -279,6 +279,7 @@ function formattedListDocx(title: string, text?: string | null): Paragraph[] {
 function header(data: TemplateData): Paragraph[] {
   const { company, doc } = data;
   const logo = parseLogoDataUri(data.logoDataUri);
+  const logoOnly = doc.extra.header_identity_mode === "logo_only" && Boolean(logo);
   const logoParagraph = logo
     ? new Paragraph({
         alignment: AlignmentType.LEFT,
@@ -295,28 +296,34 @@ function header(data: TemplateData): Paragraph[] {
 
   return [
     ...(logoParagraph ? [logoParagraph] : []),
-    new Paragraph({
-      alignment: AlignmentType.LEFT,
-      children: [run(company.name, { bold: true, size: 30 })],
-      spacing: { after: 40 },
-    }),
-    ...(company.tagline ? [p([run(company.tagline, { italics: true, size: 17, color: "475569" })])] : []),
-    ...(company.address ? [p([run(company.address, { size: 17, color: "475569" })], { spacing: { after: 20 } })] : []),
-    ...([company.phone, company.email, company.website].filter(Boolean).length
+    ...(!logoOnly
       ? [
-          p(
-            [
-              run([company.phone, company.email, company.website].filter(Boolean).join("  ·  "), {
-                size: 17,
-                color: "475569",
-              }),
-            ],
-            { spacing: { after: 20 } }
-          ),
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [run(company.name, { bold: true, size: 30 })],
+            spacing: { after: 40 },
+          }),
+          ...(company.tagline ? [p([run(company.tagline, { italics: true, size: 17, color: "475569" })])] : []),
+          ...(company.address
+            ? [p([run(company.address, { size: 17, color: "475569" })], { spacing: { after: 20 } })]
+            : []),
+          ...([company.phone, company.email, company.website].filter(Boolean).length
+            ? [
+                p(
+                  [
+                    run([company.phone, company.email, company.website].filter(Boolean).join("  ·  "), {
+                      size: 17,
+                      color: "475569",
+                    }),
+                  ],
+                  { spacing: { after: 20 } }
+                ),
+              ]
+            : []),
+          ...(company.npwp
+            ? [p([run(`NPWP: ${company.npwp}`, { size: 17, color: "64748b" })], { spacing: { after: 20 } })]
+            : []),
         ]
-      : []),
-    ...(company.npwp
-      ? [p([run(`NPWP: ${company.npwp}`, { size: 17, color: "64748b" })], { spacing: { after: 20 } })]
       : []),
     title(doc.title),
     ...(doc.number

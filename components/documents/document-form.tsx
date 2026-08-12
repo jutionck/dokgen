@@ -37,6 +37,7 @@ import type {
   DocExtra,
   Company,
   StampDutyMode,
+  HeaderIdentityMode,
 } from "@/lib/types";
 import { createDocumentAction, updateDocumentAction } from "@/lib/actions/documents";
 import { formatIDR, todayISO } from "@/lib/utils";
@@ -75,6 +76,7 @@ function emptyExtra(): DocExtra {
     clauses: "",
     result_text: "",
     stamp_duty_mode: "auto",
+    header_identity_mode: "full",
   };
 }
 
@@ -200,6 +202,11 @@ export function DocumentForm({
     const comp = company || (doc as { company?: Company })?.company || (seed as { company?: Company })?.company || {};
     return parseBankAccounts(comp);
   }, [company, doc, seed]);
+  const hasCompanyLogo = Boolean(
+    company?.logo_url ||
+    (doc as { company?: Company })?.company?.logo_url ||
+    (seed as { company?: Company })?.company?.logo_url
+  );
 
   const [type, setType] = useState<DocType>(isEdit ? doc!.type : initialType);
   const [clientId, setClientId] = useState(doc?.client_id || "");
@@ -462,6 +469,23 @@ export function DocumentForm({
                 { value: "MYR", label: "MYR — Ringgit (RM)" },
               ]}
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-700">Tampilan Kop</Label>
+            <Select
+              value={extra.header_identity_mode || "full"}
+              onValueChange={(value) =>
+                setExtra((current) => ({ ...current, header_identity_mode: value as HeaderIdentityMode }))
+              }
+              options={[
+                { value: "full", label: "Logo + identitas perusahaan" },
+                { value: "logo_only", label: "Logo saja" },
+              ]}
+            />
+            {extra.header_identity_mode === "logo_only" && !hasCompanyLogo && (
+              <p className="text-xs text-amber-700">Logo belum tersedia; identitas perusahaan tetap ditampilkan.</p>
+            )}
           </div>
 
           {(isQuotation || isInvoice) && (

@@ -69,6 +69,7 @@ const docExtraSchema = z
     result_text: z.string().max(50_000).nullable().optional(),
     selected_banks: z.array(z.string().max(500)).max(20).nullable().optional(),
     stamp_duty_mode: z.enum(["auto", "required", "none"]).nullable().optional(),
+    header_identity_mode: z.enum(["full", "logo_only"]).nullable().optional(),
   })
   .strict();
 
