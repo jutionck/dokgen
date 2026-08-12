@@ -1,6 +1,7 @@
 import type { TemplateData } from "./shared";
 import { fmt, fmtDate, fmtNum, terbilang } from "./shared";
-import { CompanySignature, DocHeader, ItemsTable } from "./blocks";
+import { CompanySignature, DocHeader, ItemsTable, StampDutyPlaceholder } from "./blocks";
+import { resolveStampDuty } from "@/lib/documents/stamp-duty";
 
 function Pasal({ no, title, children }: { no: string; title: string; children: React.ReactNode }) {
   return (
@@ -17,6 +18,13 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
   const { company, doc, client, totals } = data;
   const extra = doc.extra;
   const city = extra.location || company.city || "-";
+  const stampDuty = resolveStampDuty({
+    type: doc.type,
+    status: doc.status,
+    currency: doc.currency,
+    total: totals.total,
+    mode: extra.stamp_duty_mode,
+  });
 
   return (
     <div className="space-y-5">
@@ -162,8 +170,11 @@ export function KontrakTemplate({ data }: { data: TemplateData }) {
           <p className="mt-2 text-xs text-slate-500">
             {company.city || "-"}, {fmtDate(doc.issue_date)}
           </p>
-          <div className={company.signature_url ? "mt-2" : "mt-16"}>
-            <CompanySignature company={company} />
+          <div className={company.signature_url || stampDuty.required ? "mt-2" : "mt-16"}>
+            <div className="flex items-end justify-center gap-2">
+              {stampDuty.required && <StampDutyPlaceholder />}
+              <CompanySignature company={company} />
+            </div>
             <p className="font-semibold underline">{company.signer_name || company.name}</p>
             <p className="text-xs text-slate-600">{company.signer_position}</p>
           </div>

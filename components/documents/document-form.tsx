@@ -17,6 +17,7 @@ import {
   TableProperties,
   Landmark,
   Loader2,
+  BadgeCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -27,11 +28,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { DOC_TYPES, DOC_STATUS } from "@/lib/types";
-import type { Client, DocRecord, DocStatus, DocType, DocumentItem, DocExtra, Company } from "@/lib/types";
+import type {
+  Client,
+  DocRecord,
+  DocStatus,
+  DocType,
+  DocumentItem,
+  DocExtra,
+  Company,
+  StampDutyMode,
+} from "@/lib/types";
 import { createDocumentAction, updateDocumentAction } from "@/lib/actions/documents";
 import { formatIDR, todayISO } from "@/lib/utils";
 import type { DocSeed } from "@/lib/documents/templates";
 import { parseScopeOfWork, parseBankAccounts } from "@/components/documents/templates/blocks";
+import { resolveStampDuty } from "@/lib/documents/stamp-duty";
 
 interface ItemRow extends DocumentItem {
   key: number;
@@ -63,6 +74,7 @@ function emptyExtra(): DocExtra {
     duration_text: "",
     clauses: "",
     result_text: "",
+    stamp_duty_mode: "auto",
   };
 }
 
@@ -289,6 +301,14 @@ export function DocumentForm({
     const tax = (taxable * (Number(taxRate) || 0)) / 100;
     return { subtotal, disc, tax, total: taxable + tax };
   }, [rows, discount, taxRate]);
+
+  const stampDuty = resolveStampDuty({
+    type,
+    status,
+    currency,
+    total: totals.total,
+    mode: extra.stamp_duty_mode,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -882,7 +902,64 @@ export function DocumentForm({
         </CardContent>
       </Card>
 
-      {/* 4. KETENTUAN, PEMBAYARAN, & CATATAN */}
+      {/* 4. BEA METERAI */}
+      <Card className="shadow-sm">
+        <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-3 pt-4">
+          <div className="flex items-center gap-2">
+            <div className="rounded-md bg-amber-100 p-1.5 text-amber-700">
+              <BadgeCheck className="h-4 w-4" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-semibold text-slate-800">Bea Meterai & Tanda Tangan</CardTitle>
+              <CardDescription className="text-xs">
+                Atur ruang pembubuhan e-Meterai resmi pada dokumen final
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-4 p-5 sm:grid-cols-[240px_1fr] sm:items-start">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-700">Penggunaan Meterai</Label>
+            <Select
+              value={extra.stamp_duty_mode || "auto"}
+              onValueChange={(value) =>
+                setExtra((current) => ({ ...current, stamp_duty_mode: value as StampDutyMode }))
+              }
+              options={[
+                { value: "auto", label: "Otomatis sesuai dokumen" },
+                { value: "required", label: "Gunakan meterai" },
+                { value: "none", label: "Tanpa meterai" },
+              ]}
+            />
+          </div>
+          <div
+            className={`rounded-xl border px-4 py-3 text-sm ${
+              stampDuty.required
+                ? "border-amber-300 bg-amber-50 text-amber-950"
+                : stampDuty.needsReview
+                  ? "border-blue-200 bg-blue-50 text-blue-950"
+                  : "border-slate-200 bg-slate-50 text-slate-700"
+            }`}
+          >
+            <p className="font-semibold">
+              {stampDuty.required
+                ? "Perlu e-Meterai Rp10.000"
+                : stampDuty.needsReview
+                  ? "Perlu pemeriksaan manual"
+                  : "Ruang meterai tidak ditampilkan"}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed opacity-80">{stampDuty.reason}</p>
+            {stampDuty.required && (
+              <p className="mt-2 text-xs leading-relaxed">
+                Docgen hanya menyediakan ruang pembubuhan. Gunakan e-Meterai resmi dengan nomor seri unik pada PDF
+                final.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 5. KETENTUAN, PEMBAYARAN, & CATATAN */}
       <Card className="shadow-sm">
         <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-3 pt-4">
           <div className="flex items-center gap-2">

@@ -63,7 +63,7 @@ export function InvoiceTemplate({ data }: { data: TemplateData }) {
       {extra.payment_terms && <TermsBlock terms={extra.payment_terms} />}
       {doc.notes && <NotesBlock notes={doc.notes} />}
 
-      <SignatureBlock company={company} date={doc.issue_date} />
+      <SignatureBlock data={data} date={doc.issue_date} />
     </div>
   );
 }

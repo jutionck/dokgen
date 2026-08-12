@@ -1,5 +1,6 @@
 import type { TemplateData } from "./shared";
 import { DOCUMENT_GENERATED_NOTICE } from "@/lib/documents/branding";
+import { resolveStampDuty } from "@/lib/documents/stamp-duty";
 import { fmt, fmtDate, fmtNum, terbilang } from "./shared";
 
 function logo(company: TemplateData["company"]) {
@@ -19,6 +20,17 @@ export function CompanySignature({ company }: { company: TemplateData["company"]
       alt={`Tanda tangan ${company.signer_name || company.name}`}
       className="mx-auto h-16 w-36 object-contain"
     />
+  );
+}
+
+export function StampDutyPlaceholder() {
+  return (
+    <div className="flex h-16 w-24 shrink-0 flex-col items-center justify-center rounded border border-dashed border-amber-500 bg-amber-50 px-1 text-center text-[8px] font-semibold leading-tight text-amber-900">
+      <span>RUANG</span>
+      <span>e-METERAI</span>
+      <span>Rp10.000</span>
+      <span className="mt-0.5 font-normal">Bubuhkan resmi</span>
+    </div>
   );
 }
 
@@ -366,7 +378,7 @@ export function NotesBlock({ notes, title = "Catatan" }: { notes?: string | null
 
 /** Blok tanda tangan penyedia jasa (kiri: pihak I, kanan: pihak II opsional). */
 export function SignatureBlock({
-  company,
+  data,
   signerName,
   signerPosition,
   city,
@@ -376,7 +388,7 @@ export function SignatureBlock({
   rightSignerName,
   rightSignerPosition,
 }: {
-  company: TemplateData["company"];
+  data: TemplateData;
   signerName?: string | null;
   signerPosition?: string | null;
   city?: string | null;
@@ -386,6 +398,14 @@ export function SignatureBlock({
   rightSignerName?: string;
   rightSignerPosition?: string;
 }) {
+  const { company, doc, totals } = data;
+  const stampDuty = resolveStampDuty({
+    type: doc.type,
+    status: doc.status,
+    currency: doc.currency,
+    total: totals.total,
+    mode: doc.extra.stamp_duty_mode,
+  });
   const place = city || company.city || "";
   const formattedDate = date ? fmtDate(date) : "";
   const dateLine = [place, formattedDate].filter(Boolean).join(", ");
@@ -396,8 +416,17 @@ export function SignatureBlock({
         <div className="w-64 text-center">
           <p className="whitespace-pre-line font-semibold text-slate-800">{leftLabel(company.name)}</p>
           {dateLine && <p className="mt-1 text-xs text-slate-500">{dateLine}</p>}
-          <div className={company.signature_url ? "mt-2 flex flex-col items-center" : "mt-16 flex flex-col items-center"}>
-            <CompanySignature company={company} />
+          <div
+            className={
+              company.signature_url || stampDuty.required
+                ? "mt-2 flex flex-col items-center"
+                : "mt-16 flex flex-col items-center"
+            }
+          >
+            <div className="flex items-end justify-center gap-2">
+              {stampDuty.required && <StampDutyPlaceholder />}
+              <CompanySignature company={company} />
+            </div>
             <p className="font-semibold underline text-slate-900">
               {signerName || company.signer_name || company.name}
             </p>
@@ -414,8 +443,17 @@ export function SignatureBlock({
       <div className="text-center">
         <p className="whitespace-pre-line font-semibold text-slate-800">{leftLabel(company.name)}</p>
         {dateLine && <p className="mt-1 text-xs text-slate-500">{dateLine}</p>}
-        <div className={company.signature_url ? "mt-2 flex flex-col items-center" : "mt-16 flex flex-col items-center"}>
-          <CompanySignature company={company} />
+        <div
+          className={
+            company.signature_url || stampDuty.required
+              ? "mt-2 flex flex-col items-center"
+              : "mt-16 flex flex-col items-center"
+          }
+        >
+          <div className="flex items-end justify-center gap-2">
+            {stampDuty.required && <StampDutyPlaceholder />}
+            <CompanySignature company={company} />
+          </div>
           <p className="font-semibold underline text-slate-900">{signerName || company.signer_name || company.name}</p>
           <p className="text-xs text-slate-600">{signerPosition || company.signer_position}</p>
           {company.signer_nip && <p className="text-xs text-slate-500">NIP. {company.signer_nip}</p>}
