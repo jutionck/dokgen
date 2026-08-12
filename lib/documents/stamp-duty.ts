@@ -46,7 +46,7 @@ export function resolveStampDuty({
     };
   }
 
-  if (type === "invoice" && status === "paid") {
+  if (type === "invoice") {
     if (currency !== "IDR") {
       return {
         required: false,
@@ -59,17 +59,12 @@ export function resolveStampDuty({
       return {
         required: true,
         needsReview: false,
-        reason: "Invoice lunas menyatakan penerimaan/pelunasan uang lebih dari Rp5.000.000.",
+        reason:
+          status === "paid"
+            ? "Invoice lunas menyatakan penerimaan/pelunasan uang lebih dari Rp5.000.000."
+            : "Nilai invoice lebih dari Rp5.000.000; ruang meterai disiapkan sejak dokumen diterbitkan agar tidak terlambat saat menjadi bukti pembayaran.",
       };
     }
-  }
-
-  if (type === "invoice" && currency === "IDR" && total > STAMP_DUTY_THRESHOLD_IDR) {
-    return {
-      required: false,
-      needsReview: false,
-      reason: "Ruang meterai akan aktif otomatis ketika invoice ditandai Lunas.",
-    };
   }
 
   return {
