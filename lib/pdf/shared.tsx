@@ -74,15 +74,8 @@ export const pdfStyles = StyleSheet.create({
   sigTitle: { fontSize: 8.5, color: "#475569" },
   signatureImage: { width: 100, height: 46, objectFit: "contain", marginBottom: 2 },
   stampDuty: {
-    width: 70,
+    width: 46,
     height: 46,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: "#d97706",
-    backgroundColor: "#fffbeb",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 3,
   },
   infoBox: {
     borderWidth: 1,
@@ -239,15 +232,19 @@ export function PdfTotals({ data }: { data: TemplateData }) {
 export function PdfBankBlock({
   company,
   selectedBanks,
+  compact = false,
 }: {
   company: TemplateData["company"];
   selectedBanks?: string[] | null;
+  compact?: boolean;
 }) {
   const accounts = parseBankAccounts(company, selectedBanks);
   if (accounts.length === 0) return null;
 
   return (
-    <View style={pdfStyles.infoBox}>
+    <View
+      style={[pdfStyles.infoBox, compact && accounts.length === 1 ? { width: "58%", alignSelf: "flex-start" } : {}]}
+    >
       <Text style={[pdfStyles.bold, pdfStyles.gray, { fontSize: 8, textTransform: "uppercase", marginBottom: 4 }]}>
         Pembayaran dapat ditransfer ke
       </Text>
@@ -313,13 +310,7 @@ export function PdfSignature({
     mode: doc.extra.stamp_duty_mode,
   });
 
-  const stampPlaceholder = stampDuty.required ? (
-    <View style={pdfStyles.stampDuty}>
-      <Text style={[pdfStyles.bold, { color: "#92400e", fontSize: 7, textAlign: "center" }]}>RUANG e-METERAI</Text>
-      <Text style={[pdfStyles.bold, { color: "#92400e", fontSize: 7 }]}>Rp10.000</Text>
-      <Text style={{ color: "#92400e", fontSize: 5.5, marginTop: 1 }}>Bubuhkan resmi</Text>
-    </View>
-  ) : null;
+  const stampPlaceholder = stampDuty.required ? <View style={pdfStyles.stampDuty} /> : null;
 
   if (!rightLabel) {
     return (

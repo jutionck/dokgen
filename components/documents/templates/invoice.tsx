@@ -12,17 +12,17 @@ export function InvoiceTemplate({ data }: { data: TemplateData }) {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
         <ClientBlock data={data} />
-        <div className="shrink-0 text-sm">
+        <div className="w-full text-sm sm:w-[22rem] sm:shrink-0 sm:text-right">
           {extra.po_number && (
-            <p>
+            <p className="leading-relaxed">
               <span className="text-slate-500">No. PO / Referensi:</span> {extra.po_number}
             </p>
           )}
-          <p>
+          <p className="leading-relaxed">
             <span className="text-slate-500">Tanggal Invoice:</span> {fmtDate(doc.issue_date)}
           </p>
           {doc.due_date && (
-            <p>
+            <p className="leading-relaxed">
               <span className="text-slate-500">Jatuh Tempo:</span> {fmtDate(doc.due_date)}
             </p>
           )}
@@ -58,7 +58,7 @@ export function InvoiceTemplate({ data }: { data: TemplateData }) {
         <p className="text-[11px] italic text-slate-500">Terbilang: {terbilang(totals.total)}</p>
       </div>
 
-      <BankBlock company={company} selectedBanks={extra.selected_banks} />
+      <BankBlock company={company} selectedBanks={extra.selected_banks} compact />
 
       {extra.payment_terms && <TermsBlock terms={extra.payment_terms} />}
       {doc.notes && <NotesBlock notes={doc.notes} />}

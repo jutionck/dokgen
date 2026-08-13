@@ -25,11 +25,8 @@ export function CompanySignature({ company }: { company: TemplateData["company"]
 
 export function StampDutyPlaceholder() {
   return (
-    <div className="flex h-16 w-20 shrink-0 flex-col items-center justify-center rounded border border-dashed border-amber-500 bg-amber-50 px-1 text-center text-[8px] font-semibold leading-tight text-amber-900">
-      <span>RUANG</span>
-      <span>e-METERAI</span>
-      <span>Rp10.000</span>
-      <span className="mt-0.5 font-normal">Bubuhkan resmi</span>
+    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded border border-dashed border-slate-300 bg-white px-1 text-center text-[8px] font-medium leading-tight text-slate-400 print:border-transparent print:text-transparent">
+      <span>Area e-Meterai</span>
     </div>
   );
 }
@@ -345,15 +342,21 @@ export function parseBankAccounts(
 export function BankBlock({
   company,
   selectedBanks,
+  compact = false,
 }: {
   company: TemplateData["company"];
   selectedBanks?: string[] | null;
+  compact?: boolean;
 }) {
   const accounts = parseBankAccounts(company, selectedBanks);
   if (accounts.length === 0) return null;
 
   return (
-    <div className="rounded-md border border-slate-200 bg-slate-50/80 p-3.5 text-xs text-slate-700">
+    <div
+      className={`rounded-md border border-slate-200 bg-slate-50/80 p-3.5 text-xs text-slate-700 ${
+        compact ? "w-full max-w-md" : ""
+      }`}
+    >
       <h3 className="mb-2 font-bold uppercase tracking-wider text-slate-600">Pembayaran dapat ditransfer ke</h3>
       <div className={`grid gap-3 ${accounts.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
         {accounts.map((acc, idx) => (
