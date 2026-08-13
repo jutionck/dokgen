@@ -192,7 +192,6 @@ function signatureBlock(data: TemplateData, left: string[], right?: string[]): P
     total: data.totals.total,
     mode: doc.extra.stamp_duty_mode,
   });
-  const stampBorder = { style: BorderStyle.DASHED, size: 6, color: "D97706", space: 4 };
 
   const col = (
     lines: string[],
@@ -212,23 +211,9 @@ function signatureBlock(data: TemplateData, left: string[], right?: string[]): P
       ? [
           new Paragraph({
             alignment: align,
-            indent: align === AlignmentType.RIGHT ? { left: 6100 } : { right: 6100 },
-            border: { top: stampBorder, bottom: stampBorder, left: stampBorder, right: stampBorder },
-            shading: { type: ShadingType.CLEAR, fill: "FFFBEB" },
-            children: [
-              run("RUANG e-METERAI Rp10.000", {
-                bold: true,
-                size: 15,
-                color: "92400E",
-              }),
-              run("Bubuhkan resmi pada dokumen final", {
-                break: 1,
-                size: 14,
-                color: "92400E",
-              }),
-            ],
+            children: [run(" ", { break: 2 })],
             keepNext: true,
-            spacing: { after: 40 },
+            spacing: { after: 20 },
           }),
         ]
       : []),
@@ -552,13 +537,35 @@ export function buildInvoice(data: TemplateData, paper: { width: number; height:
         children: [
           ...header(data),
           ...clientBlock(data),
-          ...(extra.po_number ? [p([run(`No. PO / Referensi: ${extra.po_number}`)])] : []),
-          p([
-            run(doc.status === "paid" ? "LUNAS" : doc.status === "cancelled" ? "DIBATALKAN" : "BELUM DIBAYAR", {
-              bold: true,
-              color: doc.status === "paid" ? "047857" : "b45309",
-            }),
-          ]),
+          ...(extra.po_number
+            ? [
+                p([run(`No. PO / Referensi: ${extra.po_number}`)], {
+                  alignment: AlignmentType.RIGHT,
+                  spacing: { after: 20 },
+                }),
+              ]
+            : []),
+          p([run(`Tanggal Invoice: ${fmtDate(doc.issue_date)}`)], {
+            alignment: AlignmentType.RIGHT,
+            spacing: { after: 20 },
+          }),
+          ...(doc.due_date
+            ? [
+                p([run(`Jatuh Tempo: ${fmtDate(doc.due_date)}`)], {
+                  alignment: AlignmentType.RIGHT,
+                  spacing: { after: 20 },
+                }),
+              ]
+            : []),
+          p(
+            [
+              run(doc.status === "paid" ? "LUNAS" : doc.status === "cancelled" ? "DIBATALKAN" : "BELUM DIBAYAR", {
+                bold: true,
+                color: doc.status === "paid" ? "047857" : "b45309",
+              }),
+            ],
+            { alignment: AlignmentType.RIGHT }
+          ),
           itemsTable(data),
           ...totalsBlock(data),
           ...buildBankBlockDocx(company, extra.selected_banks),

@@ -131,18 +131,23 @@ export function InvoicePdf({ data, paperSize }: { data: TemplateData; paperSize?
         <View style={pdfStyles.col}>
           <PdfClient data={data} />
         </View>
-        <View style={pdfStyles.col}>
-          {extra.po_number ? <Text>No. PO / Referensi: {extra.po_number}</Text> : null}
-          <Text>Tanggal Invoice: {fmtDate(doc.issue_date)}</Text>
-          {doc.due_date ? <Text>Jatuh Tempo: {fmtDate(doc.due_date)}</Text> : null}
-          <Text style={[pdfStyles.bold, { color: doc.status === "paid" ? "#047857" : "#b45309", marginTop: 4 }]}>
+        <View style={[pdfStyles.col, { alignItems: "flex-end", paddingLeft: 18 }]}>
+          {extra.po_number ? <Text style={{ textAlign: "right" }}>No. PO / Referensi: {extra.po_number}</Text> : null}
+          <Text style={{ textAlign: "right" }}>Tanggal Invoice: {fmtDate(doc.issue_date)}</Text>
+          {doc.due_date ? <Text style={{ textAlign: "right" }}>Jatuh Tempo: {fmtDate(doc.due_date)}</Text> : null}
+          <Text
+            style={[
+              pdfStyles.bold,
+              { color: doc.status === "paid" ? "#047857" : "#b45309", marginTop: 4, textAlign: "right" },
+            ]}
+          >
             {doc.status === "paid" ? "LUNAS" : doc.status === "cancelled" ? "DIBATALKAN" : "BELUM DIBAYAR"}
           </Text>
         </View>
       </View>
       <PdfItemsTable data={data} />
       <PdfTotals data={data} />
-      <PdfBankBlock company={company} selectedBanks={extra.selected_banks} />
+      <PdfBankBlock company={company} selectedBanks={extra.selected_banks} compact />
       {extra.payment_terms ? <PdfTermsBlock terms={extra.payment_terms} /> : null}
       {doc.notes ? <PdfNotesBlock notes={doc.notes} /> : null}
       <PdfSignature
